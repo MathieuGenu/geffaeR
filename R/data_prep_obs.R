@@ -4,7 +4,7 @@
 #' pour les autres fonctions de ce package.}
 #'
 #' @param species \encoding{Nom du groupe, de la famille, du taxon d'interêt.}
-#' @param species_base \encoding{nom de la base de données contenant les observations de \code{species}.}
+#' @param obs_base \encoding{nom de la base de données contenant les observations de \code{species}.}
 #' @param DataDir \encoding{Direction du répertoire où se trouvent le shape file et la base d'observation
 #' Cela suppose donc que le shape file et la base sont dans le meme fichier.}
 #' @param legdata \encoding{data.frame "Legdata" au prealable construit avec la fonction
@@ -28,7 +28,7 @@
 #'
 #' @export
 
-prepare_data_obs <- function(sp, species_base, DataDir, legdata, segdata, shape, shape_layer, projection = projection,
+prepare_data_obs <- function(sp, obs_base, DataDir, legdata, segdata, shape, shape_layer, projection = projection,
                              group = FALSE, family = FALSE, taxon = FALSE, truncation = NULL, remove_sp = NULL,
                              optimal = TRUE,bird = FALSE, unit_km = FALSE) {
 
@@ -37,7 +37,7 @@ prepare_data_obs <- function(sp, species_base, DataDir, legdata, segdata, shape,
 
 
   # load Observation base
-  raw_obs <- species_base
+  raw_obs <- obs_base
   raw_obs <- subset(raw_obs, segId %in% unique(segdata$Seg))
 
   # ne prendre que l'espece choisie
