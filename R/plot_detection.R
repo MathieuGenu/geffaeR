@@ -28,7 +28,7 @@
 
 
 plot_detection <- function(distdata, bin, key, upper = NULL) {
-  #enlever la colonne observer si elle existe car elle capote la focntion ds()
+  # renommer observer car capote la fonction ds() (nom attribué à une fonction pour ds)
   if(!is.null(distdata$observer)) {
     distdata$observer <- distdata$observer_ID
   }

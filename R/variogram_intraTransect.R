@@ -213,11 +213,11 @@ variogram_intraTransect <- function(segdata_obs,
             axis.text = element_text(size = 12)
       ) +coord_cartesian(ylim=c(0, max(sumnull$emp)))
 
-    return(list(vario = vario,
+    return(list(variogram = vario,
                 g = g,
                 distmat = distmat))
   } else {
-    return(list(vario = vario,
+    return(list(variogram = vario,
                      distmat = distmat))
   }
 }

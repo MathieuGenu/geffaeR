@@ -29,8 +29,8 @@
 #' @export
 
 prepare_data_obs <- function(sp, obs_base, DataDir, legdata, segdata, shape, shape_layer, projection = projection,
-                             group = FALSE, family = FALSE, taxon = FALSE, truncation = NULL, remove_sp = NULL,
-                             optimal = TRUE,bird = FALSE, unit_km = FALSE) {
+                             truncation = NULL, remove_sp = NULL,
+                             optimal = TRUE, unit_km = FALSE) {
 
   # polygons sampling
   poly_NC <- readOGR(dsn = paste(DataDir, shape, sep = "/"), layer = shape_layer, verbose = F)
@@ -40,16 +40,31 @@ prepare_data_obs <- function(sp, obs_base, DataDir, legdata, segdata, shape, sha
   raw_obs <- obs_base
   raw_obs <- subset(raw_obs, segId %in% unique(segdata$Seg))
 
-  # ne prendre que l'espece choisie
-  if(group) {
+  # # ne prendre que l'espece choisie
+  # if(group) {
+  #   sp_data <- subset(raw_obs, group_ %in% sp)
+  # } else if(taxon) {
+  #   sp_data <- subset(raw_obs, taxon %in% sp)
+  # } else if(family) {
+  #   sp_data <- subset(raw_obs, family %in% sp)
+  # } else {
+  #   sp_data <- subset(raw_obs, species %in% sp)
+  # }
+
+  # ne prendre que l'espece choisie ###TEST###
+  if(sp %in% unique(raw_obs$group_)) {
     sp_data <- subset(raw_obs, group_ %in% sp)
-    } else if(taxon) {
-      sp_data <- subset(raw_obs, taxon %in% sp)
-    } else if(family) {
-      sp_data <- subset(raw_obs, family %in% sp)
-    } else {
-        sp_data <- subset(raw_obs, species %in% sp)
-    }
+  }
+  if(sp %in% unique(raw_obs$taxon)) {
+    sp_data <- subset(raw_obs, taxon %in% sp)
+  }
+  if(sp %in% unique(raw_obs$family)) {
+    sp_data <- subset(raw_obs, family %in% sp)
+  }
+  if(sp %in% unique(raw_obs$species)) {
+    sp_data <- subset(raw_obs, species %in% sp)
+  }
+
   # qu'est ce ?
   if(!is.null(remove_sp)) { sp_data <- subset(sp_data, species != remove_sp) }
 

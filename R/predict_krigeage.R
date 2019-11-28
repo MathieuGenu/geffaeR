@@ -23,8 +23,9 @@ fit_variomodel <- function(variogram, form = c("matern", "exponential")) {
 #' @export
 
 # faire un plot de la semi-variance (semivarPlot)
-semi_var_plot <- function(variogram, model, distance) {
+semi_var_plot <- function(variogram, vario_model, distance) {
 
+  distance <-
   semivario_function <- function(h, sill, range, form) {
     if(form == "matern") { f <- sill *(1 -(1 + h * sqrt(3) / range) * exp(- h * sqrt(3) / range)) }
     if(form == "exponential") { f <- sill *(1 - exp(- h / range)) }
@@ -34,11 +35,11 @@ semi_var_plot <- function(variogram, model, distance) {
 
   obs_df <- with(variogram, data.frame(x = u, y = v, n = n))
   pred_df <- data.frame(x = distance,
-                        y = model$nugget +
+                        y = vario_model$nugget +
                           semivario_function(distance,
-                                             model$cov.pars[1],
-                                             model$cov.pars[2],
-                                             form = model$cov.model
+                                             vario_model$cov.pars[1],
+                                             vario_model$cov.pars[2],
+                                             form = vario_model$cov.model
                           )
   )
   theme_set(theme_bw(base_size = 14))
@@ -61,7 +62,7 @@ semi_var_plot <- function(variogram, model, distance) {
 
 
 # fonction pour prédire
-predict_kriging <- function(segdata_obs, esw, model, distmat_x, distmat_xy,
+predict_kriging <- function(segdata_obs, esw, vario_model, distmat_x, distmat_xy,
                             fast_inversion = TRUE, saturate = TRUE) {
   col_needed <- c("y","n","Effort")
   if(!all(col_needed %in% colnames(segdata_obs))) {
@@ -87,11 +88,11 @@ predict_kriging <- function(segdata_obs, esw, model, distmat_x, distmat_xy,
   m <- TauxObs(y, esw, l)
 
   # on prend le modele de covariance
-  form <- model$cov.model
+  form <- vario_model$cov.model
 
   # on prend l'ajustement 2 avec parametres:
-  sill <- as.numeric(model$cov.pars[1])
-  range <- as.numeric(model$cov.pars[2])
+  sill <- as.numeric(vario_model$cov.pars[1])
+  range <- as.numeric(vario_model$cov.pars[2])
 
   # nombre de points(segments)
   nbpts <- length(y)
@@ -155,7 +156,7 @@ predict_kriging <- function(segdata_obs, esw, model, distmat_x, distmat_xy,
   var_pred <- ifelse(var_pred < 0, 0, var_pred)
 
   predict_krig_df <- data.frame(mean_pred = round(mean_pred, 3),
-                                var_pred = round(var_pred + model$nugget, 3))
+                                var_pred = round(var_pred + vario_model$nugget, 3))
 
   return(predict_krig_df = predict_krig_df)
 }
