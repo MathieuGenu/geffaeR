@@ -38,7 +38,8 @@ change_effort_varName <- function(effort_base){
     pos_var <- which(col_name_neces %in% var_alone)
     # lon
     if("strate_sec" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("STRATE_SEC","subRegion_strate")] <- "strate_sec"
+      colnames(effort_base)[colnames(effort_base) %in% c("STRATE_SEC","subRegion_strate",
+                                                         "suRegStra")] <- "strate_sec"
     }
     if("lon" %in% var_alone){
       colnames(effort_base)[colnames(effort_base) %in% c("point_X","Point_X","pointX","PointX",
