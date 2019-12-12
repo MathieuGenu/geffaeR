@@ -1,25 +1,26 @@
-#' \encoding{Calcul de la distance de dectection moyenne.}
+#' distance smapling analysis
 #'
-#' \encoding{Cette fonction calcul la distance moyenne de détection avec le package distance,
-#' il est possible de choisir une key fonction half-Normal ou Hazard-rate. Elle calcul également l'intevalle de confiance
-#' autour de l'estimation de la courbe de détection avec les paramètres définis par la fonction \link[Distance]{ds}.}
+#' This function calculate the ESW (effective-strip witdth) of a taxonomic group,
+#' It also use the \link[Distance]{ds} function to estimate all the abondance, density encounter-rate,...
+#' parameter and summarize it in the results of the function.
+#' Finally i gives the detection plot of the distance analysis.
 #'
-#' @param distdata \encoding{data.frame distadata fabriqué au préalable avec la fonction \code{\link{prepare_data_obs}}.}
-#' @param bin \encoding{valeur min et max de l'estimation de la distance et le pas entre ces deux valeurs.}
-#' @param key \encoding{choix de la "key" fonction parmi
-#'              \enumerate{
-#'                \item \encoding{"halfnorm" : demi loi Normale.}
-#'                \item \encoding{"hazard" : hazard-rate.}
-#'              }
+#' @param distdata distadata data.frame previously built with  \code{\link{prepare_data_obs}}.
+#' @param bin Min and max value of the distance detection and the step between
+#' theese two.
+#' @param key Choice bewtween two key function :
+#'            \enumerate{
+#'              \item "halfnorm" : Half-Normal.
+#'              \item "hazard" : hazard-rate.
 #'            }
-#' @param upper \encoding{Distance maximale de detection, équivaut au w dans l'intégrale.}
-#' @return Cette fonction renvoie une liste contenant :
+#'
+#' @param upper Maximum value of the distance range of detection estimation.
+#' @return This function return list with :
 #'         \enumerate{
-#'           \item \encoding{esw : distance pour laquelle il y a autant d'individus détectés après que de
-#'           non détectés avant.}
-#'           \item \encoding{esw_cv : intervalle de confiance autour de l'estimation d'esw.}
-#'           \item \encoding{graph : L'histogramme du nombre d'observation en fonction de la distance, avec superposé
-#'           par dessus la fonction de détection et l'intervalle de confiance autour de celle-ci.}
+#'           \item esw : effective strip width. with confidence interval at 95 percent.
+#'           \item esw_cv : coefficient of variation of esw in percent.
+#'           \item graph : Barplot of detections depending of distance, with confindence
+#'           estimated with mcmc chains.
 #'         }
 #' @examples
 #'
@@ -29,6 +30,10 @@
 
 plot_detection <- function(distdata, bin, key, upper = NULL) {
   # renommer observer car capote la fonction ds() (nom attribué à une fonction pour ds)
+  if(nrow(distdata) < 2) {
+    stop(paste("il doit y avoir au moins 2 lignes d'observation dans distdata"))
+  }
+
   if(!is.null(distdata$observer)) {
     distdata$observer <- distdata$observer_ID
   }
