@@ -1,17 +1,16 @@
-#' \encoding{Standardisation des noms de colonnes}
+#' Standardisation of column names
 #'
-#' \encoding{Cette fonction permet d'attribuer au data.frame effort les bons noms de colonnes pour
-#' la suite des analyse à effectuer.}
+#' This function allows to attribute standard names to column names of effort data.frame
+#' for the next steps of the analysis.
 #'
-#' @param effort_base \encoding{data.frame contenant les données d'effort pour lesquelles les variables sont à standardiser.}
+#' @param effort_base Data.frame containing column names to standardize.
 #'
-#' @return \encoding{Cette fonction renvoie un data.frame effort avec les noms de variables au bon format
-#'         pour la suite de l'analyse.}
+#' @return This function return the same data.frame as in input with the standardized column name.
 #'
-#' @note \encoding{Lorsque strate_sec n'est pas trouvé à la fin de la fonction, celle-ci créée un strate_sec
-#'       correspondant à la moitié de transect plus survey séparés par un "_".
-#'       Example, pour une ligne donnée, si \code{transect = O2/306} et \code{survey = FR_N_C} on aura alors
-#'       \code{strate_sec = FR_N_c_02}.}
+#' @note When "strate_sec" is not found at the end of the function, it creates a strate_sec
+#' column automatically corresponding to half of transect column and survey colum separated by "_".
+#'       Example, for a row, if \code{transect = O2/306} and \code{survey = FR_N_C} we will get
+#'       \code{strate_sec = FR_N_c_02}.
 #'
 #' @examples
 #'
@@ -23,7 +22,7 @@
 change_effort_varName <- function(effort_base){
 
   col_name_neces <- c("lon","lat","seaState","subjective",
-                      "survey","strate_sec","transect","IdLeg","Shape_Leng","segId","left_","right_")
+                      "survey","strate_sec","transect","IdLeg","segLength","segId","left_","right_")
 
   if("session_" %in% colnames(effort_base)){
     effort_base$session_ <- as.factor(effort_base$session_)
@@ -39,15 +38,15 @@ change_effort_varName <- function(effort_base){
     # lon
     if("strate_sec" %in% var_alone){
       colnames(effort_base)[colnames(effort_base) %in% c("STRATE_SEC","subRegion_strate",
-                                                         "suRegStra")] <- "strate_sec"
+                                                         "subRegStra")] <- "strate_sec"
     }
     if("lon" %in% var_alone){
       colnames(effort_base)[colnames(effort_base) %in% c("point_X","Point_X","pointX","PointX",
-                                                         "POINT_X","POINTX")] <- "lon"
+                                                         "POINT_X","POINTX","longitude")] <- "lon"
     }
     if("lat" %in% var_alone){
       colnames(effort_base)[colnames(effort_base) %in% c("point_Y","Point_Y","pointY","PointY",
-                                                         "POINT_Y","POINTY")] <- "lat"
+                                                         "POINT_Y","POINTY","latitude")] <- "lat"
     }
     if("seaState" %in% var_alone){
       colnames(effort_base)[colnames(effort_base) %in% c("Sea_State","SeaState","sea_state","SEA_STATE",
@@ -63,15 +62,18 @@ change_effort_varName <- function(effort_base){
       colnames(effort_base)[colnames(effort_base) %in% c("TRANSECT","Transect")] <- "transect"
     }
     if("IdLeg" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("IDLEG","Id_Leg","Id_leg","Sample.Label")] <- "IdLeg"
+      colnames(effort_base)[colnames(effort_base) %in% c("IDLEG","Id_Leg","Id_leg","Sample.Label",
+                                                         "legID")] <- "IdLeg"
     }
-    if("Shape_Leng" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("Length","length","LengthKm",'LengthKM')] <- "Shape_Leng"
+    if("segLength" %in% var_alone){
+      colnames(effort_base)[colnames(effort_base) %in% c("Length","length","LengthKm",'LengthKM',
+                                                         "legLengthKm", "SegLeng10k")] <- "segLength"
     }
     if("segId" %in% var_alone){
       # cas particulier peut y avoir plusieurs segId dans la table effort (5k et 10k) -> prendre celui sans 0
       effort_match <- effort_base[,colnames(effort_base) %in% c("IdSeg","Id_Seg","IDSEG","Seg","seg","SegID",
-                                                      "segId5k","segId10k","segId5K","segId10K"), drop = FALSE]
+                                                      "segId5k","segId10k","segId5K","segId10K", "segID10k"),
+                                  drop = FALSE]
       colnames(effort_base)[colnames(effort_base) %in% names(effort_match)[colSums(effort_match) > 1]] <- "segId"
     }
     if("left_" %in% var_alone){
@@ -108,16 +110,14 @@ change_effort_varName <- function(effort_base){
   }
 }
 
-#' \encoding{Standardisation des noms de colonnes de la base observation}
+#' Standardisation of column names
 #'
-#' \encoding{Cette fonction permet d'attribuer au data.frame observation les bons noms de colonnes pour
-#' la suite des analyses à effectuer.}
+#' This function allows to attribute standard names to column names of observation data.frame
+#' for the next steps of the analysis.
 #'
-#' @param obs_base \encoding{data.frame contenant les données d'observation pour lesquelles les variables
-#'        sont à standardiser.}
+#' @param obs_base Data.frame containing column names to standardize.
 #'
-#' @return \encoding{Cette fonction renvoie un data.frame effort avec les noms de variables au bon format
-#'         pour la suite de l'analyse.}
+#' @return This function return the same data.frame as in input with the standardized column name.
 #'
 #' @examples
 #'
@@ -166,10 +166,11 @@ change_obs_varName <- function(obs_base) {
       colnames(obs_base)[colnames(obs_base) %in% c("SECTEUR","Secteur")] <- "subRegion"
     }
     if("PerpDist" %in% var_alone_after_lower) {
-      colnames(obs_base)[colnames(obs_base) %in% c("Distance","distance")] <- "PerpDist"
+      colnames(obs_base)[colnames(obs_base) %in% c("Distance","distance","perpDist")] <- "PerpDist"
     }
     if("IdLeg" %in% var_alone_after_lower) {
-      colnames(obs_base)[colnames(obs_base) %in% c("IDLEG","Id_Leg","Id_leg","Sample.Label")] <- "IdLeg"
+      colnames(obs_base)[colnames(obs_base) %in% c("IDLEG","Id_Leg","Id_leg","Sample.Label",
+                                                   "legID")] <- "IdLeg"
     }
     if("segId" %in% var_alone_after_lower) {
       obs_match <- obs_base[,colnames(obs_base) %in% c("IdSeg","Id_Seg","IDSEG","Seg","seg","SegID",
