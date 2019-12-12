@@ -38,7 +38,7 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
 
   # verifier si les colonnes sont bien dans le DF effort
   col_name_neces <- c("lon","lat","seaState","subjective",
-                      "survey","strate_sec","transect","IdLeg","Shape_Leng",
+                      "survey","strate_sec","transect","IdLeg","segLength",
                       "segId","left_","right_")
   if(!all(col_name_neces %in% colnames(effort))){
     var_alone <- col_name_neces[!(col_name_neces %in% colnames(effort))]
@@ -63,7 +63,7 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
   }
 
   # polygons sampling
-  poly_NC <- readOGR(dsn = paste(DataDir, shape, sep = "/"), layer = shape_layer, verbose = F) # NC
+  poly_NC <- readOGR(dsn = paste(shape), layer = shape_layer, verbose = F) # NC
 
 
   # Covariable
@@ -93,13 +93,13 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
     if("session" %in% colnames(effort)) {
       legdata <- effort %>%
         group_by(survey, strate_sec, transect, IdLeg, left_, right_, session) %>%
-        summarize(Effort = sum(Shape_Leng),
+        summarize(Effort = sum(segLength),
                   seaState = unique(seaState),
                   subjective = unique(subjective))
     } else {
       legdata <- effort %>%
         group_by(survey, strate_sec, transect, IdLeg, left_, right_) %>%
-        summarize(Effort = sum(Shape_Leng),
+        summarize(Effort = sum(segLength),
                   seaState = unique(seaState),
                   subjective = unique(subjective))
     }
@@ -116,12 +116,12 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
   #-- segdata --#
   #-------------#
   if("session" %in% colnames(effort)) {
-    segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "IdLeg", "segId", "Shape_Leng", "POINT_X",
+    segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "IdLeg", "segId", "segLength", "POINT_X",
                                      "POINT_Y", "lon", "lat", "strate_sec",
                                      "seaState", "subjective","session", allvar)
                                  ])
   } else {
-    segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "IdLeg", "segId", "Shape_Leng", "POINT_X",
+    segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "IdLeg", "segId", "segLength", "POINT_X",
                                      "POINT_Y", "lon", "lat", "strate_sec",
                                      "seaState", "subjective", allvar)
                                  ])
