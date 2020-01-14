@@ -1,0 +1,20 @@
+---
+title: "Exemple simple d'utilisation du package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Package_example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+test
+```{r setup}
+library(geffaeR)
+
+```
