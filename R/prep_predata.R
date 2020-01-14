@@ -4,7 +4,7 @@
 #' grille de la zone d'étude. Cette fonction permet également l'imputation de données manquantes pour les data.frames
 #' segdata et predata}
 #'
-#' @inheritParams prepare_data_obs tet
+#' @inheritParams prepare_data_obs
 #' @param gridfile_name \encoding{Grille de la zone d'étude avec toutes les variables d'intérêt qui permettront la fabrication
 #'        de predata.}
 #' @param proj_grid \encoding{Systême de projection du fichier de gride.}
