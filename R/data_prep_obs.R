@@ -1,44 +1,46 @@
-#' \encoding{Préparation des données d'observation.}
+#' Preparation of observation data
 #'
-#' \encoding{Cette fonction prépare les donnees d'observation pour qu'elles soient compatibles
-#' pour les autres fonctions de ce package.}
+#' This function transform raw observation data into multiple sub data.frame for next analysis of
+#' other functions of the package.
 #'
-#' @param species \encoding{Nom du groupe, de la famille, du taxon d'interêt.}
-#' @param obs_base \encoding{nom de la base de données contenant les observations de \code{species}.}
-#' @param DataDir \encoding{Direction du répertoire où se trouvent le shape file et la base d'observation
-#' Cela suppose donc que le shape file et la base sont dans le meme fichier.}
-#' @param legdata \encoding{data.frame "Legdata" au prealable construit avec la fonction
-#'        \code{\link{prepare_data_effort}}.}
-#' @param segdata \encoding{data.frame "Segdata" au prealable construit avec la fonction
-#'        \code{\link{prepare_data_effort}}.}
+#' @param sp Name of taxon, group, family or species.
+#' @param obs_base Observation database.
+#' @param legdata "Legdata" data.frame, built with \code{\link{prepare_data_effort}}.
+#' @param segdata "Segdata" data.frame, built with \code{\link{prepare_data_effort}}.
 #' @inheritParams prepare_data_effort
-#' @return Cette fonction renvoie une liste contenant :
+#' @param projection Projection of \code{shape} object.
+#' @param truncation Default = \code{NULL}. disstance of truncation of the sampling (in km)
+#' @param remove_sp Species to remove of the data set.
+#' @param unit_km Default = \code{FALSE}. Is the unit of distance in the data set is in km ?
+#' @return This function return a list containing :
 #'         \enumerate{
-#'           \item distdata : Un data.frame contenant les infos sur chaque .....
-#'           \item obsdata : Un data.frame contenant les infos sur chaque observation.
-#'           \item \encoding{countdata_leg : Un data.frame contenant le nombre de detection
-#'           et d'individus total pour les legs
-#'           où il y a eu observation pour l'espece ou group en question.}
-#'           \item \encoding{countdata_seg : Un data.frame contenant le nombre de detection
-#'           et d'individus total pour les segment
-#'           ou il y a eu observation pour l'espece ou group en question.}
+#'           \item distdata : Data.frame with distance information, which aim to be an input for
+#'           \code{\link[Distance]{ds}}.
+#'           \item obsdata : Data.frame containing information at observation scale.
+#'           \item countdata_leg : A data.frame that merge leg scale effort informations
+#'           with number of sightings and number of individuals (N and Y).
+#'           \item countdata_seg : A data.frame that merge segment scale effort informations
+#'           with number of sightings and number of individuals (N and Y).
 #'         }
 #' @examples
 #'
 #'
 #' @export
 
-prepare_data_obs <- function(sp, obs_base, DataDir, legdata, segdata, shape, shape_layer, projection = projection,
+prepare_data_obs <- function(sp, obs_base, legdata, segdata, shape, shape_layer, projection,
                              truncation = NULL, remove_sp = NULL,
-                             optimal = TRUE, unit_km = FALSE) {
+                             unit_km = FALSE) {
 
   # polygons sampling
-  poly_NC <- readOGR(dsn = paste(DataDir, shape, sep = "/"), layer = shape_layer, verbose = F)
+  poly_NC <- readOGR(dsn = file.path(shape), layer = shape_layer, verbose = F)
 
 
   # load Observation base
   raw_obs <- obs_base
   raw_obs <- subset(raw_obs, segId %in% unique(segdata$Seg))
+
+  # remove center observation
+  raw_obs <- subset(raw_obs, side != "CENTER")
 
   # # ne prendre que l'espece choisie
   # if(group) {
@@ -52,18 +54,31 @@ prepare_data_obs <- function(sp, obs_base, DataDir, legdata, segdata, shape, sha
   # }
 
   # ne prendre que l'espece choisie ###TEST###
-  if(sp %in% unique(raw_obs$group_)) {
-    sp_data <- subset(raw_obs, group_ %in% sp)
+  # cas pour plusieurs espèces en même temps
+
+  sp_data <- raw_obs[0,]
+
+  if (any(sp %in% unique(raw_obs$group_))) {
+    match_group_ <- sp[which(sp %in% unique(raw_obs$group_))]
+    sp_data_group_ <- subset(raw_obs, group_ %in% match_group_)
+    sp_data <- rbind(sp_data, sp_data_group_)
   }
-  if(sp %in% unique(raw_obs$taxon)) {
-    sp_data <- subset(raw_obs, taxon %in% sp)
+  if (any(sp %in% unique(raw_obs$taxon))) {
+    match_taxon <- sp[which(sp %in% unique(raw_obs$taxon))]
+    sp_data_taxon <- subset(raw_obs, taxon %in% match_taxon)
+    sp_data <- rbind(sp_data, sp_data_taxon)
   }
-  if(sp %in% unique(raw_obs$family)) {
-    sp_data <- subset(raw_obs, family %in% sp)
+  if (any(sp %in% unique(raw_obs$family))) {
+    match_family <- sp[which(sp %in% unique(raw_obs$family))]
+    sp_data_family <- subset(raw_obs, family %in% match_family)
+    sp_data <- rbind(sp_data, sp_data_family)
   }
-  if(sp %in% unique(raw_obs$species)) {
-    sp_data <- subset(raw_obs, species %in% sp)
+  if (any(sp %in% unique(raw_obs$species))) {
+    match_species <- sp[which(sp %in% unique(raw_obs$species))]
+    sp_data_species <- subset(raw_obs, species %in% match_species)
+    sp_data <- rbind(sp_data, sp_data_species)
   }
+
 
   # qu'est ce ?
   if(!is.null(remove_sp)) { sp_data <- subset(sp_data, species != remove_sp) }
@@ -86,9 +101,14 @@ prepare_data_obs <- function(sp, obs_base, DataDir, legdata, segdata, shape, sha
     wa <- truncation
   } else {
     #tronque a 5%, arrondie a la classe superieure
-    pas <- 50
-    wa <- as.numeric(with(sp_data, quantile(PerpDist,  prob = 0.95)))
-    wa <- pas*floor(wa/pas) + ifelse(wa%%pas == 0, 0, pas)
+    if(unit_km == F){
+      corr_km <- 1/1000
+    } else {
+      corr_km <- 1
+    }
+    pas <- 50 * corr_km
+    wa <- as.numeric(with(sp_data, quantile(distance,  prob = 0.95)))
+    wa <- pas*floor(wa/pas) + ifelse(wa %% pas == 0, 0, pas)
   }
 
   sp_data <- subset(sp_data, distance <= wa)
@@ -168,5 +188,6 @@ prepare_data_obs <- function(sp, obs_base, DataDir, legdata, segdata, shape, sha
   return(list(distdata = distdata,
               obsdata = obsdata,
               countdata_leg = countdata_leg,
-              countdata_seg = countdata_seg))
+              countdata_seg = countdata_seg,
+              trunc = wa))
 }
