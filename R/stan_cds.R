@@ -37,7 +37,7 @@ stan_cds <- function(cds_data, segdata_obs, distdata) {
   }
 
 
-  standata_cds <- function(segdata_obs_, distdata_, truncation_in_km = 1.0) {
+  standata_cds <- function(segdata_obs, distdata, truncation_in_km = 1.0) {
     datalist <- list(n_obs = nrow(segdata_obs),
                      n_strata = length(unique(segdata_obs$session)),
                      OBS = segdata_obs$y,
@@ -59,7 +59,7 @@ stan_cds <- function(cds_data, segdata_obs, distdata) {
   n_warm <- 250
   n_thin <- 1
   mod <- sampling(obj = stan_cds_hn,
-                         data = standata_cds(segdata_obs_ = segdata_obs, distdata_ = distdata),
+                         data = standata_cds(segdata_obs = segdata_obs, distdata = distdata),
                          pars = c('intercept', 'alpha', 'inv_omega', 'esw', 'log_lik'),
                          chains = n_chains,
                          iter = n_iter,
