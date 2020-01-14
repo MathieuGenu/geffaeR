@@ -1,7 +1,7 @@
-#' \encoding{Préparation des données d'effort.}
+#' Preparation of effort data
 #'
-#' \encoding{Cette fonction prépare les données d'effort pour qu'elles soient compatibles
-#' pour les autres fonctions de ce package.}
+#' This function transform raw effort data into multiple sub data.frame for next analysis of
+#' other functions of the package.
 #'
 #' @param effort_base \encoding{data.frame contenant les données d'effort.}
 #' @param covariable \encoding{Vecteur contenant le nom des covariables à conserver en sortie de la fonction.}
