@@ -23,13 +23,13 @@
 ajout_obs <- function(countdata_leg, legdata, countdata_seg, segdata){
 
   ### merge Legdata avec obs pour n_detected et n_ind ###
-  legdata_obs <- merge(effort_output$legdata, observation_output$countdata_leg, by = c("Transect.Label","Sample.Label"),
+  legdata_obs <- merge(legdata, countdata_leg, by = c("Transect.Label","Sample.Label"),
                        all.x = TRUE)
   legdata_obs$n_detected[is.na(legdata_obs$n_detected)] <- 0
   legdata_obs$n_ind[is.na(legdata_obs$n_ind)] <- 0
 
   ### merge Segdata avec obs pour n_detected et n_ind ###
-  segdata_obs <- merge(effort_output$segdata, observation_output$countdata_seg, by = c("Transect.Label","Seg","Sample.Label"),
+  segdata_obs <- merge(segdata, countdata_seg, by = c("Transect.Label","Seg","Sample.Label"),
                        all.x = TRUE)
   segdata_obs$n[is.na(segdata_obs$n)] <- 0
   segdata_obs$y[is.na(segdata_obs$y)] <- 0
