@@ -161,8 +161,8 @@ prepare_data_obs <- function(sp, obs_base, legdata, segdata, shape, shape_layer,
   distdata[, c("X", "Y")] <- distdata_xy@coords
 
   if("session" %in% colnames(sp_data)) {
-    distdata <- left_join(dplyr::select(legdata, -survey, -left_, -right_, -session),
-                          dplyr::select(distdata, -Transect.Label, -Region.Label),
+    distdata <- left_join(dplyr::select(legdata, -survey, -left_, -right_),
+                          dplyr::select(distdata, -Transect.Label, -Region.Label,-session),
                           by="Sample.Label")
   } else {
     distdata <- left_join(dplyr::select(legdata, -survey, -left_, -right_),
