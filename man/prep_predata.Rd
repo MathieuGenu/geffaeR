@@ -67,5 +67,4 @@ segdata et predata}
 }
 \examples{
 
-
 }
