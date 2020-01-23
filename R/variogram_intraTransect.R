@@ -5,13 +5,14 @@ variogram_intraTransect <- function(segdata_obs,
                             obs,
                             esw,
                             is_WGS84 = T,
+                            intraTransect = T,
                             breaks = NULL,
                             plot = TRUE,
                             pairs.min = 100,
                             n_sim = 100,
                             distmat = NULL,
-                            region=NULL,
-                            esp="species"  # only for title   # only for title
+                            region = NULL,
+                            esp = "species"  # only for title   # only for title
                             ) {
 
   # y = donnÃ©es de comptage
@@ -63,32 +64,19 @@ variogram_intraTransect <- function(segdata_obs,
 
   ### calculer la matrice de distance
   if(is.null(distmat)) {
+    center <- as.data.frame(center); names(center) <- c("X", "Y")
+    sp::coordinates(center) <- ~ X + Y
+    if(is_WGS84) {
+      proj4string(center) <- CRS("+init=epsg:4326")
+      center <- as.data.frame(sp::spTransform(center, CRS(lbrt93_proj))@coords)
+      names(center) <- c("X", "Y")
+    }
+    D <- fields::rdist(center) / 1e3 # in kilometers
     # tenir compte du design de l'Ã©chantillonnage
-    if(is.null(id_transect)) { id_transect <- rep(1, length(y)) }
-    else {
-      offset_inter_transect <- 1000 # effort en km a rajouter Ã chaque changement de transect pour les rendre spatiallement indÃ©pendants
-      if(!is.numeric(id_transect)) { id_transect <- as.numeric(as.factor(id_transect)) }
-      ### trier dans l'ordre croissant
-      croissant <- order(id_transect)
-      id_transect <- id_transect[croissant]
-      y <- y[croissant] ; l <- l[croissant]
-      center <- center[croissant, ]
-    }
-
-    D <- ifelse(id_transect[-1] - id_transect[-length(y)] != 0, 1, 0)
-    xD <- diffinv(D) # cumul de D
-
-    # classes de distances pour couple de points
-    dl <- sqrt((center[-1, 1] - center[-length(y), 1])^2 + (center[-1, 2] - center[-length(y), 2])^2)
-    xl <- diffinv(dl) + xD * offset_inter_transect
-    if(is.null(is_WGS84)) {
-      stop("les colonnes 'X' et 'Y' ne sont pas au format WGS84")
-
-    }
-    convert2km <- ifelse(is_WGS84, 1/1e3, (60 * 1.852)) # convertir en km (si WGS84, 1Â°lat = 60'= 60 * 1.852 km soit environ 110km)
-    distmat <- fields::rdist(xl) * convert2km
+    if(!intraTransect) { id_transect <- rep(1, length(y)) }
+    D_design <- fields::rdist(as.numeric(id_transect)) * 1000
+    distmat <- D + D_design
   }
-
   distclas <- cut(distmat, breaks = breaks)
 
   # calcul de la moyenne du taux d'observation m pour correction Poisson du Variogramme
