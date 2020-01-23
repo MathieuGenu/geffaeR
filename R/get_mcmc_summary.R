@@ -1,3 +1,15 @@
+#' summarize mcmc output of stan
+#'
+#' This function transform output of stan model in data.frame which is easier to use.
+#'
+#' @param x Output of stan function
+#' @param alpha Risk taken for \code{\link[coda]{HPDinterval} function.}
+#' @param dig Digits to round output of the funtion.
+#' @param median Logical. If TRUE, indexes will be around median (mad). If FALSE, indexes will be around
+#'        mean (sd).
+#'
+#' @examples
+#'
 #' @export
 
 get_mcmc_summary <- function(x, alpha = 0.2, dig = 4, median = FALSE) {

@@ -3,27 +3,25 @@
 #' This function transform raw effort data into multiple sub data.frame for next analysis of
 #' other functions of the package.
 #'
-#' @param effort_base \encoding{data.frame contenant les données d'effort.}
-#' @param covariable \encoding{Vecteur contenant le nom des covariables à conserver en sortie de la fonction.}
-#' @param block_area \encoding{data.frame contenant une colonne :
+#' @param effort_base Data.frame with effort data.
+#' @param covariable Vector of covariable names to keep in output of the function.
+#' @param block_area Data.frame with 2 colnames :
 #'                     \enumerate{
 #'                       \item Block.
 #'                       \item Area.
 #'                     }
-#'                   }
-#' @param shape \encoding{Nom du shape file de la zone d'étude.}
-#' @param shape_layer \encoding{Couche du shape file d'interêt.}
-#' @param New_projection \encoding{Nouvelle projection des longitude et latitude des
-#'        colonnes (POINT_X et POINT_Y) format Proj4String,
-#'        voir : \code{\link[sp]{CRS}} pour plus d'infos.}
-#' @param optimal \encoding{Paramètre permettant de selectionner (ou non) les données prelevées dans les
-#'        conditions otpimales. Par défaut toutes les données sont selectionnées. Dans le cas où seules les
-#'        données en conditions optimales sont selectionnees, ce sont les indices
-#'        \code{c("GG", "GM", "MG", "EG", "GE", "EE", "ME", "EM", "MM")} qui sont conservés.}
-#' @return Cette fonction renvoie une liste  contenant :
+#' @param shape Shapefile of the study area.
+#' @param shape_layer Layer of the shapefile.
+#' @param New_projection New projection of longitude and latitude of columns
+#'        (POINT_X et POINT_Y) in Proj4String format,
+#'        see : \code{\link[sp]{CRS}} for more infos.
+#' @param optimal Argument which allows to keep data sampled in optimal conditions.
+#'        Defaults settings are all data are kept. In case of optimal = T, indexes
+#'        \code{c("GG", "GM", "MG", "EG", "GE", "EE", "ME", "EM", "MM")} are kept.
+#' @return This function return :
 #'         \enumerate{
-#'           \item Legdata : Un data.frame contenant les infos sur chaque leg.
-#'           \item Segdata : Un data.frame contenant les infos sur chaque segment.
+#'           \item Legdata : Data.frame with infos at leg scale.
+#'           \item Segdata : Data.frame with infos at segment scale.
 #'         }
 #' @examples
 #'
