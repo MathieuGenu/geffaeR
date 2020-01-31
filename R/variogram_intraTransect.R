@@ -2,18 +2,17 @@
 #' @export
 
 variogram_intraTransect <- function(segdata_obs,
-                            obs,
-                            esw,
-                            is_WGS84 = T,
-                            intraTransect = T,
-                            breaks = NULL,
-                            plot = TRUE,
-                            pairs.min = 100,
-                            n_sim = 100,
-                            distmat = NULL,
-                            region = NULL,
-                            esp = "species"  # only for title   # only for title
-                            ) {
+                                    obs,
+                                    esw,
+                                    intraTransect = T,
+                                    breaks = NULL,
+                                    plot = TRUE,
+                                    pairs.min = 100,
+                                    n_sim = 100,
+                                    distmat = NULL,
+                                    region = NULL,
+                                    esp = "species"  # only for title   # only for title
+) {
 
   # y = donnÃ©es de comptage
   # esw = effective half-strip width en km
@@ -36,7 +35,7 @@ variogram_intraTransect <- function(segdata_obs,
   }
   l <- segdata_obs$Effort
 
-  center <- matrix(c(segdata_obs$X, segdata_obs$Y), nrow = nrow(segdata_obs))
+  center <- segdata_obs[, c("X", "Y")]
   id_transect <- segdata_obs$Transect.Label
   region.label <- segdata_obs$Region.Label
 
@@ -57,20 +56,18 @@ variogram_intraTransect <- function(segdata_obs,
   TauxObs <- function(y, esw, l){
     my_control <- list(epsilon = 1e-6, maxit = 100000, trace = FALSE)
     # utiliser quasi poisson pour eventuelle surdispersion
-    model_m <- glm(y ~ 1 + offset(2 * esw * l), family = "quasipoisson", control = my_control)
+    model_m <- arm::bayesglm(y ~ 1 + offset(2 * esw * l),
+                             prior.mean.for.intercept = -1.0, # prior is less than 4 obs/ind per km
+                             prior.scale.for.intercept = 1.0,
+                             prior.df.for.intercept = 7,
+                             family = "quasipoisson", control = my_control
+                             )
     m <- mean(exp(rnorm(1000, as.numeric(coef(model_m)), as.numeric(sqrt(vcov(model_m))))))
     return(round(m, 6))
   }
 
   ### calculer la matrice de distance
   if(is.null(distmat)) {
-    center <- as.data.frame(center); names(center) <- c("X", "Y")
-    sp::coordinates(center) <- ~ X + Y
-    if(is_WGS84) {
-      proj4string(center) <- CRS("+init=epsg:4326")
-      center <- as.data.frame(sp::spTransform(center, CRS(lbrt93_proj))@coords)
-      names(center) <- c("X", "Y")
-    }
     D <- fields::rdist(center) / 1e3 # in kilometers
     # tenir compte du design de l'Ã©chantillonnage
     if(!intraTransect) { id_transect <- rep(1, length(y)) }
@@ -206,6 +203,6 @@ variogram_intraTransect <- function(segdata_obs,
                 distmat = distmat))
   } else {
     return(list(variogram = vario,
-                     distmat = distmat))
+                distmat = distmat))
   }
 }
