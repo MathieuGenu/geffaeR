@@ -74,8 +74,8 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
   # Reprojeter dans système de projection  renseingé en argument
   effort_xy <- effort[, c("POINT_X", "POINT_Y")]
   coordinates(effort_xy) <- ~ POINT_X + POINT_Y
-  effort_xy@proj4string <- CRS(New_projection)
-  effort_xy <- spTransform(effort_xy, CRS(as.character(poly_NC@proj4string)))
+  effort_xy@proj4string <- CRS(as.character(poly_NC@proj4string))
+  effort_xy <- spTransform(effort_xy, CRS(New_projection))
   effort[, c("POINT_X", "POINT_Y")] <- effort_xy@coords
 
   # selection effort et obs en bonnes conditions
@@ -107,19 +107,23 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
                                                                                        "Sample.Label")
 
   # Assigner area à legdata en fonction du nom du block commun avec block_area
-  legdata$Area <- sapply(legdata$Region.Label, function(id) {as.numeric(block_area$Area[which(block_area$Block == id)])})
+  legdata$Area <- sapply(legdata$Region.Label, function(id) {
+    as.numeric(block_area$Area[which(block_area$Block == id)])
+    })
 
 
 
   #-- segdata --#
   #-------------#
   if("session" %in% colnames(effort)) {
-    segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "IdLeg", "segId", "segLength", "POINT_X",
+    segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "IdLeg", "segId",
+                                     "segLength", "POINT_X",
                                      "POINT_Y", "lon", "lat", "strate_sec",
                                      "seaState", "subjective","session", allvar)
                                  ])
   } else {
-    segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "IdLeg", "segId", "segLength", "POINT_X",
+    segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "IdLeg", "segId",
+                                     "segLength", "POINT_X",
                                      "POINT_Y", "lon", "lat", "strate_sec",
                                      "seaState", "subjective", allvar)
                                  ])
