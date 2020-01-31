@@ -42,5 +42,7 @@ Imports:
     Rcpp,
     geoR,
     MASS,
-    WhatIf
+    WhatIf,
+    arm,
+    viridisLite
 RoxygenNote: 7.0.0
