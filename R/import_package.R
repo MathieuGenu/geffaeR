@@ -9,7 +9,7 @@
 #' @rawNamespace import(coda, except = c(traceplot))
 #' @rawNamespace import(arm, except = c(traceplot))
 #' @rawNamespace import(MASS, except = c(area, select))
-#' @importFrom stats integrate rnorm sd as.formula coef cor diffinv glm poisson rgamma rnbinom rpois var vcov
+#' @importFrom stats integrate rnorm sd as.formula coef cor diffinv glm poisson rgamma rnbinom rpois var vcov family mad
 #' @importFrom lubridate ymd
 #' @importFrom utils combn
 NULL
