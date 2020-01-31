@@ -1,5 +1,5 @@
 Package: geffaeR
-Title: What the Package Does (One Line, Title Case)
+Title: Generic function for abundance estimation with R
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "First",
@@ -7,11 +7,14 @@ Authors@R:
            role = c("aut", "cre"),
            email = "first.last@example.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: What license it uses
+Author: Mathieu Genu [aut, cre], Matthieu Authier [aut, cre]
+Description: The package transforms SAMMOA output and
+    applies different analysis and give graphical output.
+License: GPL-3
 Encoding: UTF-8
 Language: fr
 LazyData: true
+RoxygenNote: 7.0.0
 Imports: 
     rgdal,
     maptools,
@@ -44,5 +47,6 @@ Imports:
     MASS,
     WhatIf,
     arm,
-    viridisLite
-RoxygenNote: 7.0.0
+    viridisLite,
+    stats,
+    utils
