@@ -42,9 +42,8 @@
 #' @export
 
 
-prep_predata <- function(DataDir,
-                         segdata,
-                         gridfile_name, proj_grid,
+prep_predata <- function(segdata,
+                         gridfile_name,
                          varenviro, do_log_enviro,
                          varphysio, do_log_physio,
                          imputation = "Amelia",
@@ -70,12 +69,19 @@ prep_predata <- function(DataDir,
   segdata <- NULL
 
   ## prediction
-  pred.poly <- readOGR(dsn = paste(DataDir, shape_pred, sep = "/"), layer = layer_pred)
+  pred.poly <- readOGR(dsn = paste(shape_pred, sep = "/"), layer = layer_pred)
 
   ### Covariable(s)
   # grille de la zone d'étude pour 2017
-  grid <-  read.dbf(paste(DataDir, gridfile_name, sep = "/"), as.is = TRUE)
+  grid <-  read.dbf(paste(gridfile_name, sep = "/"), as.is = TRUE)
   grid <- grid[which(duplicated(grid) == FALSE), ]
+
+  # colname of coord in grid in good format
+  if(all(c("lat","lon") %in% colnames(grid))) {
+    colnames(grid)[colnames(grid) %in% 'lat'] <- "LATITUDE"
+    colnames(grid)[colnames(grid) %in% 'lon'] <- "LONGITUDE"
+  }
+
   ## MA ## Ne conserver que les valeurs dans la zone de prédiction
   grid_xy <- grid[, c("LONGITUDE", "LATITUDE")]
   coordinates(grid_xy) <- ~ LONGITUDE + LATITUDE
@@ -83,7 +89,7 @@ prep_predata <- function(DataDir,
   if(proj4string(grid_xy) != proj4string(pred.poly)) {
     grid_xy <- spTransform(grid_xy, proj4string(pred.poly))
   }
-  xy_inside <- which(!is.na(over(grid_xy, pred.poly)))
+  xy_inside <- which(!is.na(over(grid_xy, pred.poly)[,"Id"]))
   grid$inbox <- NA
   grid$inbox[xy_inside] <- 1
   grid$inbox[!xy_inside] <- 0
@@ -91,12 +97,12 @@ prep_predata <- function(DataDir,
     grid <- subset(grid,inbox==1)
   }
 
-  # !!! cas particulier pour ANT_GUY !!! #
-  ## SL ## renommer champ correctement, annuler fev pour ne faire prédiction que sur oct
-  grid$CHL_month     <- grid$CHL201710M
-  grid$CHL_monthClim <- grid$CHLm10Clim
-  grid$SST_month     <- grid$SST201710M
-  grid$SST_monthClim <- grid$SSTm10Clim
+  # # !!! cas particulier pour ANT_GUY !!! #
+  # ## SL ## renommer champ correctement, annuler fev pour ne faire prédiction que sur oct
+  # grid$CHL_month     <- grid$CHL201710M
+  # grid$CHL_monthClim <- grid$CHLm10Clim
+  # grid$SST_month     <- grid$SST201710M
+  # grid$SST_monthClim <- grid$SSTm10Clim
 
 
   ### Covariable
@@ -158,6 +164,8 @@ prep_predata <- function(DataDir,
       mi_segdata[, j] <- log1p(mi_segdata[, j])
     }
   }
+
+  seg_mipat <- NULL
 
   if(any(apply(mi_segdata, 2, function(j) { any(is.na(j)) }))) {
     ### missingness patterns
@@ -249,6 +257,8 @@ prep_predata <- function(DataDir,
       mi_predata[, j] <- log1p(mi_predata[, j])
     }
   }
+
+  pred_mipat <- NULL
 
   if(any(apply(mi_predata, 2, function(j) { any(is.na(j)) }))) {
     ### missingness patterns
