@@ -26,9 +26,9 @@ prepare_data_obs(
 
 \item{segdata}{"Segdata" data.frame, built with \code{\link{prepare_data_effort}}.}
 
-\item{shape}{\encoding{Nom du shape file de la zone d'étude.}}
+\item{shape}{Shapefile of the study area.}
 
-\item{shape_layer}{\encoding{Couche du shape file d'interêt.}}
+\item{shape_layer}{Layer of the shapefile.}
 
 \item{projection}{Projection of \code{shape} object.}
 

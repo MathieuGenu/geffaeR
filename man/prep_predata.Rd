@@ -5,10 +5,8 @@
 \title{\encoding{Création de predata et imputation de données manquantes}}
 \usage{
 prep_predata(
-  DataDir,
   segdata,
   gridfile_name,
-  proj_grid,
   varenviro,
   do_log_enviro,
   varphysio,
@@ -26,8 +24,6 @@ prep_predata(
 
 \item{gridfile_name}{\encoding{Grille de la zone d'étude avec toutes les variables d'intérêt qui permettront la fabrication
 de predata.}}
-
-\item{proj_grid}{\encoding{Systême de projection du fichier de gride.}}
 
 \item{varenviro}{\encoding{Vecteur contenant les variables environnementales dynamiques (i.e chlorophylles, SST).}}
 
@@ -50,6 +46,8 @@ Par défaut la méthode est "PCA".}}
 \item{shape_pred}{\encoding{shapefile délimitant la zone où la prédiction est effectuée.}}
 
 \item{layer_pred}{\encoding{Layer du shpaefile donnant les limite de la zone de prédiction.}}
+
+\item{proj_grid}{\encoding{Systême de projection du fichier de gride.}}
 }
 \value{
 Cette fonction renvoit une liste contenant :
