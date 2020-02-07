@@ -18,9 +18,9 @@ for the next steps of the analysis.
 }
 \note{
 When "strate_sec" is not found at the end of the function, it creates a strate_sec
-column automatically corresponding to half of transect column and survey colum separated by "_".
-      Example, for a row, if \code{transect = O2/306} and \code{survey = FR_N_C} we will get
-      \code{strate_sec = FR_N_c_02}.
+      column automatically corresponding to the merge of "subRegion" and "strate". There are merged by "_".
+      Example, for a row, if \code{strate = N1} and \code{subRegion = ATL} we will get
+      \code{strateSec = ATL_N1}.
 }
 \examples{
 
