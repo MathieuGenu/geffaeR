@@ -1,5 +1,5 @@
 # WARNING #
-# this package must not be run completly but in case by case 
+# this package must not be run completly but in case by case
 # all function for package editing are here but must be run in different optic
 # ex : document is run when we want to refresh documentation of functions
 # except for the fisrt part, it have to be run in prelude
@@ -44,7 +44,8 @@ packg_to_import <- c("rgdal", "maptools",  "sp", "raster","foreign", "lubridate"
                      "dplyr", "ggplot2", "cowplot", "mvtnorm", "Distance", "captioner",
                      "Rdistance", "dsm", "knitr", "fields", "ggthemes", "broom", "coda",
                      "purrr","VIM","Amelia","missMDA","FactoMineR", "rstan", "Rcpp",
-                     "geoR", "MASS","WhatIf","arm","viridisLite","stats","utils")
+                     "geoR", "MASS","WhatIf","arm","viridisLite","stats","utils",
+                     "mgcv")
 for(pckg in packg_to_import){
   use_package(pckg, type="Imports")
 }
@@ -54,7 +55,7 @@ for(pckg in packg_to_import){
 # check package (regarder les erreurs et oublis dans documentation)
 check()
 
-# mettre à jour la documentation des fonction (les fichiers .Rd)
+# mettre ? jour la documentation des fonction (les fichiers .Rd)
 document()
 
 # load tout le package (tout les fields)
@@ -79,5 +80,17 @@ usethis::use_data(NEA_isobath100)
 usethis::use_data(NEA_isobath200)
 usethis::use_data(lbrt93_proj)
 
-# pour rstan
-use_rstan()
+# # pour rstan
+# use_rstan()
+
+
+source("C:/Users/mgenu.RATUFA/Documents/Projet/scriptR/build_example_for_package.R")
+
+# create a shapefile for vignette example
+usethis::use_data(shape_example)
+
+# create observation table
+usethis::use_data(observation_example)
+
+# create effort table
+usethis::use_data(effort_example)
