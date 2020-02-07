@@ -8,106 +8,134 @@
 #' @return This function return the same data.frame as in input with the standardized column name.
 #'
 #' @note When "strate_sec" is not found at the end of the function, it creates a strate_sec
-#' column automatically corresponding to half of transect column and survey colum separated by "_".
-#'       Example, for a row, if \code{transect = O2/306} and \code{survey = FR_N_C} we will get
-#'       \code{strate_sec = FR_N_c_02}.
+#'       column automatically corresponding to the merge of "subRegion" and "strate". There are merged by "_".
+#'       Example, for a row, if \code{strate = N1} and \code{subRegion = ATL} we will get
+#'       \code{strateSec = ATL_N1}.
 #'
 #' @examples
 #'
 #'
 #' @export
 
-
-
 change_effort_varName <- function(effort_base){
 
-  col_name_neces <- c("lon","lat","seaState","subjective",
-                      "survey","strate_sec","transect","IdLeg","segLength","segId","left_","right_")
-
-  if("session_" %in% colnames(effort_base)){
-    effort_base$session_ <- as.factor(effort_base$session_)
-  }
+  col_name_neces <- c("lon","lat","seaState","subjective","subRegion","strate", "survey",
+                      "strateSec","transect","idLeg","segLength","segId","left","right")
 
   if(all(col_name_neces %in% colnames(effort_base))){
+
     return(effort_base)
+
   } else {
-    var_alone <- col_name_neces[!(col_name_neces %in% colnames(effort_base)) ]
 
-    # which var is not right
-    pos_var <- which(col_name_neces %in% var_alone)
-    # lon
-    if("strate_sec" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("STRATE_SEC","subRegion_strate",
-                                                         "subRegStra")] <- "strate_sec"
-    }
-    if("lon" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("point_X","Point_X","pointX","PointX",
-                                                         "POINT_X","POINTX","longitude")] <- "lon"
-    }
-    if("lat" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("point_Y","Point_Y","pointY","PointY",
-                                                         "POINT_Y","POINTY","latitude")] <- "lat"
-    }
-    if("seaState" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("Sea_State","SeaState","sea_state","SEA_STATE",
-                                                         "Beaufort","BEAUFORT","beaufort")] <- "seaState"
-    }
-    if("subjective" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("Subjective","SUBJECTIVE")] <- "subjective"
-    }
-    if("survey" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("Survey","Campaign","CAMPAIGN")] <- "survey"
-    }
-    if("transect" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("TRANSECT","Transect")] <- "transect"
-    }
-    if("IdLeg" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("IDLEG","Id_Leg","Id_leg","Sample.Label",
-                                                         "legID")] <- "IdLeg"
-    }
-    if("segLength" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("Length","length","LengthKm",'LengthKM',
-                                                         "legLengthKm", "SegLeng10k")] <- "segLength"
-    }
-    if("segId" %in% var_alone){
-      # cas particulier peut y avoir plusieurs segId dans la table effort (5k et 10k) -> prendre celui sans 0
-      effort_match <- effort_base[,colnames(effort_base) %in% c("IdSeg","Id_Seg","IDSEG","Seg","seg","SegID",
-                                                      "segId5k","segId10k","segId5K","segId10K", "segID10k"),
-                                  drop = FALSE]
-      colnames(effort_base)[colnames(effort_base) %in% names(effort_match)[colSums(effort_match) > 1]] <- "segId"
-    }
-    if("left_" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("LEFT_REAR")] <- "left_"
-    }
-    if("right_" %in% var_alone){
-      colnames(effort_base)[colnames(effort_base) %in% c("RIGHT_REAR")] <- "right_"
-    }
-    if(!all(is.na(as.numeric(as.character(effort_base$IdLeg))))) {
-      if("session_" %in% colnames(effort_base)) {
-        effort_base$IdLeg <- paste(effort_base$IdLeg,effort_base$session_,sep="_")
-      }
-    }
-    if(!all(is.na(as.numeric(as.character(effort_base$segId))))) {
-      if("session_" %in% colnames(effort_base)) {
-        effort_base$segId <- paste(effort_base$segId,effort_base$session_,sep="_")
-        colnames(effort_base)[colnames(effort_base) %in% c("session_")] <- "session"
+    # Put everything tolowercase and without "_" and check if there are matches with colnames ----
+    lower_colnames <- tolower(colnames(effort_base))
+    lower_no_under_colnames <- gsub("_", "", lower_colnames)
+    lower_neces <- tolower(col_name_neces)
+
+    for (n in 1:length(lower_neces)) {
+      if (lower_neces[n] %in% lower_no_under_colnames) {
+        colnames(effort_base)[lower_no_under_colnames %in% lower_neces[n]] <- col_name_neces[n]
       }
     }
 
-    # tester si strate_sec est fabriqué, sinon le fabriquer avec "survey" et "transect" si ils existent...
-    if(!("strate_sec" %in% colnames(effort_base)) & all(c("survey","transect") %in% colnames(effort_base))){
-      split <- strsplit(effort_base$transect,"/")
-      half_transect <- sapply( split, "[", 1)
-      effort_base$strate_sec <- paste(effort_base$survey,half_transect,sep="_")
+    # Are there all the needed columns ? ----
+    missing_needed_col <- which(!(col_name_neces %in% colnames(effort_base)))
+
+    if (!("lon" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("pointx","longitude")] <- "lon"
     }
-    # tester si c'est OK maintenant sino renvoyer un message et dire quel équivalent est absent
-    if(!all(col_name_neces %in% colnames(effort_base))){
-      var_still_alone <- col_name_neces[!(col_name_neces %in% colnames(effort_base)) ]
-      message(paste(c("Pour la base effort, la fonction ne trouve pas d'équivalent pour : ", var_still_alone), collapse="\n "))
-    } else {
-      return(effort_base = effort_base)
+    if (!("lat" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("pointy","latitude")] <- "lat"
     }
+    if (!("seaState" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("seastate","beaufort")] <- "seaState"
+    }
+    if (!("subjective" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("Subjective")] <- "subjective"
+    }
+    if (!("subRegion" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("subregion")] <- "subRegion"
+    }
+    if (!("strate" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("strate")] <- "strate"
+    }
+    if (!("survey" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("survey","campaign")] <- "survey"
+    }
+    if (!("strateSec" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("stratesec","subregstra")] <- "strateSec"
+    }
+    if (!("transect" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("transect")] <- "transect"
+    }
+    if (!("idLeg" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("legid","idleg","samplelabel")] <- "idLeg"
+    }
+    if (!("segLength" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("seglength","length","lengthkm",
+                                                           "segleng10k","segleng10km","segleng5km",
+                                                           "segleng5k")] <- "segLength"
+    }
+    if (!("segId" %in% colnames(effort_base))) {
+      # particularity for segId
+      # there are potentially 2 columns segId (10km and 5km)
+      # check if there is only one segId
+      #  if yes -> replace
+      #  if not -> check of one of them has only 0 in it
+      #    if yes -> keep one with no 0
+      #    if not -> error message, delete one
+      potential_segId <- which(lower_no_under_colnames %in% c("idseg","seg","segid",
+                                                              "segid5km","segid10km",
+                                                              "segid5k","segid10k"))
+      if (length(potential_segId) == 1) {
+        colnames(effort_base)[potential_segId] <- "segId"
+      } else {
+        length_unique_col <- sapply(effort_base[potential_segId], function(x){length(unique(x))})
+        if (length(length_unique_col[length_unique_col > 3]) == 1) {
+          colnames(effort_base)[colnames(effort_base) %in% names(length_unique_col[length_unique_col])] <- "segId"
+        } else {
+          stop("Can't determine a segId column because there are several segId columns(5k, 10k or more...)\n
+             choose between one of them.")
+        }
+      }
+    }
+
+    # Replace facultatif colnames ----
+    if (!("left" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("left")] <- "left"
+    }
+    if (!("right" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("right")] <- "right"
+    }
+    if (!("session" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("session")] <- "session"
+    }
+
+    # Add session in seg_id if both exist ----
+    if (all(c("segId","session") %in% colnames(effort_base))) {
+      effort_base$segId <- paste(effort_base$segId,effort_base$session,sep="_")
+    }
+
+    # Add session in idLeg if both exist ----
+    if (all(c("legId","session") %in% colnames(effort_base))) {
+      effort_base$idLeg <- paste(effort_base$idLeg,effort_base$session,sep="_")
+    }
+
+    # Build strate_sec if it doesn't exist ----
+    if (!("strateSec" %in% colnames(effort_base))) {
+      effort_base$strateSec <- paste(effort_base$subRegion,effort_base$strate,sep="_")
+    }
+
+    # Error message if needed columns are missing ----
+    if (!all(col_name_neces %in% colnames(effort_base))) {
+      var_still_alone <- col_name_neces[!(col_name_neces %in% colnames(effort_base))]
+      stop(paste(c("Pour la base effort, la fonction ne trouve pas d'équivalent pour : ", var_still_alone), collapse="\n "))
+    }
+
+    return(effort_base)
   }
+
 }
 
 #' Standardisation of column names
@@ -129,81 +157,127 @@ change_effort_varName <- function(effort_base){
 change_obs_varName <- function(obs_base) {
 
 
-  col_name_neces <- c("strate","subRegion","transect","taxon","group_",
+  col_name_neces <- c("strate","subRegion","transect","taxon","group",
                       "family","species","podSize","decAngle","lat","lon",
-                      "IdLeg","PerpDist","segId")
-  if("session_" %in% colnames(obs_base)) {
-    obs_base$session_ <- as.factor(obs_base$session_)
-  }
-  if("observer" %in% colnames(obs_base)) {
-    obs_base$observerId <- as.factor(obs_base$observer)
-    obs_base$observer <- NULL
-  }
+                      "legId","perpDist","segId", "survey")
 
-  if(all(col_name_neces %in% colnames(obs_base))) {
+  if(all(col_name_neces %in% colnames(obs_base))){
+
     return(obs_base)
+
   } else {
-    var_alone <- col_name_neces[!(col_name_neces %in% colnames(obs_base)) ]
 
-    # which var is not right
-    pos_var <- which(col_name_neces %in% var_alone)
+    # Put everything tolowercase and without "_" and check if there are matches with colnames ----
+    lower_colnames <- tolower(colnames(obs_base))
+    lower_no_under_colnames <- gsub("_", "", lower_colnames)
+    lower_neces <- tolower(col_name_neces)
 
-    # regarder ce qu'il reste si on enleve les majuscules
-    varName_to_lower <- tolower(colnames(obs_base))
-    varTrue <- varName_to_lower %in% var_alone
-    colnames(obs_base)[varTrue] <- varName_to_lower[varTrue]
-
-    var_alone_after_lower <- col_name_neces[!(col_name_neces %in% colnames(obs_base)) ]
-
-    # lon
-    if("lon" %in% var_alone_after_lower) {
-      colnames(obs_base)[colnames(obs_base) %in% c("point_X","Point_X","pointX","PointX","POINT_X","POINTX")] <- "lon"
-    }
-    if("lat" %in% var_alone_after_lower) {
-      colnames(obs_base)[colnames(obs_base) %in% c("point_Y","Point_Y","pointY","PointY","POINT_Y","POINTY")] <- "lat"
-    }
-    if("subRegion" %in% var_alone_after_lower) {
-      colnames(obs_base)[colnames(obs_base) %in% c("SECTEUR","Secteur")] <- "subRegion"
-    }
-    if("PerpDist" %in% var_alone_after_lower) {
-      colnames(obs_base)[colnames(obs_base) %in% c("Distance","distance","perpDist")] <- "PerpDist"
-    }
-    if("IdLeg" %in% var_alone_after_lower) {
-      colnames(obs_base)[colnames(obs_base) %in% c("IDLEG","Id_Leg","Id_leg","Sample.Label",
-                                                   "legID")] <- "IdLeg"
-    }
-    if("segId" %in% var_alone_after_lower) {
-      obs_match <- obs_base[,colnames(obs_base) %in% c("IdSeg","Id_Seg","IDSEG","Seg","seg","SegID",
-                                                       "segId5k","segId10k","segId5K","segId10K"),
-                            drop = F]
-      colnames(obs_base)[colnames(obs_base) %in% names(obs_match)[colSums(obs_match) > 1]] <- "segId"
-    }
-    if("decAngle" %in% var_alone_after_lower) {
-      colnames(obs_base)[colnames(obs_base) %in% c("DEC_ANGLE","Dec_Angle","dec_angle","dec_Angle")] <- "decAngle"
-    }
-    if("podSize" %in% var_alone_after_lower) {
-      colnames(obs_base)[colnames(obs_base) %in% c("POD_SIZE","Pod_Size","pod_size")] <- "podSize"
-    }
-    if("taxon" %in% var_alone_after_lower) {
-      colnames(obs_base)[colnames(obs_base) %in% c("TAXON_Fr")] <- "taxon"
-    }
-    if(!all(is.na(as.numeric(as.character(obs_base$IdLeg))))) {
-      if("session_" %in% colnames(obs_base)) {
-        obs_base$IdLeg <- paste(obs_base$IdLeg,obs_base$session_,sep="_")
+    for (n in 1:length(lower_neces)) {
+      if (lower_neces[n] %in% lower_no_under_colnames) {
+        colnames(obs_base)[lower_no_under_colnames %in% lower_neces[n]] <- col_name_neces[n]
       }
     }
-    if(!all(is.na(as.numeric(as.character(obs_base$segId))))) {
-      if("session_" %in% colnames(obs_base)) {
-        obs_base$segId <- paste(obs_base$segId,obs_base$session_,sep="_")
-        colnames(obs_base)[colnames(obs_base) %in% c("session_")] <- "session"
+
+    # Are there all the needed columns ? ----
+    missing_needed_col <- which(!(col_name_neces %in% colnames(obs_base)))
+
+    if (!("strate" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("strate")] <- "strate"
+    }
+    if (!("subRegion" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("subregion","secteur")] <- "subRegion"
+    }
+    if (!("transect" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("transect")] <- "transect"
+    }
+    if (!("taxon" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("taxon")] <- "taxon"
+    }
+    if (!("group" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("group")] <- "group"
+    }
+    if (!("family" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("family")] <- "family"
+    }
+    if (!("species" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("species")] <- "species"
+    }
+    if (!("podSize" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("podsize","size")] <- "podSize"
+    }
+    if (!("decAngle" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("decangle")] <- "decAngle"
+    }
+    if (!("lon" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("pointx","longitude")] <- "lon"
+    }
+    if (!("lat" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("pointy","latitude")] <- "lat"
+    }
+    if (!("strateSec" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("stratesec","subregstra")] <- "strateSec"
+    }
+    if (!("legId" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("legid","idleg","samplelabel")] <- "legId"
+    }
+    if (!("perpDist" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("perpdist","distance")] <- "perpDist"
+    }
+    if (!("segId" %in% colnames(obs_base))) {
+      # particularity for segId
+      # there are potentially 2 columns segId (10km and 5km)
+      # check if there is only one segId
+      #  if yes -> replace
+      #  if not -> check of one of them has only 0 in it
+      #    if yes -> keep one with no 0
+      #    if not -> error message, delete one
+      potential_segId <- which(lower_no_under_colnames %in% c("idseg","seg","segid",
+                                                              "segid5km","segid10km",
+                                                              "segid5k","segid10k"))
+      if (length(potential_segId) == 1) {
+        colnames(obs_base)[potential_segId] <- "segId"
+      } else {
+        length_unique_col <- sapply(obs_base[potential_segId], function(x){length(unique(x))})
+        if (length(length_unique_col[length_unique_col > 3]) == 1) {
+          colnames(obs_base)[colnames(obs_base) %in% names(length_unique_col[length_unique_col])] <- "segId"
+        } else {
+          stop("Can't determine a segId column because there are several segId columns(5k, 10k or more...)\n
+             choose between one of them.")
+        }
       }
     }
-    # tester si c'est OK maintenant sino renvoyer un message et dire quel équivalent est absent
-    if(!all(col_name_neces %in% colnames(obs_base))) {
-      var_still_alone <- col_name_neces[!(col_name_neces %in% colnames(obs_base)) ]
-      message(paste(c("Pour la base observation, la fonction ne trouve pas d'équivalent pour : ", var_still_alone), collapse="\n "))
-    } else {
-      return(obs_base = obs_base)
+    if (!("survey" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("survey")] <- "survey"
+    }
+
+    # Transform session in factor ----
+    if ("session" %in% colnames(obs_base)) {
+      obs_base$session <- as.factor(obs_base$session)
+    }
+
+    # Add session in seg_id if both exist ----
+    if (all(c("segId","session") %in% colnames(obs_base))) {
+      obs_base$segId <- paste(obs_base$segId,obs_base$session,sep="_")
+    }
+
+    # Add session in idLeg if both exist ----
+    if (all(c("legId","session") %in% colnames(obs_base))) {
+      obs_base$legId <- paste(obs_base$legId,obs_base$session,sep="_")
+    }
+
+    # Build strate_sec if it doesn't exist ----
+    if (!("strateSec" %in% colnames(obs_base))) {
+      obs_base$strateSec <- paste(obs_base$subRegion,obs_base$strate,sep="_")
+    }
+    # Transform observer into observerId ----
+    if("observer" %in% colnames(obs_base)) {
+      obs_base$observerId <- as.factor(obs_base$observer)
+      obs_base$observer <- NULL
+    }
+    # Error message if needed columns are missing ----
+    if (!all(col_name_neces %in% colnames(obs_base))) {
+      var_still_alone <- col_name_neces[!(col_name_neces %in% colnames(obs_base))]
+      stop(paste(c("Pour la base observation, la fonction ne trouve pas d'équivalent pour : ", var_still_alone), collapse="\n "))
     }
   }
 }
