@@ -49,4 +49,5 @@ Imports:
     arm,
     viridisLite,
     stats,
-    utils
+    utils,
+    mgcv
