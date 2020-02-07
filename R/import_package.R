@@ -12,4 +12,5 @@
 #' @importFrom stats integrate rnorm sd as.formula coef cor diffinv glm poisson rgamma rnbinom rpois var vcov family mad
 #' @importFrom lubridate ymd
 #' @importFrom utils combn
+#' @importFrom mgcv nb tw gam
 NULL
