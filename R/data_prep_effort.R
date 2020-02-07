@@ -36,8 +36,10 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
 
   # verifier si les colonnes sont bien dans le DF effort
   col_name_neces <- c("lon","lat","seaState","subjective",
-                      "survey","strate_sec","transect","IdLeg","segLength",
-                      "segId","left_","right_")
+                      "survey","strateSec","transect","legId","segLength",
+                      "segId","left","right")
+
+
   if(!all(col_name_neces %in% colnames(effort))){
     var_alone <- col_name_neces[!(col_name_neces %in% colnames(effort))]
     stop(paste("Les variables : ",var_alone, "ne sont pas dans le tableau effort.", sep="\n",collapse = ", "),
@@ -53,11 +55,11 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
   } else {
     block_area <- block_area
   }
-  # correspondance entre strate_sec et block area
-  if(!any(block_area$Block %in% effort$strate_sec)){
-    stop(cat("la variable Block de block_area ne correspond pas aux valeurs de strate_sec dans la table effort :",
-               "- soit le strate_sec créé par change_varName n'est pas du bon format",
-               "- soit les valeurs de Block ne sont pas dans dans la variable strate_sec de la table effort",sep="\n"))
+  # correspondance entre strateSec et block area
+  if(!any(block_area$Block %in% effort$strateSec)){
+    stop(cat("la variable Block de block_area ne correspond pas aux valeurs de strateSec dans la table effort :",
+               "- soit le strateSec créé par change_varName n'est pas du bon format",
+               "- soit les valeurs de Block ne sont pas dans dans la variable strateSec de la table effort",sep="\n"))
   }
 
   # polygons sampling
@@ -90,20 +92,20 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
   #-------------#
     if("session" %in% colnames(effort)) {
       legdata <- effort %>%
-        group_by(survey, strate_sec, transect, IdLeg, left_, right_, session) %>%
+        group_by(survey, strateSec, transect, legId, left, right, session) %>%
         summarize(Effort = sum(segLength),
                   seaState = unique(seaState),
                   subjective = unique(subjective))
     } else {
       legdata <- effort %>%
-        group_by(survey, strate_sec, transect, IdLeg, left_, right_) %>%
+        group_by(survey, strateSec, transect, legId, left, right) %>%
         summarize(Effort = sum(segLength),
                   seaState = unique(seaState),
                   subjective = unique(subjective))
     }
 
   legdata <- as.data.frame(legdata)
-  names(legdata)[which(names(legdata) %in% c("strate_sec", "transect", "IdLeg"))] <- c("Region.Label", "Transect.Label",
+  names(legdata)[which(names(legdata) %in% c("strateSec", "transect", "legId"))] <- c("Region.Label", "Transect.Label",
                                                                                        "Sample.Label")
 
   # Assigner area à legdata en fonction du nom du block commun avec block_area
@@ -116,15 +118,15 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
   #-- segdata --#
   #-------------#
   if("session" %in% colnames(effort)) {
-    segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "IdLeg", "segId",
+    segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "legId", "segId",
                                      "segLength", "POINT_X",
-                                     "POINT_Y", "lon", "lat", "strate_sec",
+                                     "POINT_Y", "lon", "lat", "strateSec",
                                      "seaState", "subjective","session", allvar)
                                  ])
   } else {
-    segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "IdLeg", "segId",
+    segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "legId", "segId",
                                      "segLength", "POINT_X",
-                                     "POINT_Y", "lon", "lat", "strate_sec",
+                                     "POINT_Y", "lon", "lat", "strateSec",
                                      "seaState", "subjective", allvar)
                                  ])
   }

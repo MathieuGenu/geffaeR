@@ -44,7 +44,7 @@ prepare_data_obs <- function(sp, obs_base, legdata, segdata, shape, shape_layer,
 
   # # ne prendre que l'espece choisie
   # if(group) {
-  #   sp_data <- subset(raw_obs, group_ %in% sp)
+  #   sp_data <- subset(raw_obs, group %in% sp)
   # } else if(taxon) {
   #   sp_data <- subset(raw_obs, taxon %in% sp)
   # } else if(family) {
@@ -58,10 +58,10 @@ prepare_data_obs <- function(sp, obs_base, legdata, segdata, shape, shape_layer,
 
   sp_data <- raw_obs[0,]
 
-  if (any(sp %in% unique(raw_obs$group_))) {
-    match_group_ <- sp[which(sp %in% unique(raw_obs$group_))]
-    sp_data_group_ <- subset(raw_obs, group_ %in% match_group_)
-    sp_data <- rbind(sp_data, sp_data_group_)
+  if (any(sp %in% unique(raw_obs$group))) {
+    match_group <- sp[which(sp %in% unique(raw_obs$group))]
+    sp_data_group <- subset(raw_obs, group %in% match_group)
+    sp_data <- rbind(sp_data, sp_data_group)
   }
   if (any(sp %in% unique(raw_obs$taxon))) {
     match_taxon <- sp[which(sp %in% unique(raw_obs$taxon))]
@@ -91,9 +91,9 @@ prepare_data_obs <- function(sp, obs_base, legdata, segdata, shape, shape_layer,
 
   ## distance en km
   if(!unit_km){
-    sp_data$distance <- sp_data$PerpDist/1000
+    sp_data$distance <- sp_data$perpDist/1000
   } else {
-    sp_data$distance <- sp_data$PerpDist
+    sp_data$distance <- sp_data$perpDist
   }
 
   # troncation
@@ -115,12 +115,12 @@ prepare_data_obs <- function(sp, obs_base, legdata, segdata, shape, shape_layer,
 
   ## countdata seg et leg pour rajouter les observation à legdata et segdata avec la fonction ajout_obs()
   if("session" %in% colnames(sp_data)) {
-    countdata_seg <- as.data.frame(sp_data[, c("transect", "IdLeg", "segId","podSize","session")] %>%
-                                     group_by(transect, IdLeg, segId) %>%
+    countdata_seg <- as.data.frame(sp_data[, c("transect", "legId", "segId","podSize","session")] %>%
+                                     group_by(transect, legId, segId) %>%
                                      summarize(n = n(), count = sum(podSize)))
   } else {
-    countdata_seg <- as.data.frame(sp_data[, c("transect", "IdLeg", "segId","podSize")] %>%
-                                     group_by(transect, IdLeg, segId) %>%
+    countdata_seg <- as.data.frame(sp_data[, c("transect", "legId", "segId","podSize")] %>%
+                                     group_by(transect, legId, segId) %>%
                                      summarize(n = n(), count = sum(podSize)))
   }
 
@@ -135,13 +135,13 @@ prepare_data_obs <- function(sp, obs_base, legdata, segdata, shape, shape_layer,
 
   ## table : distdata with truncation
   if("session" %in% colnames(sp_data)) {
-    distdata <- sp_data[, c("transect", "strate", "IdLeg", "segId", "lon", "lat", "lon",
+    distdata <- sp_data[, c("transect", "strate", "legId", "segId", "lon", "lat", "lon",
                             "lat", "podSize", "distance", "observerId","session")]
     distdata$strate <- paste(sp_data$subRegion, sp_data$strate)
     names(distdata) <- c("Transect.Label", "Region.Label", "Sample.Label", "Seg", "X", "Y",
                          "longitude", "latitude", "size", "distance","observerId","session")
   } else {
-    distdata <- sp_data[, c("transect", "strate", "IdLeg", "segId", "lon", "lat", "lon",
+    distdata <- sp_data[, c("transect", "strate", "legId", "segId", "lon", "lat", "lon",
                             "lat", "podSize", "distance", "observerId")]
     distdata$strate <- paste(sp_data$subRegion, sp_data$strate)
     names(distdata) <- c("Transect.Label", "Region.Label", "Sample.Label", "Seg", "X", "Y",
@@ -161,11 +161,11 @@ prepare_data_obs <- function(sp, obs_base, legdata, segdata, shape, shape_layer,
   distdata[, c("X", "Y")] <- distdata_xy@coords
 
   if("session" %in% colnames(sp_data)) {
-    distdata <- left_join(dplyr::select(legdata, -survey, -left_, -right_),
+    distdata <- left_join(dplyr::select(legdata, -survey, -left, -right),
                           dplyr::select(distdata, -Transect.Label, -Region.Label,-session),
                           by="Sample.Label")
   } else {
-    distdata <- left_join(dplyr::select(legdata, -survey, -left_, -right_),
+    distdata <- left_join(dplyr::select(legdata, -survey, -left, -right),
                           dplyr::select(distdata, -Transect.Label, -Region.Label),
                           by="Sample.Label")
   }
