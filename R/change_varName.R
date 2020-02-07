@@ -279,5 +279,6 @@ change_obs_varName <- function(obs_base) {
       var_still_alone <- col_name_neces[!(col_name_neces %in% colnames(obs_base))]
       stop(paste(c("Pour la base observation, la fonction ne trouve pas d'équivalent pour : ", var_still_alone), collapse="\n "))
     }
+    return(obs_base)
   }
 }
