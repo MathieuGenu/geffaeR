@@ -7,7 +7,8 @@ fit_variomodel <- function(variogram, form = c("matern", "exponential")) {
                                 cov.model = form,
                                 fix.nugget = FALSE,
                                 nugget = mean(variogram$v) / 4,
-                                fix.kappa = TRUE, kappa = ifelse(form == "matern", 1.5, 1),
+                                fix.kappa = TRUE,
+                                kappa = ifelse(form == "matern", 1.5, 1),
                                 weights = "npairs",
                                 minimisation.function = "optim",
                                 ini.cov.pars = expand.grid(
