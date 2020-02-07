@@ -20,7 +20,7 @@
 change_effort_varName <- function(effort_base){
 
   col_name_neces <- c("lon","lat","seaState","subjective","subRegion","strate", "survey",
-                      "strateSec","transect","idLeg","segLength","segId","left","right")
+                      "strateSec","transect","legId","segLength","segId","left","right")
 
   if(all(col_name_neces %in% colnames(effort_base))){
 
@@ -69,8 +69,8 @@ change_effort_varName <- function(effort_base){
     if (!("transect" %in% colnames(effort_base))) {
       colnames(effort_base)[lower_no_under_colnames %in% c("transect")] <- "transect"
     }
-    if (!("idLeg" %in% colnames(effort_base))) {
-      colnames(effort_base)[lower_no_under_colnames %in% c("legid","idleg","samplelabel")] <- "idLeg"
+    if (!("legId" %in% colnames(effort_base))) {
+      colnames(effort_base)[lower_no_under_colnames %in% c("legid","idleg","samplelabel")] <- "legId"
     }
     if (!("segLength" %in% colnames(effort_base))) {
       colnames(effort_base)[lower_no_under_colnames %in% c("seglength","length","lengthkm",
@@ -117,9 +117,9 @@ change_effort_varName <- function(effort_base){
       effort_base$segId <- paste(effort_base$segId,effort_base$session,sep="_")
     }
 
-    # Add session in idLeg if both exist ----
+    # Add session in legId if both exist ----
     if (all(c("legId","session") %in% colnames(effort_base))) {
-      effort_base$idLeg <- paste(effort_base$idLeg,effort_base$session,sep="_")
+      effort_base$legId <- paste(effort_base$legId,effort_base$session,sep="_")
     }
 
     # Build strate_sec if it doesn't exist ----
@@ -250,6 +250,17 @@ change_obs_varName <- function(obs_base) {
       colnames(obs_base)[lower_no_under_colnames %in% c("survey")] <- "survey"
     }
 
+    # Replace facultatif colnames ----
+    if (!("left" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("left")] <- "left"
+    }
+    if (!("right" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("right")] <- "right"
+    }
+    if (!("session" %in% colnames(obs_base))) {
+      colnames(obs_base)[lower_no_under_colnames %in% c("session")] <- "session"
+    }
+
     # Transform session in factor ----
     if ("session" %in% colnames(obs_base)) {
       obs_base$session <- as.factor(obs_base$session)
@@ -260,7 +271,7 @@ change_obs_varName <- function(obs_base) {
       obs_base$segId <- paste(obs_base$segId,obs_base$session,sep="_")
     }
 
-    # Add session in idLeg if both exist ----
+    # Add session in legId if both exist ----
     if (all(c("legId","session") %in% colnames(obs_base))) {
       obs_base$legId <- paste(obs_base$legId,obs_base$session,sep="_")
     }
