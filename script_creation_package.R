@@ -45,7 +45,7 @@ packg_to_import <- c("rgdal", "maptools",  "sp", "raster","foreign", "lubridate"
                      "Rdistance", "dsm", "knitr", "fields", "ggthemes", "broom", "coda",
                      "purrr","VIM","Amelia","missMDA","FactoMineR", "rstan", "Rcpp",
                      "geoR", "MASS","WhatIf","arm","viridisLite","stats","utils",
-                     "mgcv")
+                     "mgcv","cli","crayon")
 for(pckg in packg_to_import){
   use_package(pckg, type="Imports")
 }
