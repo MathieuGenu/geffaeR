@@ -85,7 +85,7 @@ prepare_data_obs <- function(sp, obs_base, legdata, segdata, shape, shape_layer,
 
   # ne garder que les obs dans la bande pour les oiseaux
   if(all(sp_data$taxon == "Oiseau marin")) {
-    writeLines("Keeping only observations within the 200 m around the transect")
+    cli_alert_info("Keeping only observations within the 200 m around the transect")
     sp_data <- subset(sp_data, decAngle %in% c(1, 3))
   }
 
