@@ -84,13 +84,14 @@ usethis::use_data(lbrt93_proj)
 # use_rstan()
 
 
-source("C:/Users/mgenu.RATUFA/Documents/Projet/scriptR/build_example_for_package.R")
+source("C:/Users/mgenu.RATUFA/Documents/Projet/Build_example_for_package/res/01_build_study_area_with_effort_obs/")
 
 # create a shapefile for vignette example
-usethis::use_data(shape_example)
+load("C:/Users/mgenu.RATUFA/Documents/Projet/Build_example_for_package/res/01_build_study_area_with_effort_obs/effort_observation.RData")
+usethis::use_data(spdf)
 
 # create observation table
-usethis::use_data(observation_example)
+usethis::use_data(observation)
 
 # create effort table
-usethis::use_data(effort_example)
+usethis::use_data(effort)
