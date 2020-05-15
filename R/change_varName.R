@@ -75,7 +75,9 @@ change_effort_varName <- function(effort_base){
     if (!("segLength" %in% colnames(effort_base))) {
       colnames(effort_base)[lower_no_under_colnames %in% c("seglength","length","lengthkm",
                                                            "segleng10k","segleng10km","segleng5km",
-                                                           "segleng5k")] <- "segLength"
+                                                           "segleng5k", "seglength5k","seglength5km",
+                                                           "seglength5","seglength10k","seglength10km",
+                                                           "seglength10")] <- "segLength"
     }
     if (!("segId" %in% colnames(effort_base))) {
       # particularity for segId

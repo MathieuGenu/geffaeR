@@ -72,10 +72,12 @@ usethis::use_vignette("Package_example")
 
 # mettre des data dans le package
 load(paste("C:/Users/mgenu.RATUFA/Documents/Projet/donnees/data_package/Europe_fond2carte.RData"))
+load(paste("C:/Users/mgenu.RATUFA/Documents/Projet/donnees/data_package/NEA.RData"))
+
 usethis::use_data(cds)
 usethis::use_data(cds_krig)
 usethis::use_data(Europe)
-usethis::use_data(NEA)
+usethis::use_data(NEA, overwrite = T)
 usethis::use_data(NEA_isobath100)
 usethis::use_data(NEA_isobath200)
 usethis::use_data(lbrt93_proj)
@@ -87,11 +89,14 @@ usethis::use_data(lbrt93_proj)
 source("C:/Users/mgenu.RATUFA/Documents/Projet/Build_example_for_package/res/01_build_study_area_with_effort_obs/")
 
 # create a shapefile for vignette example
-load("C:/Users/mgenu.RATUFA/Documents/Projet/Build_example_for_package/res/01_build_study_area_with_effort_obs/effort_observation.RData")
-usethis::use_data(spdf)
+load("Y:/8_DOSSIERS_EQUIPE/MGenu/Build_example_for_package/res/01_build_study_area_with_effort_obs/effort_observation.RData")
+effort_example <- effort
+observation_example <- observation
+shape_example <- spdf
+usethis::use_data(shape_example, overwrite = T)
 
 # create observation table
-usethis::use_data(observation)
+usethis::use_data(observation_example, overwrite = T)
 
 # create effort table
-usethis::use_data(effort)
+usethis::use_data(effort_example, overwrite = T)

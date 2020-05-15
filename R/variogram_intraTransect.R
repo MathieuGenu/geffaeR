@@ -27,7 +27,7 @@ variogram_intraTransect <- function(segdata_obs,
     stop(paste("Les colonnes suivantes ne sont pas dans les colonnes de segdata_obs :",
                paste(missing_col, collapse = "\n"), sep="\n"))
   }
-  if(obs == "n_obs") {
+  if(obs == "n_ind") {
     y <- segdata_obs$y
   }
   if(obs == "n_detection") {
