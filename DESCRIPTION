@@ -50,4 +50,7 @@ Imports:
     viridisLite,
     stats,
     utils,
-    mgcv
+    mgcv,
+    cli,
+    crayon,
+    crch
