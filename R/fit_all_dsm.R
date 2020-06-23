@@ -1,13 +1,13 @@
 #' @export
 
-get_k_best_models <- function(tab_model, m = 5, use_AIC = TRUE) {
+get_k_best_models <- function(tab_model, k = 5, use_AIC = TRUE) {
   if(use_AIC) {
     tab_model <- tab_model[order(tab_model$AIC, decreasing = FALSE), ]
   } else {
     writeLines("\tUsing Explained Deviance for model selection")
     tab_model <- tab_model[order(tab_model$ExpDev, decreasing = TRUE), ]
   }
-  return(as.character(tab_model[1:m, "model"]))
+  return(tab_model[1:k, "index"])
 }
 
 
@@ -17,22 +17,22 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
                         family = "negative binomial", esw = NULL,
                         max_cor = 0.6, nb_max_pred = 3, complexity = 3,
                         longlat = TRUE, use_gam = FALSE,
-                        m = 5) {
+                        k = 5, weighted = FALSE) {
   ## family must be one of "negative binomial", "poisson" or "tweedie"
   ## default is "negative binomial"
   ## longlat controls what sort of intercept is being fitted :
   # for prediction inside the prospected polygon,
   # should be set to TRUE to obtain stable estimates
   # for prediction outside, MUST be set to FALSE to keep extrapolation under control
-  # m is the number of model to return (based on AIC or Deviance)
+  # k is the number of model to return (based on AIC or Deviance)
   # by default, use B-splines with shrinkage
   rescale <- function(x) { (x - mean(x))/sd(x) }
 
-  ## design matrix
-  X <- segdata[, c(predictors, "longitude", "latitude")]
+  ## raw data
+  X <- segdata
 
   ## standardize
-  segdata[, c(predictors, "longitude", "latitude")] <- apply(X, 2, rescale)
+  segdata[, c(predictors, "longitude", "latitude")] <- apply(segdata[, c(predictors, "longitude", "latitude")], 2, rescale)
 
   ## prepare smooth terms
   smoothers <- paste("s(", predictors, ", k = ", complexity, ", bs = 'cs')", sep = "")
@@ -68,29 +68,49 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
 
   ## remove combinations of variables that are too correlated
   all_mods <- all_mods[which(rm_combn < max_cor)]
+  ## compute weights
+  if(weighted) {
+    w <- lapply(all_x, function(tab) {
+      sapply(1:ncol(tab), function(j) {
+        make_cfact_2(calibration_data = segdata,
+                     test_data = segdata,
+                     var_name = covariable[tab[, j]],
+                     percent = F,
+                     near_by = T
+        )
+      })
+    })
+    w <- cbind(rep(1, nrow(segdata)), do.call('cbind', w))
+    w <- w[, which(rm_combn < max_cor)]
+
+  } else {
+    w <- matrix(1, nrow = nrow(segdata), ncol = length(which(rm_combn < max_cor)))
+  }
 
   # suppress warnings
   # options(warn = -1)
 
   # relabel Sample.Label to have only unique match
+  X$Sample.Label <- paste(X$Sample.Label, X$Seg, sep = "_")
   segdata$Sample.Label <- paste(segdata$Sample.Label, segdata$Seg, sep = "_")
   obsdata$Sample.Label <- paste(obsdata$Sample.Label, obsdata$Seg, sep = "_")
 
   ## fit the models
   if(!is.null(distFit)) {
-    my_dsm_fct <- function(x, tab = TRUE) {
+    my_dsm_fct <- function(x, tab = TRUE, segdata) {
       if(family == "negative binomial") {
-        model <- dsm(as.formula(x), ddf.obj = distFit, segment.data = segdata, observation.data = obsdata, strip.width = NULL, family = nb(), method = "REML")
+        model <- dsm(as.formula(all_mods[x]), ddf.obj = distFit, segment.data = segdata, observation.data = obsdata, strip.width = NULL, family = nb(), method = "REML", weights = w[, x])
       }
       if(family == "poisson") {
-        model <- dsm(as.formula(x), ddf.obj = distFit, segment.data = segdata, observation.data = obsdata, strip.width = NULL, family = poisson(), method = "REML")
+        model <- dsm(as.formula(all_mods[x]), ddf.obj = distFit, segment.data = segdata, observation.data = obsdata, strip.width = NULL, family = poisson(), method = "REML", weights = w[, x])
       }
       if(family == "tweedie") {
-        model <- dsm(as.formula(x), ddf.obj = distFit, segment.data = segdata, observation.data = obsdata, strip.width = NULL, family = tw(), method = "REML")
+        model <- dsm(as.formula(all_mods[x]), ddf.obj = distFit, segment.data = segdata, observation.data = obsdata, strip.width = NULL, family = tw(), method = "REML", weights = w[, x])
       }
       ### store some results in a data frame
       if(tab) {
-        return(data.frame(model = x,
+        return(data.frame(model = all_mods[x],
+                          index = x,
                           Convergence = ifelse(model$converged, 1, 0),
                           AIC = model$aic,
                           # GCV = model$gcv.ubre,
@@ -116,17 +136,18 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
           }
           my_dsm_fct <- function(x, tab = TRUE) {
             if(family == "negative binomial") {
-              model <- gam(as.formula(x), data = segdata, offset = 2*esw*segdata$Effort, family = nb(), method = "REML")
+              model <- gam(as.formula(all_mods[x]), data = segdata, offset = 2*esw*segdata$Effort, family = nb(), method = "REML", weights = w[, x])
             }
             if(family == "poisson") {
-              model <- gam(as.formula(x), data = segdata, offset = 2*esw*segdata$Effort, family = poisson(), method = "REML")
+              model <- gam(as.formula(all_mods[x]), data = segdata, offset = 2*esw*segdata$Effort, family = poisson(), method = "REML", weights = w[, x])
             }
             if(family == "tweedie") {
-              model <- gam(as.formula(x), data = segdata, offset = 2*esw*segdata$Effort, family = tw(), method = "REML")
+              model <- gam(as.formula(all_mods[x]), data = segdata, offset = 2*esw*segdata$Effort, family = tw(), method = "REML", weights = w[, x])
             }
             ### store some results in a data frame
             if(tab) {
-              return(data.frame(model = x,
+              return(data.frame(model = all_mods[x],
+                                index = x,
                                 Convergence = ifelse(model$converged, 1, 0),
                                 AIC = model$aic,
                                 # GCV = model$gcv.ubre,
@@ -140,17 +161,18 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
         } else {
           my_dsm_fct <- function(x, tab = TRUE) {
             if(family == "negative binomial") {
-              model <- dsm(as.formula(x), ddf.obj = NULL, strip.width = esw, segment.data = segdata, observation.data = obsdata, family = nb(), method = "REML")
+              model <- dsm(as.formula(all_mods[x]), ddf.obj = NULL, strip.width = esw, segment.data = segdata, observation.data = obsdata, family = nb(), method = "REML", weights = w[, x])
             }
             if(family == "poisson") {
-              model <- dsm(as.formula(x), ddf.obj = NULL, strip.width = esw, segment.data = segdata, observation.data = obsdata, family = poisson(), method = "REML")
+              model <- dsm(as.formula(all_mods[x]), ddf.obj = NULL, strip.width = esw, segment.data = segdata, observation.data = obsdata, family = poisson(), method = "REML", weights = w[, x])
             }
             if(family == "tweedie") {
-              model <- dsm(as.formula(x), ddf.obj = NULL, strip.width = esw, segment.data = segdata, observation.data = obsdata, family = tw(), method = "REML")
+              model <- dsm(as.formula(all_mods[x]), ddf.obj = NULL, strip.width = esw, segment.data = segdata, observation.data = obsdata, family = tw(), method = "REML", weights = w[, x])
             }
             ### store some results in a data frame
             if(tab) {
-              return(data.frame(model = x,
+              return(data.frame(model = all_mods[x],
+                                index = x,
                                 Convergence = ifelse(model$converged, 1, 0),
                                 AIC = model$aic,
                                 # GCV = model$gcv.ubre,
@@ -167,15 +189,18 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
       }
     }
   }
-  all_fits <- lapply(all_mods, my_dsm_fct)
+  all_fits <- lapply(1:length(all_mods), my_dsm_fct, segdata = segdata)
   ## Collapse to a data frame
   all_fits_binded <- do.call('rbind', all_fits)
 
   ## select the n-best models
-  best <- lapply(get_k_best_models(tab_model = all_fits_binded, m = m), my_dsm_fct, tab = FALSE)
+  best <- lapply(get_k_best_models(tab_model = all_fits_binded, k = k), my_dsm_fct, tab = FALSE, segdata = X)
+  best_std <- lapply(get_k_best_models(tab_model = all_fits_binded, k = k), my_dsm_fct, tab = FALSE, segdata = segdata)
 
   ## wrap-up with the outputs
   return(list(all_fits_binded = all_fits_binded,
-              best_models = best)
+              best_models = best,
+              best_models_std = best_std # pour le pred splines
+              )
          )
 }
