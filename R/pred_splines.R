@@ -22,9 +22,9 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE) {
 
   if(remove_intercept) { beta[, 1] <- 0; writeLines("\tRemoving intercept") }
 
-  rm_spatial <- grep("Lon,Lat", names(dsm_model$coefficients))
+  rm_spatial <- grep("X, Y", names(dsm_model$coefficients))
   if(length(rm_spatial) != 0) { beta[, rm_spatial] <- 0.0 }
-  if(any(var_name %in% c("longitude", "latitude"))) { var_name <- var_name[-which(var_name %in% c("longitude", "latitude"))] }
+  if(any(var_name %in% c("X", "Y"))) { var_name <- var_name[-which(var_name %in% c("longitude", "latitude"))] }
 
   for(j in var_name) {
     Z <- Xnew

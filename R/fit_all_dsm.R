@@ -16,27 +16,27 @@ get_k_best_models <- function(tab_model, k = 5, use_AIC = TRUE) {
 fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
                         family = "negative binomial", esw = NULL,
                         max_cor = 0.6, nb_max_pred = 3, complexity = 3,
-                        longlat = TRUE, use_gam = FALSE,
+                        smooth_xy = TRUE, use_gam = FALSE,
                         k = 5, weighted = FALSE) {
   ## family must be one of "negative binomial", "poisson" or "tweedie"
   ## default is "negative binomial"
-  ## longlat controls what sort of intercept is being fitted :
+  ## smooth_xy controls the intercept to include or not a bivariate smooth on x and y :
   # for prediction inside the prospected polygon,
   # should be set to TRUE to obtain stable estimates
   # for prediction outside, MUST be set to FALSE to keep extrapolation under control
-  # k is the number of model to return (based on AIC or Deviance)
-  # by default, use B-splines with shrinkage
-  rescale <- function(x) { (x - mean(x))/sd(x) }
+  ## k is the number of model to return (based on AIC or Deviance)
+  ## by default, use cubic B-splines with shrinkage
+  rescale <- function(x) { (x - mean(x)) / sd(x) }
 
   ## raw data
   X <- segdata
 
   ## standardize
-  segdata[, c(predictors, "longitude", "latitude")] <- apply(segdata[, c(predictors, "longitude", "latitude")], 2, rescale)
+  segdata[, c(predictors, "longitude", "latitude", "X", "Y")] <- apply(segdata[, c(predictors, "longitude", "latitude", "X", "Y")], 2, rescale)
 
   ## prepare smooth terms
   smoothers <- paste("s(", predictors, ", k = ", complexity, ", bs = 'cs')", sep = "")
-  intercept <- ifelse(longlat, "~ s(longitude, latitude)", "~ 1")
+  intercept <- ifelse(smooth_xy, "~ s(X, Y)", "~ 1")
 
   ## all combinations among nb_max_pred
   all_x <- lapply(1:nb_max_pred, combn, x = length(predictors))
@@ -117,8 +117,8 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
                           ResDev = model$deviance,
                           NulDev = model$null.deviance,
                           ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
-                          )
-               )
+        )
+        )
       } else { return(model) }
     }
   } else {
@@ -154,8 +154,8 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
                                 ResDev = model$deviance,
                                 NulDev = model$null.deviance,
                                 ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
-                                )
-                     )
+              )
+              )
             } else { return(model) }
           }
         } else {
@@ -179,8 +179,8 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
                                 ResDev = model$deviance,
                                 NulDev = model$null.deviance,
                                 ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
-                                )
-                     )
+              )
+              )
             } else { return(model) }
           }
         }
@@ -201,6 +201,6 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
   return(list(all_fits_binded = all_fits_binded,
               best_models = best,
               best_models_std = best_std # pour le pred splines
-              )
-         )
+  )
+  )
 }
