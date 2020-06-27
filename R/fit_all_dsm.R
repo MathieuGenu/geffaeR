@@ -34,15 +34,6 @@ fit_all_dsm <- function(distFit = NULL,
   ## by default, use cubic B-splines with shrinkage
 
   rescale <- function(x) { (x - mean(x)) / sd(x) }
-
-  ## response variable is either n (nb of observations) or y (nb of individuals)
-  if(response != "ind") {
-    writeLines("response variable is the number of obsersations")
-    obsdata$size <- 1
-  } else {
-    writeLines("response variable is the number of individuals")
-  }
-
   ## raw data
   X <- segdata
 
@@ -51,7 +42,8 @@ fit_all_dsm <- function(distFit = NULL,
 
   ## prepare smooth terms
   smoothers <- paste("s(", predictors, ", k = ", complexity, ", bs = 'cs')", sep = "")
-  intercept <- ifelse(smooth_xy, "~ te(X, Y, bs = 'cs')", "~ 1")
+  # intercept <- ifelse(smooth_xy, "~ te(X, Y, bs = 'cs')", "~ 1")
+  intercept <- ifelse(smooth_xy, "~ te(longitude, latitude, bs = 'cs')", "~ 1")
 
   ## can include a random effect
   if(!is.null(random)) {
@@ -118,6 +110,14 @@ fit_all_dsm <- function(distFit = NULL,
   X$Sample.Label <- paste(X$Sample.Label, X$Seg, sep = "_")
   segdata$Sample.Label <- paste(segdata$Sample.Label, segdata$Seg, sep = "_")
   obsdata$Sample.Label <- paste(obsdata$Sample.Label, obsdata$Seg, sep = "_")
+
+  ## response variable is either n (nb of observations) or y (nb of individuals)
+  if(response != "ind") {
+    writeLines("response variable is the number of obsersations")
+    obsdata$size <- 1
+  } else {
+    writeLines("response variable is the number of individuals")
+  }
 
   ## fit the models
   if(!is.null(distFit)) {
