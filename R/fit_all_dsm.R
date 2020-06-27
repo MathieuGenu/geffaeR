@@ -58,7 +58,7 @@ fit_all_dsm <- function(distFit = NULL,
     if(!any(names(segdata) == random)) {
       stop("Check random effect: no matching column in segdata")
     } else {
-      intercept <- paste(intercept, " + s(", random, ", bs = "re")", sep = "")
+      intercept <- paste(intercept, " + s(", random, ", bs = 're')", sep = "")
     }
   }
 
