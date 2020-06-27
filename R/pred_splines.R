@@ -56,7 +56,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE) {
   } else {
     gridxy <- NULL
   }
-  if(any(var_name %in% c("X", "Y"))) { var_name <- var_name[-which(var_name %in% c("X", "Y"))] }
+  if(any(var_name %in% c("X", "Y", "longitude", "latitude"))) { var_name <- var_name[-which(var_name %in% c("X", "Y", "longitude", "latitude"))] }
 
   for(j in var_name) {
     Z <- Xnew
