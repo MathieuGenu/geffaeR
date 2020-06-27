@@ -13,11 +13,16 @@ get_k_best_models <- function(tab_model, k = 5, use_AIC = TRUE) {
 
 #' @export
 
-fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
+fit_all_dsm <- function(distFit = NULL,
+                        segdata, obsdata,
+                        response = "ind",
+                        predictors,
                         likelihood = "negbin", esw = NULL,
                         max_cor = 0.5, nb_max_pred = 3, complexity = 4,
-                        smooth_xy = TRUE, use_gam = FALSE,
-                        k = 5, weighted = FALSE
+                        smooth_xy = TRUE,
+                        k = 5,
+                        weighted = FALSE,
+                        random = NULL
                         ) {
   ## likelihood must be one of "negbin", "poisson" or "tweedie"
   ## default is "negbin" for negative binomial likelihood
@@ -27,7 +32,16 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
   # for prediction outside, MUST be set to FALSE to keep extrapolation under control
   ## k is the number of model to return (based on AIC or Deviance)
   ## by default, use cubic B-splines with shrinkage
+
   rescale <- function(x) { (x - mean(x)) / sd(x) }
+
+  ## response variable is either n (nb of observations) or y (nb of individuals)
+  if(response != "ind") {
+    writeLines("response variable is the number of obsersations")
+    obsdata$size <- 1
+  } else {
+    writeLines("response variable is the number of individuals")
+  }
 
   ## raw data
   X <- segdata
@@ -38,6 +52,15 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
   ## prepare smooth terms
   smoothers <- paste("s(", predictors, ", k = ", complexity, ", bs = 'cs')", sep = "")
   intercept <- ifelse(smooth_xy, "~ s(X, Y)", "~ 1")
+
+  ## can include a random effect
+  if(!is.null(random)) {
+    if(!any(names(segdata) == random)) {
+      stop("Check random effect: no matching column in segdata")
+    } else {
+      intercept <- paste(intercept, " + s(", random, ", bs = "re")", sep = "")
+    }
+  }
 
   ## all combinations among nb_max_pred
   all_x <- lapply(1:nb_max_pred, combn, x = length(predictors))
@@ -63,8 +86,8 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
           sep = paste(intercept, "+", sep = " ")
           )
   }
-  all_mods <- c(paste(outcome, intercept, sep = " "),
-                unlist(lapply(1:nb_max_pred, mlist, y = outcome, predictors = smoothers))
+  all_mods <- c(paste("count", intercept, sep = " "),
+                unlist(lapply(1:nb_max_pred, mlist, y = "count", predictors = smoothers))
                 )
 
   ## remove combinations of variables that are too correlated
@@ -92,24 +115,25 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
   # options(warn = -1)
 
   # relabel Sample.Label to have only unique match per segments
-  # X$Sample.Label <- paste(X$Sample.Label, X$Seg, sep = "_")
-  # segdata$Sample.Label <- paste(segdata$Sample.Label, segdata$Seg, sep = "_")
-  # obsdata$Sample.Label <- paste(obsdata$Sample.Label, obsdata$Seg, sep = "_")
+  X$Sample.Label <- paste(X$Sample.Label, X$Seg, sep = "_")
+  segdata$Sample.Label <- paste(segdata$Sample.Label, segdata$Seg, sep = "_")
+  obsdata$Sample.Label <- paste(obsdata$Sample.Label, obsdata$Seg, sep = "_")
+
 
   ## fit the models
   if(!is.null(distFit)) {
     my_dsm_fct <- function(x, tab = TRUE, segdata) {
-      model <- dsm(as.formula(all_mods[x]), 
-                   ddf.obj = distFit, 
-                   segment.data = segdata, 
-                   observation.data = obsdata, 
-                   strip.width = NULL, 
-                   family = switch(likelihood, 
+      model <- dsm(as.formula(all_mods[x]),
+                   ddf.obj = distFit,
+                   segment.data = segdata,
+                   observation.data = obsdata,
+                   strip.width = NULL,
+                   family = switch(likelihood,
                                    negbin = nb(),
                                    poisson = poisson(),
                                    tweedie = tw()
-                                   ), 
-                   method = "REML", 
+                                   ),
+                   method = "REML",
                    weights = w[, x]
                    )
       ### store some results in a data frame
@@ -131,62 +155,34 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
       stop("Must Provide a value for esw")
     } else {
       if(length(esw) == 1 | length(esw) == nrow(segdata)) {
-        if(use_gam == TRUE) {
-          my_dsm_fct <- function(x, tab = TRUE, segdata) {
-            model <- gam(as.formula(all_mods[x]), 
-                         data = segdata, 
-                         offset = 2 * esw * segdata$Effort, 
-                         family = switch(likelihood, 
-                                         negbin = nb(),
-                                         poisson = poisson(),
-                                         tweedie = tw()
-                                         ), 
-                         method = "REML", 
-                         weights = w[, x]
-                         )
-            ### store some results in a data frame
-            if(tab) {
-              return(data.frame(model = all_mods[x],
-                                index = x,
-                                Convergence = ifelse(model$converged, 1, 0),
-                                AIC = model$aic,
-                                # GCV = model$gcv.ubre,
-                                ResDev = model$deviance,
-                                NulDev = model$null.deviance,
-                                ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
-                                )
-              )
-            } else { return(model) }
-          }
-        } else {
-          my_dsm_fct <- function(x, tab = TRUE, segdata) {
-            model <- dsm(as.formula(all_mods[x]), 
-                         ddf.obj = NULL, 
-                         strip.width = esw, 
-                         segment.data = segdata, 
-                         observation.data = obsdata, 
-                         family = switch(likelihood, 
-                                         negbin = nb(),
-                                         poisson = poisson(),
-                                         tweedie = tw()
-                                         ), 
-                         method = "REML", 
-                         weights = w[, x]
-                         )
-            ### store some results in a data frame
-            if(tab) {
-              return(data.frame(model = all_mods[x],
-                                index = x,
-                                Convergence = ifelse(model$converged, 1, 0),
-                                AIC = model$aic,
-                                # GCV = model$gcv.ubre,
-                                ResDev = model$deviance,
-                                NulDev = model$null.deviance,
-                                ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
-                                )
-              )
-            } else { return(model) }
-          }
+        my_dsm_fct <- function(x, tab = TRUE, segdata) {
+          model <- dsm(as.formula(all_mods[x]),
+                       ddf.obj = NULL,
+                       strip.width = NULL,
+                       segment.area = 2 * esw * segdata$Effort,
+                       segment.data = segdata,
+                       observation.data = obsdata,
+                       family = switch(likelihood,
+                                       negbin = nb(),
+                                       poisson = poisson(),
+                                       tweedie = tw()
+                                       ),
+                       method = "REML",
+                       weights = w[, x]
+                       )
+          ### store some results in a data frame
+          if(tab) {
+            return(data.frame(model = all_mods[x],
+                              index = x,
+                              Convergence = ifelse(model$converged, 1, 0),
+                              AIC = model$aic,
+                              # GCV = model$gcv.ubre,
+                              ResDev = model$deviance,
+                              NulDev = model$null.deviance,
+                              ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
+                              )
+                   )
+          } else { return(model) }
         }
       } else {
         stop("Please check esw: provide either a single value or a vector with same length as segdata")
