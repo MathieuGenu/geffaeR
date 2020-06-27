@@ -119,7 +119,6 @@ fit_all_dsm <- function(distFit = NULL,
   segdata$Sample.Label <- paste(segdata$Sample.Label, segdata$Seg, sep = "_")
   obsdata$Sample.Label <- paste(obsdata$Sample.Label, obsdata$Seg, sep = "_")
 
-
   ## fit the models
   if(!is.null(distFit)) {
     my_dsm_fct <- function(x, tab = TRUE, segdata) {

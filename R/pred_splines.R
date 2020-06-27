@@ -23,7 +23,32 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE) {
   if(remove_intercept) { beta[, 1] <- 0; writeLines("\tRemoving intercept") }
 
   rm_spatial <- grep("X,Y", names(dsm_model$coefficients))
-  if(length(rm_spatial) != 0) { beta[, rm_spatial] <- 0.0 }
+  if(length(rm_spatial) != 0) {
+    gridxy <- expand.grid(X = (seq(min(segdata[, "X"], na.rm = TRUE), max(segdata[, "X"], na.rm = TRUE), length.out = 1e2) - mean(segdata[, "X"], na.rm = TRUE)) / sd(segdata[, "X"], na.rm = TRUE),
+                          Y = (seq(min(segdata[, "Y"], na.rm = TRUE), max(segdata[, "Y"], na.rm = TRUE), length.out = 1e2) - mean(segdata[, "Y"], na.rm = TRUE)) / sd(segdata[, "Y"], na.rm = TRUE)
+                          )
+
+    Z <- predict(dsm_model,
+                 newdata = cbind(gridxy,
+                                 as.data.frame(sapply(var_name[-which(var_name %in% c("X", "Y"))], function(id) { rep(0, 1e4) }))
+                                 ),
+                 off.set = 1,
+                 type = "lpmatrix"
+                 )
+    slinpred <- beta %*% t(Z); rm(Z)
+    gridxy <- expand.grid(X = seq(min(segdata[, "X"], na.rm = TRUE), max(segdata[, "X"], na.rm = TRUE), length.out = 1e2),
+                          Y = seq(min(segdata[, "Y"], na.rm = TRUE), max(segdata[, "Y"], na.rm = TRUE), length.out = 1e2)
+                          )
+    gridxy <- rbind(gridxy, gridxy)
+    gridxy$spatial <- c(apply(slinpred, 2, mean), apply(exp(slinpred), 2, mean))
+    gridxy$lower <- c(apply(slinpred, 2, lower), apply(exp(slinpred), 2, lower))
+    gridxy$upper <- c(apply(slinpred, 2, upper), apply(exp(slinpred), 2, upper))
+    gridxy$scale <- rep(c("log", "natural"), each = 1e4)
+    ### set to 0 for remaining effects
+    beta[, rm_spatial] <- 0.0
+  } else {
+    gridxy <- NULL
+  }
   if(any(var_name %in% c("X", "Y"))) { var_name <- var_name[-which(var_name %in% c("X", "Y"))] }
 
   for(j in var_name) {
@@ -38,15 +63,15 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE) {
                                    upper = apply(linpred, 2, upper),
                                    param = rep(j, nx),
                                    scale = rep("log", nx)
-                        ),
+                                   ),
                         data.frame(x = seq(min(segdata[, j], na.rm = TRUE), max(segdata[, j], na.rm = TRUE), length.out = nx),
                                    y = apply(exp(linpred), 2, mean),
                                    lower = apply(exp(linpred), 2, lower),
                                    upper = apply(exp(linpred), 2, upper),
                                    param = rep(j, nx),
                                    scale = rep("natural", nx)
+                                   )
                         )
-    )
   }
   g_splines <- ggplot(data = df_splines,
                       aes(x = x, y = y, ymin = lower, ymax = upper)
@@ -59,7 +84,8 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE) {
     theme_bw()
 
   return(list(df_splines = df_splines,
-              g_splines = g_splines
-  )
-  )
+              g_splines = g_splines,
+              spatial = gridxy
+              )
+         )
 }
