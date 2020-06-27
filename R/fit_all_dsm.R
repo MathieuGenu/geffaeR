@@ -51,7 +51,7 @@ fit_all_dsm <- function(distFit = NULL,
 
   ## prepare smooth terms
   smoothers <- paste("s(", predictors, ", k = ", complexity, ", bs = 'cs')", sep = "")
-  intercept <- ifelse(smooth_xy, "~ s(X, Y)", "~ 1")
+  intercept <- ifelse(smooth_xy, "~ te(X, Y, bs = 'cs')", "~ 1")
 
   ## can include a random effect
   if(!is.null(random)) {
