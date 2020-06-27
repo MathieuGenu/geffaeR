@@ -158,7 +158,7 @@ fit_all_dsm <- function(distFit = NULL,
         my_dsm_fct <- function(x, tab = TRUE, segdata) {
           model <- dsm(as.formula(all_mods[x]),
                        ddf.obj = NULL,
-                       strip.width = NULL,
+                       strip.width = esw,
                        segment.area = 2 * esw * segdata$Effort,
                        segment.data = segdata,
                        observation.data = obsdata,
