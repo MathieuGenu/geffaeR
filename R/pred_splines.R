@@ -24,7 +24,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE) {
 
   rm_spatial <- grep("X,Y", names(dsm_model$coefficients))
   if(length(rm_spatial) != 0) { beta[, rm_spatial] <- 0.0 }
-  if(any(var_name %in% c("X", "Y"))) { var_name <- var_name[-which(var_name %in% c("longitude", "latitude"))] }
+  if(any(var_name %in% c("X", "Y"))) { var_name <- var_name[-which(var_name %in% c("X", "Y"))] }
 
   for(j in var_name) {
     Z <- Xnew
@@ -50,7 +50,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE) {
   }
   g_splines <- ggplot(data = df_splines,
                       aes(x = x, y = y, ymin = lower, ymax = upper)
-  ) +
+                      ) +
     geom_ribbon(alpha = 0.3, fill = "midnightblue") +
     geom_line(color = "midnightblue") +
     facet_grid(scale ~ param, scales = "free") +

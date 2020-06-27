@@ -14,12 +14,13 @@ get_k_best_models <- function(tab_model, k = 5, use_AIC = TRUE) {
 #' @export
 
 fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
-                        family = "negative binomial", esw = NULL,
-                        max_cor = 0.6, nb_max_pred = 3, complexity = 3,
+                        likelihood = "negbin", esw = NULL,
+                        max_cor = 0.5, nb_max_pred = 3, complexity = 4,
                         smooth_xy = TRUE, use_gam = FALSE,
-                        k = 5, weighted = FALSE) {
-  ## family must be one of "negative binomial", "poisson" or "tweedie"
-  ## default is "negative binomial"
+                        k = 5, weighted = FALSE
+                        ) {
+  ## likelihood must be one of "negbin", "poisson" or "tweedie"
+  ## default is "negbin" for negative binomial likelihood
   ## smooth_xy controls the intercept to include or not a bivariate smooth on x and y :
   # for prediction inside the prospected polygon,
   # should be set to TRUE to obtain stable estimates
@@ -55,16 +56,16 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
     rm_combn <- c(c(rep(0, length(predictors) + 1)), unlist(rm_combn))
   }
 
-  ## Create list of models
+  ## list of models
   mlist <- function(n, y, predictors) {
     paste(y,
           apply(X = combn(predictors, n), MARGIN = 2, paste, collapse = " + "),
           sep = paste(intercept, "+", sep = " ")
-    )
+          )
   }
   all_mods <- c(paste(outcome, intercept, sep = " "),
                 unlist(lapply(1:nb_max_pred, mlist, y = outcome, predictors = smoothers))
-  )
+                )
 
   ## remove combinations of variables that are too correlated
   all_mods <- all_mods[which(rm_combn < max_cor)]
@@ -77,7 +78,7 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
                      var_name = covariable[tab[, j]],
                      percent = F,
                      near_by = T
-        )
+                     )
       })
     })
     w <- cbind(rep(1, nrow(segdata)), do.call('cbind', w))
@@ -90,23 +91,27 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
   # suppress warnings
   # options(warn = -1)
 
-  # relabel Sample.Label to have only unique match
-  X$Sample.Label <- paste(X$Sample.Label, X$Seg, sep = "_")
-  segdata$Sample.Label <- paste(segdata$Sample.Label, segdata$Seg, sep = "_")
-  obsdata$Sample.Label <- paste(obsdata$Sample.Label, obsdata$Seg, sep = "_")
+  # relabel Sample.Label to have only unique match per segments
+  # X$Sample.Label <- paste(X$Sample.Label, X$Seg, sep = "_")
+  # segdata$Sample.Label <- paste(segdata$Sample.Label, segdata$Seg, sep = "_")
+  # obsdata$Sample.Label <- paste(obsdata$Sample.Label, obsdata$Seg, sep = "_")
 
   ## fit the models
   if(!is.null(distFit)) {
     my_dsm_fct <- function(x, tab = TRUE, segdata) {
-      if(family == "negative binomial") {
-        model <- dsm(as.formula(all_mods[x]), ddf.obj = distFit, segment.data = segdata, observation.data = obsdata, strip.width = NULL, family = nb(), method = "REML", weights = w[, x])
-      }
-      if(family == "poisson") {
-        model <- dsm(as.formula(all_mods[x]), ddf.obj = distFit, segment.data = segdata, observation.data = obsdata, strip.width = NULL, family = poisson(), method = "REML", weights = w[, x])
-      }
-      if(family == "tweedie") {
-        model <- dsm(as.formula(all_mods[x]), ddf.obj = distFit, segment.data = segdata, observation.data = obsdata, strip.width = NULL, family = tw(), method = "REML", weights = w[, x])
-      }
+      model <- dsm(as.formula(all_mods[x]), 
+                   ddf.obj = distFit, 
+                   segment.data = segdata, 
+                   observation.data = obsdata, 
+                   strip.width = NULL, 
+                   family = switch(likelihood, 
+                                   negbin = nb(),
+                                   poisson = poisson(),
+                                   tweedie = tw()
+                                   ), 
+                   method = "REML", 
+                   weights = w[, x]
+                   )
       ### store some results in a data frame
       if(tab) {
         return(data.frame(model = all_mods[x],
@@ -117,7 +122,7 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
                           ResDev = model$deviance,
                           NulDev = model$null.deviance,
                           ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
-        )
+                          )
         )
       } else { return(model) }
     }
@@ -127,23 +132,18 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
     } else {
       if(length(esw) == 1 | length(esw) == nrow(segdata)) {
         if(use_gam == TRUE) {
-          if(any(names(segdata) == outcome) == FALSE) {
-            countdata <- as.data.frame(obsdata[, c("Sample.Label", "size")] %>% group_by(Sample.Label) %>% summarize(n = n(), count = sum(size)))
-            segdata$n <- merge(segdata, countdata, by  = "Sample.Label", all.x = TRUE)[, "n"]
-            segdata$n <- ifelse(is.na(segdata$n), 0, segdata$n)
-            segdata$count <- merge(segdata, countdata, by  = "Sample.Label", all.x = TRUE)[, "count"]
-            segdata$count <- ifelse(is.na(segdata$count), 0, segdata$count)
-          }
-          my_dsm_fct <- function(x, tab = TRUE) {
-            if(family == "negative binomial") {
-              model <- gam(as.formula(all_mods[x]), data = segdata, offset = 2*esw*segdata$Effort, family = nb(), method = "REML", weights = w[, x])
-            }
-            if(family == "poisson") {
-              model <- gam(as.formula(all_mods[x]), data = segdata, offset = 2*esw*segdata$Effort, family = poisson(), method = "REML", weights = w[, x])
-            }
-            if(family == "tweedie") {
-              model <- gam(as.formula(all_mods[x]), data = segdata, offset = 2*esw*segdata$Effort, family = tw(), method = "REML", weights = w[, x])
-            }
+          my_dsm_fct <- function(x, tab = TRUE, segdata) {
+            model <- gam(as.formula(all_mods[x]), 
+                         data = segdata, 
+                         offset = 2 * esw * segdata$Effort, 
+                         family = switch(likelihood, 
+                                         negbin = nb(),
+                                         poisson = poisson(),
+                                         tweedie = tw()
+                                         ), 
+                         method = "REML", 
+                         weights = w[, x]
+                         )
             ### store some results in a data frame
             if(tab) {
               return(data.frame(model = all_mods[x],
@@ -154,21 +154,25 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
                                 ResDev = model$deviance,
                                 NulDev = model$null.deviance,
                                 ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
-              )
+                                )
               )
             } else { return(model) }
           }
         } else {
-          my_dsm_fct <- function(x, tab = TRUE) {
-            if(family == "negative binomial") {
-              model <- dsm(as.formula(all_mods[x]), ddf.obj = NULL, strip.width = esw, segment.data = segdata, observation.data = obsdata, family = nb(), method = "REML", weights = w[, x])
-            }
-            if(family == "poisson") {
-              model <- dsm(as.formula(all_mods[x]), ddf.obj = NULL, strip.width = esw, segment.data = segdata, observation.data = obsdata, family = poisson(), method = "REML", weights = w[, x])
-            }
-            if(family == "tweedie") {
-              model <- dsm(as.formula(all_mods[x]), ddf.obj = NULL, strip.width = esw, segment.data = segdata, observation.data = obsdata, family = tw(), method = "REML", weights = w[, x])
-            }
+          my_dsm_fct <- function(x, tab = TRUE, segdata) {
+            model <- dsm(as.formula(all_mods[x]), 
+                         ddf.obj = NULL, 
+                         strip.width = esw, 
+                         segment.data = segdata, 
+                         observation.data = obsdata, 
+                         family = switch(likelihood, 
+                                         negbin = nb(),
+                                         poisson = poisson(),
+                                         tweedie = tw()
+                                         ), 
+                         method = "REML", 
+                         weights = w[, x]
+                         )
             ### store some results in a data frame
             if(tab) {
               return(data.frame(model = all_mods[x],
@@ -179,7 +183,7 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
                                 ResDev = model$deviance,
                                 NulDev = model$null.deviance,
                                 ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
-              )
+                                )
               )
             } else { return(model) }
           }
@@ -201,6 +205,6 @@ fit_all_dsm <- function(distFit, segdata, obsdata, outcome, predictors,
   return(list(all_fits_binded = all_fits_binded,
               best_models = best,
               best_models_std = best_std # pour le pred splines
-  )
-  )
+              )
+         )
 }
