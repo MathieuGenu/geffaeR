@@ -96,3 +96,63 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE) {
               )
          )
 }
+
+
+#' @export
+
+rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0) {
+  ### posterior predictive checks
+  beta <- mvtnorm::rmvnorm(n_rep, mean = model_fit$coefficients, sigma = model_fit$Vp)
+  Z <- predict(model_fit, type = "lpmatrix")
+  linpred <- beta %*% t(Z)
+  transfo_overdispersion <- exp(model_fit$family$getTheta())
+  y_rep <- t(apply(exp(linpred), 1,
+                   function(x) { MASS::rnegbin(n = length(x), mu = x, theta = transfo_overdispersion) }
+                   )
+             )
+
+  ### rootogram
+  countdata <- model_fit$data$count
+  f_histogram <- function(x, max_obs) { table(factor(x, levels = min_obs:max_obs)) }
+  max_obs <- max(countdata, as.numeric(y_rep))
+
+  ### earth-mover distance
+  cantonnier <- function(x, y, breaks, remove_zeroes = FALSE) {
+    if(remove_zeroes) {
+      x <- x[which(x != 0)]
+      y <- y[which(x != 0)]
+    }
+    x <- hist(x, breaks, plot = FALSE)$density
+    y <- hist(y, breaks, plot = FALSE)$density
+    return(emd = sum(abs(cumsum(x) - cumsum(y))))
+  }
+  gof <- apply(y_rep, 1, cantonnier, y = countdata, breaks = min_obs:max_obs, remove_zeroes = TRUE)
+
+  ### plot
+  theme_set(theme_bw(base_size = 16))
+  g <- ggplot(data.frame(mids = (min_obs:max_obs + (min_obs + 1):(max_obs + 1))/2,
+                         y_obs = as.numeric(f_histogram(x = countdata, max_obs = max_obs)),
+                         y_rep = apply(apply(y_rep, 1, f_histogram, max_obs = max_obs), 1, mean)
+                         ),
+              aes(x = mids, y = y_rep)
+              ) +
+    geom_rect(aes(xmin = mids - 0.5, xmax = mids + 0.5,
+                  ymax = y_obs, ymin = 0),
+              fill = "lightgrey", color = grey(0.6), alpha = 0.5
+              ) +
+    geom_line(aes(x = mids, y = y_rep), color = "black", size = 1.0) +
+    scale_y_sqrt(name = "Count") +
+    scale_x_sqrt(name = quote(y[obs]), breaks = c(c(1, 5, 10, 50), seq(100, 100 * ceiling(max_obs / 100), 100))) +
+    guides(size = "none") +
+    theme(plot.title = element_text(lineheight = 0.8, face = "bold"),
+          axis.text = element_text(size = 12),
+          strip.text = element_text(size = 12),
+          strip.background = element_rect(fill = grey(0.95))
+          )
+
+  ### wrap-up
+  return(list(rootogram = g,
+              earthMover = gof
+              )
+         )
+}
