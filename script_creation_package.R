@@ -89,7 +89,7 @@ usethis::use_data(lbrt93_proj)
 source("C:/Users/mgenu.RATUFA/Documents/Projet/Build_example_for_package/res/01_build_study_area_with_effort_obs/")
 
 # create a shapefile for vignette example
-load("Y:/8_DOSSIERS_EQUIPE/MGenu/Build_example_for_package/res/01_build_study_area_with_effort_obs/effort_observation.RData")
+load("C:/Users/mgenu.RATUFA/Documents/Projet/simul_ppp/res/effort_observation.RData")
 effort_example <- effort
 observation_example <- observation
 shape_example <- spdf
@@ -99,4 +99,5 @@ usethis::use_data(shape_example, overwrite = T)
 usethis::use_data(observation_example, overwrite = T)
 
 # create effort table
+effort_example$CenterTime <- lubridate::date(effort_example$CenterTime)
 usethis::use_data(effort_example, overwrite = T)

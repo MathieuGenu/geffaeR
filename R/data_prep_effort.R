@@ -10,8 +10,10 @@
 #'                       \item Block.
 #'                       \item Area.
 #'                     }
-#' @param shape Shapefile of the study area.
-#' @param shape_layer Layer of the shapefile.
+#' @param shape Shapefile of the study area. It can be either a SpatialPolygonsDataFrame class object,
+#'  in this case it is not necessary to give shape_layer argument. Or it can be the name of the shape
+#'  object with its extension ".shp" (ex : "data/studyAreShapefile.shp")
+#' @param shape_layer Layer of the shapefile if shape is a character string.
 #' @param New_projection New projection of longitude and latitude of columns
 #'        (POINT_X et POINT_Y) in Proj4String format,
 #'        see : \code{\link[sp]{CRS}} for more infos.
@@ -63,7 +65,11 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
   }
 
   # polygons sampling
-  poly_NC <- readOGR(dsn = paste(shape), layer = shape_layer, verbose = F) # NC
+  if(any("character" %in% is(shape))){
+    poly_NC <- readOGR(dsn = paste(shape), layer = shape_layer, verbose = F) # NC
+  } else {
+    poly_NC <- shape
+  }
 
 
   # Covariable

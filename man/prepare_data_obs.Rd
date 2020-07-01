@@ -26,9 +26,11 @@ prepare_data_obs(
 
 \item{segdata}{"Segdata" data.frame, built with \code{\link{prepare_data_effort}}.}
 
-\item{shape}{Shapefile of the study area.}
+\item{shape}{Shapefile of the study area. It can be either a SpatialPolygonsDataFrame class object,
+in this case it is not necessary to give shape_layer argument. Or it can be the name of the shape
+object with its extension ".shp" (ex : "data/studyAreShapefile.shp")}
 
-\item{shape_layer}{Layer of the shapefile.}
+\item{shape_layer}{Layer of the shapefile if shape is a character string.}
 
 \item{projection}{Projection of \code{shape} object.}
 

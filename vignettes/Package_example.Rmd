@@ -49,10 +49,10 @@ This vignette presents :
 
 # 1. Data Preparation
 
-Analysis are performed on data collected with [SAMMOA](https://www.codelutin.com/page-detail-sammoa.html) software. This software allows observers to input data while there are in aircraft or on boat. The outputs of this software are structured as below:
+Analysis are performed on data collected with [SAMMOA](https://www.codelutin.com/page-detail-sammoa.html) software. This software allows observers to collect data while there are in aircraft or on boat. The outputs of this software are structured as below:
 
 * Observation 
-```{r, echo = FALSE}
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
 library(geffaeR)
 library(tidyverse)
 library(DT)
@@ -78,8 +78,28 @@ htmltools::div(
 <br>
 
 
-To perform analysis on thoose data, it is necessary to modify its structure and column name to match the need of packages (Distance, dsm). To do so, there are 2 functions change_effort_varName and change_obs_varName
+## 1.1 change column names
 
+To perform analysis on thoose data, it is necessary to modify its column name to match the need of packages (Distance, dsm). To do so, there are 2 functions ```change_effort_varName()``` and ```change_obs_varName()```.
+
+
+## 1.2 Prepare data
+
+Then, it is necessary to modify the data structure. Effort and observation are modified to 
+```{r}
+library(data.tree)
+standard_effort <- change_effort_varName(effort_example)
+test <- prepare_data_effort(effort_base = standard_effort, 
+                    shape = shape_example,
+                    optimal = T,
+                    block_area = data.frame(Block = c("ATL_N"), 
+                                            Area = c(shape_example$area)), 
+                    New_projection = lbrt93_proj,
+                    covariable = NULL)
+tree <- as.Node(effort_example)
+print(tree)
+
+```
 
 
 
