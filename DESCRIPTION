@@ -54,3 +54,6 @@ Imports:
     cli,
     crayon,
     crch
+VignetteBuilder: knitr
+Suggests: 
+    rmarkdown

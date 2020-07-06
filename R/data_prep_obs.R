@@ -32,7 +32,11 @@ prepare_data_obs <- function(sp, obs_base, legdata, segdata, shape, shape_layer,
                              unit_km = FALSE) {
 
   # polygons sampling
-  poly_NC <- readOGR(dsn = file.path(shape), layer = shape_layer, verbose = F)
+  if(any("character" %in% is(shape))){
+    poly_NC <- readOGR(dsn = paste(shape), layer = shape_layer, verbose = F) # NC
+  } else {
+    poly_NC <- shape
+  }
 
 
   # load Observation base

@@ -57,9 +57,8 @@ library(geffaeR)
 library(tidyverse)
 library(DT)
 htmltools::div(
-  head(observation_example) %>% 
-  datatable(options = list(pageLength = 4, scrollX = T), width = 700),
-    style = "font-size:70%"
+  observation_example %>% 
+  datatable(options = list(pageLength = 5, scrollX = T), width = 700)
 )
 ```
 
@@ -69,9 +68,8 @@ library(geffaeR)
 library(tidyverse)
 library(DT)
 htmltools::div(
-  head(effort_example) %>% 
-  datatable(options = list(pageLength = 4, scrollX = T), width = 700),
-    style = "font-size:70%"
+  effort_example %>% 
+  datatable(options = list(pageLength = 5, scrollX = T), width = 700)
 )
 ```
 <br>
@@ -85,21 +83,73 @@ To perform analysis on thoose data, it is necessary to modify its column name to
 
 ## 1.2 Prepare data
 
-Then, it is necessary to modify the data structure. Effort and observation are modified to 
+Then, it is necessary to modify the data structure in a way to have the proper sub-dataframe for distance function. For this, effort dataframe is devided into 2 sub-dataframes :
+
+* dataframe at leg scale
+* dataframe at segment scale
 ```{r}
-library(data.tree)
 standard_effort <- change_effort_varName(effort_example)
-test <- prepare_data_effort(effort_base = standard_effort, 
+prepared_effort <- prepare_data_effort(effort_base = standard_effort, 
                     shape = shape_example,
                     optimal = T,
                     block_area = data.frame(Block = c("ATL_N"), 
                                             Area = c(shape_example$area)), 
                     New_projection = lbrt93_proj,
                     covariable = NULL)
-tree <- as.Node(effort_example)
-print(tree)
+str(prepared_effort)
 
+```
+Observation dataframe is splitted into 4 sub-dataframes.
+```{r}
+standard_obs <- change_obs_varName(observation_example)
+sp1 <- unique(observation_example$species)[1]
+legdata <- prepared_effort$legdata
+segdata <- prepared_effort$segdata
+projection <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+observation_output <- prepare_data_obs(sp = sp1, 
+                                       obs_base = standard_obs, 
+                                       legdata = legdata, 
+                                       segdata = segdata, 
+                                       shape = shape_example, 
+                                       shape_layer = shape_layer, 
+                                       projection = projection)
+str(observation_output)
 ```
 
 
+
+# 2. cds analysis
+
+When data are prepared the next step consist in adjusting a detection function on the data with the function ```plot_detection()```. It is possible to choose betwwen a half-normal function or hazard-rate one. It is necessary to inform the distance between which we want to perform the function.
+
+```{r}
+detection_TURTRU <- plot_detection(distdata = observation_output$distdata,
+                            bin = seq(0.0,1.0, 0.05),
+                            key = "halfnorm",
+                            upper = 1.0)
+```
+
+This function as several outputs, it gives : the esw (effective strip width),
+```{r}
+detection_TURTRU$esw
+```
+
+its standard deviation (CV),
+```{r}
+detection_TURTRU$esw_cv
+```
+
+the output of distance function from the package [Distance](https://CRAN.R-project.org/package=Distance)
+```{r}
+detection_TURTRU$distFit
+```
+```{r}
+summary(detection_TURTRU$distFit)
+```
+
+and gives the detetction plot (graph)
+```{r}
+detection_TURTRU$graph
+```
 

@@ -69,6 +69,8 @@ build()
 
 # Vignette creation
 usethis::use_vignette("Package_example")
+devtools::build_vignettes()
+devtools::build()
 
 # mettre des data dans le package
 load(paste("C:/Users/mgenu.RATUFA/Documents/Projet/donnees/data_package/Europe_fond2carte.RData"))
