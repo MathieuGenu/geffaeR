@@ -12,6 +12,7 @@ library(roxygen2)
 library(usethis)
 library(available)
 library(rstantools)
+library(pkgdown)
 
 use_devtools()
 
@@ -84,9 +85,9 @@ usethis::use_data(NEA_isobath100)
 usethis::use_data(NEA_isobath200)
 usethis::use_data(lbrt93_proj)
 
-# # pour rstan
-# use_rstan()
 
+# Data part #
+#-----------#
 
 source("C:/Users/mgenu.RATUFA/Documents/Projet/Build_example_for_package/res/01_build_study_area_with_effort_obs/")
 
@@ -103,3 +104,10 @@ usethis::use_data(observation_example, overwrite = T)
 # create effort table
 effort_example$CenterTime <- lubridate::date(effort_example$CenterTime)
 usethis::use_data(effort_example, overwrite = T)
+
+# pkgdown #
+#---------#
+# run one at the beginning
+usethis::use_pkgdown()
+pkgdown::build_site()
+pkgdown::build_home()
