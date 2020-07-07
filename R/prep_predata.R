@@ -21,8 +21,8 @@
 #'          \item{"Amelia" : }{\encoding{par méthode Amelia. méthode issue du pakage \pkg{Amelia}}.}
 #'        }
 #'        Par défaut la méthode est "PCA".}
-#' @param shape_pred \encoding{shapefile délimitant la zone où la prédiction est effectuée.}
-#' @param layer_pred \encoding{Layer du shpaefile donnant les limite de la zone de prédiction.}
+#' @param shape \encoding{shapefile délimitant la zone où la prédiction est effectuée.}
+#' @param layer \encoding{Layer du shpaefile donnant les limite de la zone de prédiction.}
 #' @param saturate_predata \encoding{Booléen. Si \code{TRUE}, la fonction saturate est appliquée à segdata sur
 #'        toutes les colonnes varenviro et varphysio. La fonction saturate va exclure les valeurs extrêmes de ces
 #'        colonnes en conservant uniquement les quantiles à 95% et 5%.}
@@ -47,7 +47,7 @@ prep_predata <- function(segdata,
                          varenviro, do_log_enviro,
                          varphysio, do_log_physio,
                          imputation = "Amelia",
-                         shape_pred,layer_pred,
+                         shape,layer,
                          saturate_predata = F, saturate_segdata = F,
                          inbox_poly = T) {
 
@@ -69,7 +69,7 @@ prep_predata <- function(segdata,
   segdata <- NULL
 
   ## prediction
-  pred.poly <- readOGR(dsn = paste(shape_pred, sep = "/"), layer = layer_pred)
+  pred.poly <- readOGR(dsn = paste(shape, sep = "/"), layer = layer)
 
   ### Covariable(s)
   # grille de la zone d'étude pour 2017
