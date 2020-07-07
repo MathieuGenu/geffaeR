@@ -1,18 +1,17 @@
-#' \encoding{Ajout des Observations sur les données effort.}
+#' \encoding{Adding observation on effort.}
 #'
-#' \encoding{Cette fonction permet d'ajouter le nombre d'individus/groupe et le nombre d'observation totale
-#' aux données d'effort preparées (i.e. a legdata et segdata).}
+#' \encoding{Adding the number of individuals and the group size on prepared effort data
+#' (e.g. on legdata and segdata).}
 #'
 #' @inheritParams prepare_data_obs
-#' @param countdata_leg \encoding{Un data.frame contenant le nombre de détection et d'individus total pour les legs
-#'           où il y a eu observation pour l'espèce ou group en question.}
-#' @param coundata_seg \encoding{Un data.frame contenant le nombre de détection et d'individus total pour les segments
-#'           où il y a eu observation pour l'espèce ou group en question.}
-#'
-#' @return Cette fonction renvoit une liste contenant :
+#' @param countdata_leg \encoding{data.frame containing the detection number and the total number of
+#' individuals for legs for which observation have beebn made.}
+#' @param coundata_seg \encoding{data.frame containing the detection number and the total number of
+#' individuals for segments for which observation have beebn made.
+#' @return This function return a list containing :
 #'         \enumerate{
-#'           \item legdata_obs : Un data.frame contenant Legdata avec des infos d'observations.
-#'           \item segdata_obs : Un data.frame contenant Segdata avec des infos d'observations.
+#'           \item legdata_obs : data.frame corresponding to legdata with observation information.
+#'           \item segdata_obs : data.frame corresponding to segdata with observation information.
 #'         }
 #' @examples
 #'

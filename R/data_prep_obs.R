@@ -1,6 +1,6 @@
-#' Preparation of observation data
+#' Preparation of observation data.
 #'
-#' This function transform raw observation data into multiple sub data.frame for next analysis of
+#' Transform raw observation data into multiple sub data.frame for next analysis of
 #' other functions of the package.
 #'
 #' @param sp Name of taxon, group, family or species.

@@ -1,6 +1,6 @@
-#' Standardisation of column names
+#' Standardisation of column names.
 #'
-#' This function allows to attribute standard names to column names of effort data.frame
+#' Attribute standard names to column names of effort data.frame
 #' for the next steps of the analysis.
 #'
 #' @param effort_base Data.frame containing column names to standardize.
@@ -140,9 +140,9 @@ change_effort_varName <- function(effort_base){
 
 }
 
-#' Standardisation of column names
+#' Standardisation of column names.
 #'
-#' This function allows to attribute standard names to column names of observation data.frame
+#' Attribute standard names to column names of observation data.frame
 #' for the next steps of the analysis.
 #'
 #' @param obs_base Data.frame containing column names to standardize.

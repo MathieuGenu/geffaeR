@@ -1,13 +1,13 @@
-#' distance smapling analysis
+#' Distance sampling analysis.
 #'
-#' This function calculate the ESW (effective-strip witdth) of a taxonomic group,
-#' It also use the \link[Distance]{ds} function to estimate all the abondance, density encounter-rate,...
-#' parameter and summarize it in the results of the function.
-#' Finally i gives the detection plot of the distance analysis.
+#' Adjust a detection function on distance observation for one taxonomic group.
+#' It gives the ESW (effective-strip witdth), its standard deviation,
+#' a distance object from \link[Distance]{ds} function,
+#' and it gives the detection plot of the detection function adjusted.
 #'
-#' @param distdata distadata data.frame previously built with  \code{\link{prepare_data_obs}}.
+#' @param distdata data.frame previously built with  \code{\link{prepare_data_obs}}.
 #' @param bin Min and max value of the distance detection and the step between
-#' theese two.
+#' these two.
 #' @param key Choice bewtween two key function :
 #'            \enumerate{
 #'              \item "halfnorm" : Half-Normal.
@@ -21,6 +21,7 @@
 #'           \item esw_cv : coefficient of variation of esw in percent.
 #'           \item graph : Barplot of detections depending of distance, with confindence
 #'           estimated with mcmc chains.
+#'           \item distfit : distance object from \link[Distance]{ds} function.
 #'         }
 #' @examples
 #'

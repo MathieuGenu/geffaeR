@@ -1,6 +1,6 @@
-#' summarize mcmc output of stan
+#' Summarize mcmc output of stan.
 #'
-#' This function transform output of stan model in data.frame which is easier to use.
+#' Transform output of stan model in data.frame which is easier to use.
 #'
 #' @param x Output of stan function
 #' @param alpha Risk taken for \code{\link[coda]{HPDinterval} function.}
