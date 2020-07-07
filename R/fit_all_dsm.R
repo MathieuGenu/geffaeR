@@ -7,14 +7,15 @@ get_k_best_models <- function(tab_model, k = 5, use_AIC = TRUE) {
     writeLines("\tUsing Explained Deviance for model selection")
     tab_model <- tab_model[order(tab_model$ExpDev, decreasing = TRUE), ]
   }
-  return(tab_model[1:k, "index"])
+  tab_model <- tab_model[1:k, "index"]
+  return(tab_model)
 }
 
 
 #' @export
 
 fit_all_dsm <- function(distFit = NULL,
-                        segdata, obsdata,
+                        segdata_w_obs, obsdata,
                         response = "ind",
                         predictors,
                         likelihood = "negbin", esw = NULL,
@@ -35,10 +36,10 @@ fit_all_dsm <- function(distFit = NULL,
 
   rescale <- function(x) { (x - mean(x)) / sd(x) }
   ## raw data
-  X <- segdata
+  X <- segdata_w_obs
 
   ## standardize
-  segdata[, c(predictors, "longitude", "latitude", "X", "Y")] <- apply(segdata[, c(predictors, "longitude", "latitude", "X", "Y")], 2, rescale)
+  segdata_w_obs[, c(predictors, "longitude", "latitude", "X", "Y")] <- apply(segdata_w_obs[, c(predictors, "longitude", "latitude", "X", "Y")], 2, rescale)
 
   ## prepare smooth terms
   smoothers <- paste("s(", predictors, ", k = ", complexity, ", bs = 'cs')", sep = "")
@@ -47,8 +48,8 @@ fit_all_dsm <- function(distFit = NULL,
 
   ## can include a random effect
   if(!is.null(random)) {
-    if(!any(names(segdata) == random)) {
-      stop("Check random effect: no matching column in segdata")
+    if(!any(names(segdata_w_obs) == random)) {
+      stop("Check random effect: no matching column in segdata_w_obs")
     } else {
       intercept <- paste(intercept, " + s(", random, ", bs = 're')", sep = "")
     }
@@ -88,19 +89,19 @@ fit_all_dsm <- function(distFit = NULL,
   if(weighted) {
     w <- lapply(all_x, function(tab) {
       sapply(1:ncol(tab), function(j) {
-        make_cfact_2(calibration_data = segdata,
-                     test_data = segdata,
+        make_cfact_2(calibration_data = segdata_w_obs,
+                     test_data = segdata_w_obs,
                      var_name = covariable[tab[, j]],
                      percent = F,
                      near_by = T
                      )
       })
     })
-    w <- cbind(rep(1, nrow(segdata)), do.call('cbind', w))
+    w <- cbind(rep(1, nrow(segdata_w_obs)), do.call('cbind', w))
     w <- w[, which(rm_combn < max_cor)]
 
   } else {
-    w <- matrix(1, nrow = nrow(segdata), ncol = length(which(rm_combn < max_cor)))
+    w <- matrix(1, nrow = nrow(segdata_w_obs), ncol = length(which(rm_combn < max_cor)))
   }
 
   # suppress warnings
@@ -108,7 +109,7 @@ fit_all_dsm <- function(distFit = NULL,
 
   # relabel Sample.Label to have only unique match per segments
   X$Sample.Label <- paste(X$Sample.Label, X$Seg, sep = "_")
-  segdata$Sample.Label <- paste(segdata$Sample.Label, segdata$Seg, sep = "_")
+  segdata_w_obs$Sample.Label <- paste(segdata_w_obs$Sample.Label, segdata_w_obs$Seg, sep = "_")
   obsdata$Sample.Label <- paste(obsdata$Sample.Label, obsdata$Seg, sep = "_")
 
   ## response variable is either n (nb of observations) or y (nb of individuals)
@@ -121,10 +122,10 @@ fit_all_dsm <- function(distFit = NULL,
 
   ## fit the models
   if(!is.null(distFit)) {
-    my_dsm_fct <- function(x, tab = TRUE, segdata) {
+    my_dsm_fct <- function(x, tab = TRUE, segdata_w_obs) {
       model <- dsm(as.formula(all_mods[x]),
                    ddf.obj = distFit,
-                   segment.data = segdata,
+                   segment.data = segdata_w_obs,
                    observation.data = obsdata,
                    strip.width = NULL,
                    family = switch(likelihood,
@@ -153,13 +154,13 @@ fit_all_dsm <- function(distFit = NULL,
     if(is.null(esw)) {
       stop("Must Provide a value for esw")
     } else {
-      if(length(esw) == 1 | length(esw) == nrow(segdata)) {
-        my_dsm_fct <- function(x, tab = TRUE, segdata) {
+      if(length(esw) == 1 | length(esw) == nrow(segdata_w_obs)) {
+        my_dsm_fct <- function(x, tab = TRUE, segdata_w_obs) {
           model <- dsm(as.formula(all_mods[x]),
                        ddf.obj = NULL,
                        strip.width = esw,
-                       segment.area = 2 * esw * segdata$Effort,
-                       segment.data = segdata,
+                       segment.area = 2 * esw * segdata_w_obs$Effort,
+                       segment.data = segdata_w_obs,
                        observation.data = obsdata,
                        family = switch(likelihood,
                                        negbin = nb(),
@@ -184,17 +185,17 @@ fit_all_dsm <- function(distFit = NULL,
           } else { return(model) }
         }
       } else {
-        stop("Please check esw: provide either a single value or a vector with same length as segdata")
+        stop("Please check esw: provide either a single value or a vector with same length as segdata_w_obs")
       }
     }
   }
-  all_fits <- lapply(1:length(all_mods), my_dsm_fct, segdata = segdata)
+  all_fits <- lapply(1:length(all_mods), my_dsm_fct, segdata_w_obs = segdata_w_obs)
   ## Collapse to a data frame
   all_fits_binded <- do.call('rbind', all_fits)
 
   ## select the n-best models
-  best <- lapply(get_k_best_models(tab_model = all_fits_binded, k = k), my_dsm_fct, tab = FALSE, segdata = X)
-  best_std <- lapply(get_k_best_models(tab_model = all_fits_binded, k = k), my_dsm_fct, tab = FALSE, segdata = segdata)
+  best <- lapply(get_k_best_models(tab_model = all_fits_binded, k = k), my_dsm_fct, tab = FALSE, segdata_w_obs = X)
+  best_std <- lapply(get_k_best_models(tab_model = all_fits_binded, k = k), my_dsm_fct, tab = FALSE, segdata_w_obs = segdata_w_obs)
 
   ## wrap-up with the outputs
   return(list(all_fits_binded = all_fits_binded,
