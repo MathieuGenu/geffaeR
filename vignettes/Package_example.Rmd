@@ -56,7 +56,7 @@ htmltools::div(
 <br>
 
 
-## 1.1 change column names
+## 1.1 Change column names
 
 To perform analysis on thoose data, it is necessary to modify its column name to match the need of packages (Distance, dsm). To do so, there are 2 functions ```change_effort_varName()``` and ```change_obs_varName()```.
 
@@ -67,6 +67,7 @@ Then, it is necessary to modify the data structure in a way to have the proper s
 
 * dataframe at leg scale
 * dataframe at segment scale
+
 ```{r}
 standard_effort <- change_effort_varName(effort_example)
 prepared_effort <- prepare_data_effort(effort_base = standard_effort, 
@@ -79,7 +80,9 @@ prepared_effort <- prepare_data_effort(effort_base = standard_effort,
 str(prepared_effort)
 
 ```
+
 Observation dataframe is splitted into 4 sub-dataframes.
+
 ```{r}
 standard_obs <- change_obs_varName(observation_example)
 sp1 <- unique(observation_example$species)[1]
@@ -99,7 +102,7 @@ str(observation_output)
 
 
 
-# 2. cds analysis
+# 2. Cds analysis
 
 When data are prepared the next step consist in adjusting a detection function on the data with the function ```plot_detection()```. It is possible to choose betwwen a half-normal function or hazard-rate one. It is necessary to inform the distance between which we want to perform the function.
 
