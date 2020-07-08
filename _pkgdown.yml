@@ -1,1 +1,27 @@
 destination: docs
+reference:
+- title: "Data"
+  desc: >
+    Data in the package
+- contents:
+  - cds
+  - effort_example
+  - Europe
+  - lbrt93_proj
+  - NEA
+  - NEA_isobath100
+  - NEA_isobath200
+  - observation_example
+  - shape_example
+- title: "Functions"
+  desc: "Functions of the package"
+- contents:
+  - ajout_obs
+  - change_effort_varName
+  - change_obs_varName
+  - get_mcmc_summary
+  - plot_detection
+  - prep_predata
+  - prepare_data_effort
+  - prepare_data_obs
+  - stan_cds
