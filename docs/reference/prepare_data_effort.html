@@ -6,8 +6,15 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Preparation of effort data — prepare_data_effort • geffaeR</title>
+<title>Preparation of effort data. — prepare_data_effort • geffaeR</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -39,9 +46,10 @@
 
 
 
-<meta property="og:title" content="Preparation of effort data — prepare_data_effort" />
-<meta property="og:description" content="This function transform raw effort data into multiple sub data.frame for next analysis of
+<meta property="og:title" content="Preparation of effort data. — prepare_data_effort" />
+<meta property="og:description" content="Transform raw effort data into multiple sub data.frame for next analysis of
 other functions of the package." />
+<meta property="og:image" content="/logo.png" />
 
 
 
@@ -116,13 +124,13 @@ other functions of the package." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Preparation of effort data</h1>
+    <h1>Preparation of effort data.</h1>
     
     <div class="hidden name"><code>prepare_data_effort.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function transform raw effort data into multiple sub data.frame for next analysis of
+    <p>Transform raw effort data into multiple sub data.frame for next analysis of
 other functions of the package.</p>
     </div>
 
@@ -158,7 +166,7 @@ other functions of the package.</p>
       <th>shape</th>
       <td><p>Shapefile of the study area. It can be either a SpatialPolygonsDataFrame class object,
 in this case it is not necessary to give shape_layer argument. Or it can be the name of the shape
-object with its extension ".shp" (ex : "data/studyAreShapefile.shp")</p></td>
+object with its extension ".shp" (ex : "data/studyAreShapefile.shp").</p></td>
     </tr>
     <tr>
       <th>shape_layer</th>
@@ -180,7 +188,7 @@ Defaults settings are all data are kept. In case of optimal = T, indexes
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>This function return :</p><ol>
+    <p>This function return a list containing:</p><ol>
 <li><p>Legdata : Data.frame with infos at leg scale.</p></li>
 <li><p>Segdata : Data.frame with infos at segment scale.</p></li>
 </ol>

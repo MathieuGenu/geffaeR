@@ -8,6 +8,13 @@
 
 <title>Création de predata et imputation de données manquantes — prep_predata • geffaeR</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -43,6 +50,7 @@
 <meta property="og:description" content="Cette fonction permet de créer predata, le data.frame contenant les données environnementales dans la
 grille de la zone d'étude. Cette fonction permet également l'imputation de données manquantes pour les data.frames
 segdata et predata" />
+<meta property="og:image" content="/logo.png" />
 
 
 
@@ -136,8 +144,8 @@ segdata et predata</p>
   <span class='kw'>varphysio</span>,
   <span class='kw'>do_log_physio</span>,
   imputation = <span class='st'>"Amelia"</span>,
-  <span class='kw'>shape_pred</span>,
-  <span class='kw'>layer_pred</span>,
+  <span class='kw'>shape</span>,
+  <span class='kw'>layer</span>,
   saturate_predata = <span class='kw'>F</span>,
   saturate_segdata = <span class='kw'>F</span>,
   inbox_poly = <span class='kw'>T</span>
@@ -184,11 +192,11 @@ Parmi les méthodes il y a :
 Par défaut la méthode est "PCA".</p></td>
     </tr>
     <tr>
-      <th>shape_pred</th>
+      <th>shape</th>
       <td><p>shapefile délimitant la zone où la prédiction est effectuée.</p></td>
     </tr>
     <tr>
-      <th>layer_pred</th>
+      <th>layer</th>
       <td><p>Layer du shpaefile donnant les limite de la zone de prédiction.</p></td>
     </tr>
     <tr>

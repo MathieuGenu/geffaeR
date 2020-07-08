@@ -2,7 +2,7 @@
 % Please edit documentation in R/change_varName.R
 \name{change_obs_varName}
 \alias{change_obs_varName}
-\title{Standardisation of column names}
+\title{Standardisation of column names.}
 \usage{
 change_obs_varName(obs_base)
 }
@@ -13,7 +13,7 @@ change_obs_varName(obs_base)
 This function return the same data.frame as in input with the standardized column name.
 }
 \description{
-This function allows to attribute standard names to column names of observation data.frame
+Attribute standard names to column names of observation data.frame
 for the next steps of the analysis.
 }
 \examples{

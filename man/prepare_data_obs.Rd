@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_prep_obs.R
 \name{prepare_data_obs}
 \alias{prepare_data_obs}
-\title{Preparation of observation data}
+\title{Preparation of observation data.}
 \usage{
 prepare_data_obs(
   sp,
@@ -28,7 +28,7 @@ prepare_data_obs(
 
 \item{shape}{Shapefile of the study area. It can be either a SpatialPolygonsDataFrame class object,
 in this case it is not necessary to give shape_layer argument. Or it can be the name of the shape
-object with its extension ".shp" (ex : "data/studyAreShapefile.shp")}
+object with its extension ".shp" (ex : "data/studyAreShapefile.shp").}
 
 \item{shape_layer}{Layer of the shapefile if shape is a character string.}
 
@@ -53,7 +53,7 @@ This function return a list containing :
         }
 }
 \description{
-This function transform raw observation data into multiple sub data.frame for next analysis of
+Transform raw observation data into multiple sub data.frame for next analysis of
 other functions of the package.
 }
 \examples{

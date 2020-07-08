@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_prep_effort.R
 \name{prepare_data_effort}
 \alias{prepare_data_effort}
-\title{Preparation of effort data}
+\title{Preparation of effort data.}
 \usage{
 prepare_data_effort(
   effort_base,
@@ -27,7 +27,7 @@ prepare_data_effort(
 
 \item{shape}{Shapefile of the study area. It can be either a SpatialPolygonsDataFrame class object,
 in this case it is not necessary to give shape_layer argument. Or it can be the name of the shape
-object with its extension ".shp" (ex : "data/studyAreShapefile.shp")}
+object with its extension ".shp" (ex : "data/studyAreShapefile.shp").}
 
 \item{shape_layer}{Layer of the shapefile if shape is a character string.}
 
@@ -40,14 +40,14 @@ Defaults settings are all data are kept. In case of optimal = T, indexes
 \code{c("GG", "GM", "MG", "EG", "GE", "EE", "ME", "EM", "MM")} are kept.}
 }
 \value{
-This function return :
+This function return a list containing:
         \enumerate{
           \item Legdata : Data.frame with infos at leg scale.
           \item Segdata : Data.frame with infos at segment scale.
         }
 }
 \description{
-This function transform raw effort data into multiple sub data.frame for next analysis of
+Transform raw effort data into multiple sub data.frame for next analysis of
 other functions of the package.
 }
 \examples{

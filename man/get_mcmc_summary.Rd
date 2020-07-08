@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_mcmc_summary.R
 \name{get_mcmc_summary}
 \alias{get_mcmc_summary}
-\title{summarize mcmc output of stan}
+\title{Summarize mcmc output of stan.}
 \usage{
 get_mcmc_summary(x, alpha = 0.2, dig = 4, median = FALSE)
 }
@@ -17,7 +17,7 @@ get_mcmc_summary(x, alpha = 0.2, dig = 4, median = FALSE)
 mean (sd).}
 }
 \description{
-This function transform output of stan model in data.frame which is easier to use.
+Transform output of stan model in data.frame which is easier to use.
 }
 \examples{
 

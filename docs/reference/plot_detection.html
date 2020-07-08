@@ -6,8 +6,15 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>distance smapling analysis — plot_detection • geffaeR</title>
+<title>Distance sampling analysis. — plot_detection • geffaeR</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -39,11 +46,12 @@
 
 
 
-<meta property="og:title" content="distance smapling analysis — plot_detection" />
-<meta property="og:description" content="This function calculate the ESW (effective-strip witdth) of a taxonomic group,
-It also use the ds function to estimate all the abondance, density encounter-rate,...
-parameter and summarize it in the results of the function.
-Finally i gives the detection plot of the distance analysis." />
+<meta property="og:title" content="Distance sampling analysis. — plot_detection" />
+<meta property="og:description" content="Adjust a detection function on distance observation for one taxonomic group.
+It gives the ESW (effective-strip witdth), its standard deviation,
+a distance object from ds function,
+and it gives the detection plot of the detection function adjusted." />
+<meta property="og:image" content="/logo.png" />
 
 
 
@@ -118,16 +126,16 @@ Finally i gives the detection plot of the distance analysis." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>distance smapling analysis</h1>
+    <h1>Distance sampling analysis.</h1>
     
     <div class="hidden name"><code>plot_detection.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function calculate the ESW (effective-strip witdth) of a taxonomic group,
-It also use the <a href='https://rdrr.io/pkg/Distance/man/ds.html'>ds</a> function to estimate all the abondance, density encounter-rate,...
-parameter and summarize it in the results of the function.
-Finally i gives the detection plot of the distance analysis.</p>
+    <p>Adjust a detection function on distance observation for one taxonomic group.
+It gives the ESW (effective-strip witdth), its standard deviation,
+a distance object from <a href='https://rdrr.io/pkg/Distance/man/ds.html'>ds</a> function,
+and it gives the detection plot of the detection function adjusted.</p>
     </div>
 
     <pre class="usage"><span class='fu'>plot_detection</span>(<span class='kw'>distdata</span>, <span class='kw'>bin</span>, <span class='kw'>key</span>, upper = <span class='kw'>NULL</span>)</pre>
@@ -137,12 +145,12 @@ Finally i gives the detection plot of the distance analysis.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>distdata</th>
-      <td><p>distadata data.frame previously built with  <code>prepare_data_obs</code>.</p></td>
+      <td><p>data.frame previously built with  <code>prepare_data_obs</code>.</p></td>
     </tr>
     <tr>
       <th>bin</th>
       <td><p>Min and max value of the distance detection and the step between
-theese two.</p></td>
+these two.</p></td>
     </tr>
     <tr>
       <th>key</th>
@@ -164,6 +172,7 @@ theese two.</p></td>
 <li><p>esw_cv : coefficient of variation of esw in percent.</p></li>
 <li><p>graph : Barplot of detections depending of distance, with confindence
           estimated with mcmc chains.</p></li>
+<li><p>distfit : distance object from <a href='https://rdrr.io/pkg/Distance/man/ds.html'>ds</a> function.</p></li>
 </ol>
 
 

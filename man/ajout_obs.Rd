@@ -2,31 +2,28 @@
 % Please edit documentation in R/ajout_obs.R
 \name{ajout_obs}
 \alias{ajout_obs}
-\title{\encoding{Ajout des Observations sur les données effort.}}
+\title{\encoding{Adding observation on effort.}}
 \usage{
 ajout_obs(countdata_leg, legdata, countdata_seg, segdata)
 }
 \arguments{
-\item{countdata_leg}{\encoding{Un data.frame contenant le nombre de détection et d'individus total pour les legs
-où il y a eu observation pour l'espèce ou group en question.}}
+\item{countdata_leg}{\encoding{data.frame containing the detection number and the total number of
+individuals for legs for which observation have beebn made.}}
 
 \item{legdata}{"Legdata" data.frame, built with \code{\link{prepare_data_effort}}.}
 
 \item{segdata}{"Segdata" data.frame, built with \code{\link{prepare_data_effort}}.}
-
-\item{coundata_seg}{\encoding{Un data.frame contenant le nombre de détection et d'individus total pour les segments
-où il y a eu observation pour l'espèce ou group en question.}}
 }
 \value{
-Cette fonction renvoit une liste contenant :
+This function return a list containing :
         \enumerate{
-          \item legdata_obs : Un data.frame contenant Legdata avec des infos d'observations.
-          \item segdata_obs : Un data.frame contenant Segdata avec des infos d'observations.
+          \item legdata_obs : data.frame corresponding to legdata with observation information.
+          \item segdata_obs : data.frame corresponding to segdata with observation information.
         }
 }
 \description{
-\encoding{Cette fonction permet d'ajouter le nombre d'individus/groupe et le nombre d'observation totale
-aux données d'effort preparées (i.e. a legdata et segdata).}
+\encoding{Adding the number of individuals and the group size on prepared effort data
+(e.g. on legdata and segdata).}
 }
 \examples{
 

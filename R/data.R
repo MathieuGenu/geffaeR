@@ -1,5 +1,62 @@
-#' Projection in Lambert 93
+#' Cds rstan script.
 #'
-#' It stores the Lambert 93 projection in CRS format to ease georeference transformation
+#' script to perform a cds analysis with rstan.
+#'
+"cds"
+
+
+
+
+
+
+
+
+
+
+#' Effort example data.
+#'
+#' Effort data simulated in atlantic ocean in the bay of Biscay.
+#'
+"effort_example"
+
+#' Europe land contour.
+#'
+#' Europe land contour for maps.
+#'
+"Europe"
+
+#' Projection in Lambert 93.
+#'
+#' It stores the Lambert 93 projection in CRS format to ease georeferenced transformation.
 #'
 "lbrt93_proj"
+
+#' Northern East Atlantic land contour.
+#'
+#' Northern East Atlantic land contour for maps.
+#'
+"NEA"
+
+#' Northern East Atlantic isobath100.
+#'
+#' Northern East Atlantic isobath for depth of 100m.
+#'
+"NEA_isobath100"
+
+#' Northern East Atlantic isobath200.
+#'
+#' Northern East Atlantic isobath for depth of 200m.
+#'
+"NEA_isobath200"
+
+#' Observation example data.
+#'
+#' Effort data simulated in atlantic ocean in the bay of Biscay.
+#'
+"observation_example"
+
+#' Shape-file example.
+#'
+#' Shape-file of the example in atlantic ocean in the bay of Biscay.
+#'
+"shape_example"

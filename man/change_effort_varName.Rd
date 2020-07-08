@@ -2,7 +2,7 @@
 % Please edit documentation in R/change_varName.R
 \name{change_effort_varName}
 \alias{change_effort_varName}
-\title{Standardisation of column names}
+\title{Standardisation of column names.}
 \usage{
 change_effort_varName(effort_base)
 }
@@ -13,7 +13,7 @@ change_effort_varName(effort_base)
 This function return the same data.frame as in input with the standardized column name.
 }
 \description{
-This function allows to attribute standard names to column names of effort data.frame
+Attribute standard names to column names of effort data.frame
 for the next steps of the analysis.
 }
 \note{

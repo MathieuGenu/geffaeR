@@ -6,8 +6,15 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Ajout des Observations sur les données effort. — ajout_obs • geffaeR</title>
+<title>Adding observation on effort. — ajout_obs • geffaeR</title>
 
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -39,9 +46,10 @@
 
 
 
-<meta property="og:title" content="Ajout des Observations sur les données effort. — ajout_obs" />
-<meta property="og:description" content="Cette fonction permet d'ajouter le nombre d'individus/groupe et le nombre d'observation totale
-aux données d'effort preparées (i.e. a legdata et segdata)." />
+<meta property="og:title" content="Adding observation on effort. — ajout_obs" />
+<meta property="og:description" content="Adding the number of individuals and the group size on prepared effort data
+(e.g. on legdata and segdata)." />
+<meta property="og:image" content="/logo.png" />
 
 
 
@@ -116,14 +124,14 @@ aux données d'effort preparées (i.e. a legdata et segdata)." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Ajout des Observations sur les données effort.</h1>
+    <h1>Adding observation on effort.</h1>
     
     <div class="hidden name"><code>ajout_obs.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Cette fonction permet d'ajouter le nombre d'individus/groupe et le nombre d'observation totale
-aux données d'effort preparées (i.e. a legdata et segdata).</p>
+    <p>Adding the number of individuals and the group size on prepared effort data
+(e.g. on legdata and segdata).</p>
     </div>
 
     <pre class="usage"><span class='fu'>ajout_obs</span>(<span class='kw'>countdata_leg</span>, <span class='kw'>legdata</span>, <span class='kw'>countdata_seg</span>, <span class='kw'>segdata</span>)</pre>
@@ -133,8 +141,8 @@ aux données d'effort preparées (i.e. a legdata et segdata).</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>countdata_leg</th>
-      <td><p>Un data.frame contenant le nombre de détection et d'individus total pour les legs
-où il y a eu observation pour l'espèce ou group en question.</p></td>
+      <td><p>data.frame containing the detection number and the total number of
+individuals for legs for which observation have beebn made.</p></td>
     </tr>
     <tr>
       <th>legdata</th>
@@ -144,18 +152,13 @@ où il y a eu observation pour l'espèce ou group en question.</p></td>
       <th>segdata</th>
       <td><p>"Segdata" data.frame, built with <code>prepare_data_effort</code>.</p></td>
     </tr>
-    <tr>
-      <th>coundata_seg</th>
-      <td><p>Un data.frame contenant le nombre de détection et d'individus total pour les segments
-où il y a eu observation pour l'espèce ou group en question.</p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Cette fonction renvoit une liste contenant :</p><ol>
-<li><p>legdata_obs : Un data.frame contenant Legdata avec des infos d'observations.</p></li>
-<li><p>segdata_obs : Un data.frame contenant Segdata avec des infos d'observations.</p></li>
+    <p>This function return a list containing :</p><ol>
+<li><p>legdata_obs : data.frame corresponding to legdata with observation information.</p></li>
+<li><p>segdata_obs : data.frame corresponding to segdata with observation information.</p></li>
 </ol>
 
 

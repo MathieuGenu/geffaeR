@@ -12,8 +12,8 @@ prep_predata(
   varphysio,
   do_log_physio,
   imputation = "Amelia",
-  shape_pred,
-  layer_pred,
+  shape,
+  layer,
   saturate_predata = F,
   saturate_segdata = F,
   inbox_poly = T
@@ -43,9 +43,9 @@ Parmi les méthodes il y a :
 }
 Par défaut la méthode est "PCA".}}
 
-\item{shape_pred}{\encoding{shapefile délimitant la zone où la prédiction est effectuée.}}
+\item{shape}{\encoding{shapefile délimitant la zone où la prédiction est effectuée.}}
 
-\item{layer_pred}{\encoding{Layer du shpaefile donnant les limite de la zone de prédiction.}}
+\item{layer}{\encoding{Layer du shpaefile donnant les limite de la zone de prédiction.}}
 
 \item{proj_grid}{\encoding{Systême de projection du fichier de gride.}}
 }

@@ -2,15 +2,15 @@
 % Please edit documentation in R/plot_detection.R
 \name{plot_detection}
 \alias{plot_detection}
-\title{distance smapling analysis}
+\title{Distance sampling analysis.}
 \usage{
 plot_detection(distdata, bin, key, upper = NULL)
 }
 \arguments{
-\item{distdata}{distadata data.frame previously built with  \code{\link{prepare_data_obs}}.}
+\item{distdata}{data.frame previously built with  \code{\link{prepare_data_obs}}.}
 
 \item{bin}{Min and max value of the distance detection and the step between
-theese two.}
+these two.}
 
 \item{key}{Choice bewtween two key function :
 \enumerate{
@@ -27,13 +27,14 @@ This function return list with :
           \item esw_cv : coefficient of variation of esw in percent.
           \item graph : Barplot of detections depending of distance, with confindence
           estimated with mcmc chains.
+          \item distfit : distance object from \link[Distance]{ds} function.
         }
 }
 \description{
-This function calculate the ESW (effective-strip witdth) of a taxonomic group,
-It also use the \link[Distance]{ds} function to estimate all the abondance, density encounter-rate,...
-parameter and summarize it in the results of the function.
-Finally i gives the detection plot of the distance analysis.
+Adjust a detection function on distance observation for one taxonomic group.
+It gives the ESW (effective-strip witdth), its standard deviation,
+a distance object from \link[Distance]{ds} function,
+and it gives the detection plot of the detection function adjusted.
 }
 \examples{
 
