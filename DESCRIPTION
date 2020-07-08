@@ -4,12 +4,13 @@ Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Mathieu",
            family = "Genu",
-           role = c("aut", "cre"),
+           role = "aut",
            email = "mathieu.genu@univ-lr.fr"),
     person(given = "Matthieu",
            family = "Authier",
            role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0001-7394-1993")))
+           comment = c(ORCID = "0000-0001-7394-1993"),
+           email = "matthieu.authier@univ-lr.fr"))
 Author: Mathieu Genu [aut, cre], Matthieu Authier [aut, cre]
 Description: The package transforms SAMMOA output and
     applies different analysis and give graphical output.
