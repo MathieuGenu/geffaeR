@@ -1,4 +1,9 @@
 destination: docs
+template:
+  params:
+    bootswatch: spacelab
+    template:
+    ganalytics: UA-000000-01
 reference:
 - title: "Data"
   desc: >
@@ -15,13 +20,21 @@ reference:
   - shape_example
 - title: "Functions"
   desc: "Functions of the package"
+- subtitle: "Data preparation"
 - contents:
   - ajout_obs
   - change_effort_varName
   - change_obs_varName
-  - get_mcmc_summary
-  - plot_detection
-  - prep_predata
   - prepare_data_effort
   - prepare_data_obs
+  - verif_effort_obs
+- subtitle: "Cds analysis"
+- contents:
+  - plot_detection
   - stan_cds
+  - get_mcmc_summary
+- subtitle: "DSM"
+- contents:
+  - prep_predata
+
+

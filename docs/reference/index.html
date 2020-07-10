@@ -19,8 +19,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/spacelab/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -61,6 +61,16 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-000000-01"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-000000-01');
+</script>
 
 
   </head>
@@ -150,7 +160,7 @@
         <td>
           <p><code><a href="cds.html">cds</a></code> </p>
         </td>
-        <td><p>cds rstan script.</p></td>
+        <td><p>Cds rstan script.</p></td>
       </tr><tr>
         
         <td>
@@ -211,6 +221,15 @@
       
     </tbody><tbody>
       
+      <tr>
+        <th colspan="2">
+          <h3 id="section-data-preparation" class="hasAnchor"><a href="#section-data-preparation" class="anchor"></a>Data preparation</h3>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+    </tbody><tbody>
+      
       
       <tr>
         
@@ -233,24 +252,6 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="get_mcmc_summary.html">get_mcmc_summary()</a></code> </p>
-        </td>
-        <td><p>Summarize mcmc output of stan.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plot_detection.html">plot_detection()</a></code> </p>
-        </td>
-        <td><p>Distance sampling analysis.</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="prep_predata.html">prep_predata()</a></code> </p>
-        </td>
-        <td><p>Création de predata et imputation de données manquantes</p></td>
-      </tr><tr>
-        
-        <td>
           <p><code><a href="prepare_data_effort.html">prepare_data_effort()</a></code> </p>
         </td>
         <td><p>Preparation of effort data.</p></td>
@@ -263,9 +264,59 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="verif_effort_obs.html">verif_effort_obs()</a></code> </p>
+        </td>
+        <td><p>Compatibility verification between effort and observation data.</p></td>
+      </tr>
+    </tbody><tbody>
+      
+      <tr>
+        <th colspan="2">
+          <h3 id="section-cds-analysis" class="hasAnchor"><a href="#section-cds-analysis" class="anchor"></a>Cds analysis</h3>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="plot_detection.html">plot_detection()</a></code> </p>
+        </td>
+        <td><p>Distance sampling analysis.</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="stan_cds.html">stan_cds()</a></code> </p>
         </td>
-        <td><p>Modelisation Baésienne à partir d'un modèle stan.</p></td>
+        <td><p>CDS Bayesian modelling from stan model.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="get_mcmc_summary.html">get_mcmc_summary()</a></code> </p>
+        </td>
+        <td><p>Summarize mcmc output of stan.</p></td>
+      </tr>
+    </tbody><tbody>
+      
+      <tr>
+        <th colspan="2">
+          <h3 id="section-dsm" class="hasAnchor"><a href="#section-dsm" class="anchor"></a>DSM</h3>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="prep_predata.html">prep_predata()</a></code> </p>
+        </td>
+        <td><p>Creation of predata and data impuation of missing data.</p></td>
       </tr>
     </tbody>
     </table>

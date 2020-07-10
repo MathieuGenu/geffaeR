@@ -1,8 +1,17 @@
 #' @export
 
-env_graph <- function(predata, varname = "Depth") {
+env_graph <- function(predata, varname = "Depth", XY = T) {
+
+  if(XY == T) {
+    long <- "X"
+    lat <- "Y"
+  } else {
+    long <- "longitude"
+    lat <- "latitude"
+  }
+
   g_env_graph <- ggplot() +
-    geom_tile(data = predata, aes_string(x = "X", y = "Y", fill = varname)) +
+    geom_tile(data = predata, aes_string(x = long, y = lat, fill = varname)) +
     theme_map() +
     scale_fill_gradientn(name = varname,
                          colours = viridisLite::viridis(256)

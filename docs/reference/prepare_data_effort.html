@@ -19,8 +19,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/spacelab/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -63,6 +63,16 @@ other functions of the package." />
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-000000-01"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-000000-01');
+</script>
 
 
   </head>
@@ -149,11 +159,11 @@ other functions of the package.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>effort_base</th>
-      <td><p>Data.frame with effort data.</p></td>
+      <td><p><code>data.frame</code> with effort data.</p></td>
     </tr>
     <tr>
       <th>covariable</th>
-      <td><p>Vector of covariable names to keep in output of the function.</p></td>
+      <td><p><code>vector</code> of covariable names to keep in output of the function.</p></td>
     </tr>
     <tr>
       <th>block_area</th>
@@ -164,33 +174,33 @@ other functions of the package.</p>
     </tr>
     <tr>
       <th>shape</th>
-      <td><p>Shapefile of the study area. It can be either a SpatialPolygonsDataFrame class object,
+      <td><p>Shapefile of the study area. It can be either a <code>SpatialPolygonsDataFrame</code> class object,
 in this case it is not necessary to give shape_layer argument. Or it can be the name of the shape
-object with its extension ".shp" (ex : "data/studyAreShapefile.shp").</p></td>
+object with its extension ".shp" (ex : "data/studyAreaShapefile.shp").</p></td>
     </tr>
     <tr>
       <th>shape_layer</th>
-      <td><p>Layer of the shapefile if shape is a character string.</p></td>
+      <td><p>Layer of the shapefile if shape is a <code>character string</code>.</p></td>
     </tr>
     <tr>
       <th>New_projection</th>
       <td><p>New projection of longitude and latitude of columns
-(POINT_X et POINT_Y) in Proj4String format,
+(POINT_X et POINT_Y) in <code>Proj4String</code> format,
 see : <code><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></code> for more infos.</p></td>
     </tr>
     <tr>
       <th>optimal</th>
       <td><p>Argument which allows to keep data sampled in optimal conditions.
 Defaults settings are all data are kept. In case of optimal = T, indexes
-<code><a href='https://rdrr.io/r/base/c.html'>c("GG", "GM", "MG", "EG", "GE", "EE", "ME", "EM", "MM")</a></code> are kept.</p></td>
+<code>"c("GG", "GM", "MG", "EG", "GE", "EE", "ME", "EM", "MM")"</code> are kept.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>This function return a list containing:</p><ol>
-<li><p>Legdata : Data.frame with infos at leg scale.</p></li>
-<li><p>Segdata : Data.frame with infos at segment scale.</p></li>
+<li><p>legdata : <code>data.frame</code> with infos at leg scale.</p></li>
+<li><p>segdata : <code>data.frame</code> with infos at segment scale.</p></li>
 </ol>
 
 

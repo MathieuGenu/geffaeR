@@ -1,3 +1,11 @@
+#' Compatibility verification between effort and observation data.
+#'
+#' Matching verification of columns values of prepared effort and prepared observation.
+#'
+#' @param var Variables for which matching between effort and observation data have to be verified.
+#' @param standard_obs Prepared observation data. e.g. Output of \code{\link[geffaeR]{prepare_data_obs}}.
+#' @param standard_effort Prepared effort data. e.g. Output of \code{\link[geffaeR]{prepare_data_effort}}.
+#'
 #' @export
 
 verif_effort_obs <- function(var, standard_obs, standard_effort) {

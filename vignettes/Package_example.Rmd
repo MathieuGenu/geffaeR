@@ -90,24 +90,26 @@ legdata <- prepared_effort$legdata
 segdata <- prepared_effort$segdata
 projection <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
-observation_output <- prepare_data_obs(sp = sp1, 
+observation_output_TURTRU <- prepare_data_obs(sp = sp1, 
                                        obs_base = standard_obs, 
                                        legdata = legdata, 
                                        segdata = segdata, 
                                        shape = shape_example, 
                                        shape_layer = shape_layer, 
                                        projection = projection)
-str(observation_output)
+str(observation_output_TURTRU)
 ```
 
 
 
 # 2. Cds analysis
 
+## 2.1 Case of non seabird 
+
 When data are prepared the next step consist in adjusting a detection function on the data with the function ```plot_detection()```. It is possible to choose betwwen a half-normal function or hazard-rate one. It is necessary to inform the distance between which we want to perform the function.
 
 ```{r}
-detection_TURTRU <- plot_detection(distdata = observation_output$distdata,
+detection_TURTRU <- plot_detection(distdata = observation_output_TURTRU$distdata,
                             bin = seq(0.0,1.0, 0.05),
                             key = "halfnorm",
                             upper = 1.0)
@@ -135,4 +137,31 @@ and gives the detetction plot (graph)
 ```{r}
 detection_TURTRU$graph
 ```
+
+## 2.2 Case of seabird
+
+For Seabirds a strip-transect is applied, that means there is no distance assigned for seabirds observation, it is set to 0.2km. To apply a detection function, it is necessary to "hack" the method for estimating seabirds abundance. The "hacking" method consist in setting distance of observation as 0 or 0.2km with a sample function. there will be as many 0 as there are 0.2 in the distance column. That means from a distance of 0 to 0.2km all seabirds will be detected. Then the detection function is a uniform function from 0 to 0.2km with a detection probability of 1.
+
+```{r}
+sp2 <- unique(observation_example$species)[2]
+legdata <- prepared_effort$legdata
+segdata <- prepared_effort$segdata
+projection <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+observation_output_LARMEL <- prepare_data_obs(sp = sp2, 
+                                       obs_base = standard_obs, 
+                                       legdata = legdata, 
+                                       segdata = segdata, 
+                                       shape = shape_example, 
+                                       shape_layer = shape_layer, 
+                                       projection = projection)
+temp <- observation_output_LARMEL$distdata
+temp$distance <- sample(c(0, 0.2),size = nrow(temp), replace = TRUE) * ifelse(is.na(observation_output_LARMEL$distdata$distance), NA, 1)
+fit <- Distance::ds(temp, key = "unif", adjustment = "poly", formula = ~1, truncation = 0.2)
+plot(fit)
+
+```
+
+
+# 3. Kriging
 

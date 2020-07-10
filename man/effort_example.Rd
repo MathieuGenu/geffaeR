@@ -4,7 +4,7 @@
 \name{effort_example}
 \alias{effort_example}
 \title{Effort example data.}
-\format{An object of class \code{data.frame} with 304 rows and 15 columns.}
+\format{An object of class \code{data.frame} with 278 rows and 15 columns.}
 \usage{
 effort_example
 }

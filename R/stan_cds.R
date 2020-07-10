@@ -1,12 +1,11 @@
-#' \encoding{Modelisation Baésienne à partir d'un modèle stan.}
+#' CDS Bayesian modelling from stan model.
 #'
-#' \encoding{Cette fonction permet de d'appliquer un modèle bayésien sur les données
-#' d'observation (distadata et segdata_obs) à partir d'un modèle stan}
+#' Apply a Bayesian model on observation data (distdata and segdata_obs) with a stan model.
 #'
-#' @param cds_data \encoding{Modèle écrit en "stan". Le modèle doit être renseigné sous forme de character string.}
-#' @param segdata_obs \encoding{data.frame segdata contenant les infos par segment avec le nombre de d'individus et le
-#'        nombre de détections. Provient de la fonction \code{\link{ajout_obs}}}
-#' @param distdata \encoding{data.frame distdata. Provient de la fonction \code{\link{prepare_data_obs}}}
+#' @param cds_data `character string` corresponding of the stan model.
+#' @param segdata_obs Segdata `data.frame` containing information at segment scale with the number
+#' on individuals and number of detection added with \code{\link{ajout_obs}} function.
+#' @param distdata `data.frame` distdata. Coming from \code{\link{prepare_data_obs}.}
 #' @return
 #'
 #' @examples

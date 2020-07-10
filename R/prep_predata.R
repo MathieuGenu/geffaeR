@@ -1,35 +1,35 @@
-#' \encoding{Creation of predata and data impuation of missing data.}
+#' Creation of predata and data impuation of missing data.
 #'
-#' \encoding{Creation of predata, a data.frame containing environmental parameters in a grid of the study area.
-#' Also it allows to impute missing data for predata and segdata.}
+#' Creation of predata, a data.frame containing environmental parameters in a grid of the study area.
+#' Also it allows to impute missing data for predata and segdata.
 #'
 #' @inheritParams prepare_data_obs
-#' @param gridfile_name \encoding{Grid of the study area with all the environmental variables which
-#' allows to build predata.}
-#' @param varenviro \encoding{Vector containing all dynamic environmental variables (e.g. chlorophyl, SST).}
-#' @param do_log_enviro \encoding{Vector precising which variables among varenviro that are necessary
-#' to transform to neperian logarithm + 1 (\code{\link[base]{log1p}}).}
-#' @param varphysio \encoding{Vector containing non-dynamic environmental variables (i.e depth, dist200m).}
-#' @param do_log_physio \encoding{Vector precising which variables among varphysio that are necessary
-#' to transform to neperian logarithm + 1 (\code{\link[base]{log1p}}).}
-#' @param imputation \encoding{Data imputation method to missing values of segdata and predata. 2 methods allowed :
+#' @param gridfile_name Grid of the study area with all the environmental variables which
+#' allows to build predata.
+#' @param varenviro Vector containing all dynamic environmental variables (e.g. chlorophyl, SST).
+#' @param do_log_enviro Vector precising which variables among varenviro that are necessary
+#' to transform to neperian logarithm + 1 (\code{\link[base]{log1p}}).
+#' @param varphysio Vector containing non-dynamic environmental variables (i.e depth, dist200m).
+#' @param do_log_physio Vector precising which variables among varphysio that are necessary
+#' to transform to neperian logarithm + 1 (\code{\link[base]{log1p}}).
+#' @param imputation Data imputation method to missing values of segdata and predata. 2 methods allowed :
 #'        \itemize{
-#'          \item{"PCA" : }{\encoding{PCA method from \pkg{missMDA}}.}
-#'          \item{"Amelia" : }{\encoding{Amelia method from \pkg{Amelia}}.}
+#'          \item{"PCA" : }{PCA method from \pkg{missMDA}}.
+#'          \item{"Amelia" : }{Amelia method from \pkg{Amelia}}.
 #'        }
-#'        Default method is PCA.}
-#' @param saturate_predata \encoding{Boolean. If \code{TRUE}, saturate function is applied on all varenviro
+#'        Default method is PCA.
+#' @param saturate_predata Boolean. If \code{TRUE}, saturate function is applied on all varenviro
 #'  an varphysio columns of segdata. Saturate function excludes extreme valuesand keep values between
 #'  quantiles 95% and 5%.}
-#' @param saturate_segdata \encoding{Boolean. If \code{TRUE}, saturate function is applied on all varenviro
+#' @param saturate_segdata Boolean. If \code{TRUE}, saturate function is applied on all varenviro
 #'  an varphysio columns of predata. Saturate function excludes extreme valuesand keep values between
-#'  quantiles 95% and 5%.}
+#'  quantiles 95% and 5%.
 #' @return This function return a list containing :
 #'         \enumerate{
 #'           \item predata : data.frame of predata.
 #'           \item segdata : data.frame of segdata.
-#'           \item pca_pred : Output of \code{\link[FactoMineR]{PCA} function on segdata.}
-#'           \item pca_seg : Output of \code{\link[FactoMineR]{PCA} function on predata.}
+#'           \item pca_pred : Output of \code{\link[FactoMineR]{PCA}} function on segdata.
+#'           \item pca_seg : Output of \code{\link[FactoMineR]{PCA}} function on predata.
 #'         }
 #'
 #' @examples
@@ -64,7 +64,13 @@ prep_predata <- function(segdata,
   segdata <- NULL
 
   ## prediction
-  pred.poly <- readOGR(dsn = paste(shape, sep = "/"), layer = layer)
+  if(any("character" %in% is(shape))){
+    # pred.poly <- readOGR(dsn = paste(shape), layer = layer, verbose = F) # NC
+    pred.poly <- st_read(paste(shape)) %>%
+      mutate(Id = 1:n())
+  } else {
+    pred.poly <- shape %>% st_as_sf()
+  }
 
   ### Covariable(s)
   # grille de la zone d'étude pour 2017
@@ -78,18 +84,25 @@ prep_predata <- function(segdata,
   }
 
   ## MA ## Ne conserver que les valeurs dans la zone de prédiction
-  grid_xy <- grid[, c("LONGITUDE", "LATITUDE")]
-  coordinates(grid_xy) <- ~ LONGITUDE + LATITUDE
-  grid_xy@proj4string <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-  if(proj4string(grid_xy) != proj4string(pred.poly)) {
-    grid_xy <- spTransform(grid_xy, proj4string(pred.poly))
+  grid_xy <- grid[, c("LONGITUDE", "LATITUDE")] %>%
+    st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = 4326) %>%
+    st_cast("POINT")
+  # coordinates(grid_xy) <- ~ LONGITUDE + LATITUDE
+  # grid_xy@proj4string <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+  if(st_crs(grid_xy) != st_crs(pred.poly)) {
+    grid_xy <- grid_sf %>% st_transform(crs = st_crs(pred.poly))
   }
-  xy_inside <- which(!is.na(over(grid_xy, pred.poly)[,"Id"]))
-  grid$inbox <- NA
-  grid$inbox[xy_inside] <- 1
-  grid$inbox[!xy_inside] <- 0
+  # if(proj4string(grid_xy) != proj4string(pred.poly)) {
+  #   grid_xy <- spTransform(grid_xy, proj4string(pred.poly))
+  # }
+
+  xy_inside <- st_intersects(grid_xy, pred.poly, sparse = FALSE)#which(!is.na(over(grid_xy, pred.poly)[,"Id"]))
+  grid$inbox <- apply(xy_inside, 1, any)
+  # grid$inbox <- NA
+  # grid$inbox[xy_inside] <- 1
+  # grid$inbox[!xy_inside] <- 0
   if(inbox_poly == T) {
-    grid <- subset(grid,inbox==1)
+    grid <- subset(grid, inbox == TRUE)
   }
 
   # # !!! cas particulier pour ANT_GUY !!! #

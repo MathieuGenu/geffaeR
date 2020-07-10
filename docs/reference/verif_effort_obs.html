@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Europe land contour. — Europe • geffaeR</title>
+<title>Compatibility verification between effort and observation data. — verif_effort_obs • geffaeR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Europe land contour. — Europe" />
-<meta property="og:description" content="Europe land contour for maps." />
+<meta property="og:title" content="Compatibility verification between effort and observation data. — verif_effort_obs" />
+<meta property="og:description" content="Matching verification of columns values of prepared effort and prepared observation." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -133,21 +133,34 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Europe land contour.</h1>
+    <h1>Compatibility verification between effort and observation data.</h1>
     
-    <div class="hidden name"><code>Europe.Rd</code></div>
+    <div class="hidden name"><code>verif_effort_obs.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Europe land contour for maps.</p>
+    <p>Matching verification of columns values of prepared effort and prepared observation.</p>
     </div>
 
-    <pre class="usage"><span class='kw'>Europe</span></pre>
+    <pre class="usage"><span class='fu'>verif_effort_obs</span>(<span class='kw'>var</span>, <span class='kw'>standard_obs</span>, <span class='kw'>standard_effort</span>)</pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>var</th>
+      <td><p>Variables for which matching between effort and observation data have to be verified.</p></td>
+    </tr>
+    <tr>
+      <th>standard_obs</th>
+      <td><p>Prepared observation data. e.g. Output of <code><a href='https://rdrr.io/pkg/geffaeR/man/prepare_data_obs.html'>prepare_data_obs</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>standard_effort</th>
+      <td><p>Prepared effort data. e.g. Output of <code><a href='https://rdrr.io/pkg/geffaeR/man/prepare_data_effort.html'>prepare_data_effort</a></code>.</p></td>
+    </tr>
+    </table>
 
-    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
-
-    <p>An object of class <code>SpatialPolygonsDataFrame</code> with 59 rows and 12 columns.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

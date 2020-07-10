@@ -2,7 +2,7 @@
 % Please edit documentation in R/prep_predata.R
 \name{prep_predata}
 \alias{prep_predata}
-\title{\encoding{Création de predata et imputation de données manquantes}}
+\title{Creation of predata and data impuation of missing data.}
 \usage{
 prep_predata(
   segdata,
@@ -22,46 +22,50 @@ prep_predata(
 \arguments{
 \item{segdata}{"Segdata" data.frame, built with \code{\link{prepare_data_effort}}.}
 
-\item{gridfile_name}{\encoding{Grille de la zone d'étude avec toutes les variables d'intérêt qui permettront la fabrication
-de predata.}}
+\item{gridfile_name}{Grid of the study area with all the environmental variables which
+allows to build predata.}
 
-\item{varenviro}{\encoding{Vecteur contenant les variables environnementales dynamiques (i.e chlorophylles, SST).}}
+\item{varenviro}{Vector containing all dynamic environmental variables (e.g. chlorophyl, SST).}
 
-\item{do_log_enviro}{\encoding{vecteur précisant parmi les variables environnementales (varenviro), lesquelles
-sont à transformer en logarithme néperien + 1 (\code{\link[base]{log1p}}).}}
+\item{do_log_enviro}{Vector precising which variables among varenviro that are necessary
+to transform to neperian logarithm + 1 (\code{\link[base]{log1p}}).}
 
-\item{varphysio}{\encoding{Vecteur contenant les variables environnementales non-dynamiques (i.e depth, dist200m).}}
+\item{varphysio}{Vector containing non-dynamic environmental variables (i.e depth, dist200m).}
 
-\item{do_log_physio}{\encoding{vecteur précisant parmi les variables physiologiques (varphysio), lesquelles
-sont à transformer en logarithme néperien + 1 (\code{\link[base]{log1p}}).}}
+\item{do_log_physio}{Vector precising which variables among varphysio that are necessary
+to transform to neperian logarithm + 1 (\code{\link[base]{log1p}}).}
 
-\item{imputation}{\encoding{Méthode permettant l'imputation de données manquantes pour segdata et predata.
-Parmi les méthodes il y a :
+\item{imputation}{Data imputation method to missing values of segdata and predata. 2 methods allowed :
 \itemize{
-  \item{"PCA" : }{\encoding{par méthode ACP. méthode issue du package \pkg{missMDA}}.}
-  \item{"Amelia" : }{\encoding{par méthode Amelia. méthode issue du pakage \pkg{Amelia}}.}
+  \item{"PCA" : }{PCA method from \pkg{missMDA}}.
+  \item{"Amelia" : }{Amelia method from \pkg{Amelia}}.
 }
-Par défaut la méthode est "PCA".}}
+Default method is PCA.}
 
-\item{shape}{\encoding{shapefile délimitant la zone où la prédiction est effectuée.}}
+\item{shape}{Shapefile of the study area. It can be either a \code{SpatialPolygonsDataFrame} class object,
+in this case it is not necessary to give shape_layer argument. Or it can be the name of the shape
+object with its extension ".shp" (ex : "data/studyAreaShapefile.shp").}
 
-\item{layer}{\encoding{Layer du shpaefile donnant les limite de la zone de prédiction.}}
+\item{saturate_predata}{Boolean. If \code{TRUE}, saturate function is applied on all varenviro
+an varphysio columns of segdata. Saturate function excludes extreme valuesand keep values between
+quantiles 95% and 5%.}}
 
-\item{proj_grid}{\encoding{Systême de projection du fichier de gride.}}
+\item{saturate_segdata}{Boolean. If \code{TRUE}, saturate function is applied on all varenviro
+an varphysio columns of predata. Saturate function excludes extreme valuesand keep values between
+quantiles 95% and 5%.}
 }
 \value{
-Cette fonction renvoit une liste contenant :
+This function return a list containing :
         \enumerate{
-          \item predata : Un data.frame contenant predata
-          \item segdata : Un data.frame contenant segdata
-          \item pca_pred : Une sortie de la fonction \code{\link[FactoMineR]{PCA} sur le data.frame segdata}
-          \item pca_seg : Une sortie de la fonction \code{\link[FactoMineR]{PCA} sur le data.frame predata}
+          \item predata : data.frame of predata.
+          \item segdata : data.frame of segdata.
+          \item pca_pred : Output of \code{\link[FactoMineR]{PCA}} function on segdata.
+          \item pca_seg : Output of \code{\link[FactoMineR]{PCA}} function on predata.
         }
 }
 \description{
-\encoding{Cette fonction permet de créer predata, le data.frame contenant les données environnementales dans la
-grille de la zone d'étude. Cette fonction permet également l'imputation de données manquantes pour les data.frames
-segdata et predata}
+Creation of predata, a data.frame containing environmental parameters in a grid of the study area.
+Also it allows to impute missing data for predata and segdata.
 }
 \examples{
 

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Modelisation Baésienne à partir d'un modèle stan. — stan_cds • geffaeR</title>
+<title>CDS Bayesian modelling from stan model. — stan_cds • geffaeR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -19,8 +19,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/spacelab/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -46,9 +46,8 @@
 
 
 
-<meta property="og:title" content="Modelisation Baésienne à partir d'un modèle stan. — stan_cds" />
-<meta property="og:description" content="Cette fonction permet de d'appliquer un modèle bayésien sur les données
-d'observation (distadata et segdata_obs) à partir d'un modèle stan" />
+<meta property="og:title" content="CDS Bayesian modelling from stan model. — stan_cds" />
+<meta property="og:description" content="Apply a Bayesian model on observation data (distdata and segdata_obs) with a stan model." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -63,6 +62,16 @@ d'observation (distadata et segdata_obs) à partir d'un modèle stan" />
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-000000-01"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-000000-01');
+</script>
 
 
   </head>
@@ -124,14 +133,13 @@ d'observation (distadata et segdata_obs) à partir d'un modèle stan" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Modelisation Baésienne à partir d'un modèle stan.</h1>
+    <h1>CDS Bayesian modelling from stan model.</h1>
     
     <div class="hidden name"><code>stan_cds.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Cette fonction permet de d'appliquer un modèle bayésien sur les données
-d'observation (distadata et segdata_obs) à partir d'un modèle stan</p>
+    <p>Apply a Bayesian model on observation data (distdata and segdata_obs) with a stan model.</p>
     </div>
 
     <pre class="usage"><span class='fu'>stan_cds</span>(<span class='kw'>cds_data</span>, <span class='kw'>segdata_obs</span>, <span class='kw'>distdata</span>)</pre>
@@ -141,16 +149,16 @@ d'observation (distadata et segdata_obs) à partir d'un modèle stan</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>cds_data</th>
-      <td><p>Modèle écrit en "stan". Le modèle doit être renseigné sous forme de character string.</p></td>
+      <td><p>`character string` corresponding of the stan model.</p></td>
     </tr>
     <tr>
       <th>segdata_obs</th>
-      <td><p>data.frame segdata contenant les infos par segment avec le nombre de d'individus et le
-nombre de détections. Provient de la fonction <code>ajout_obs</code></p></td>
+      <td><p>Segdata `data.frame` containing information at segment scale with the number
+on individuals and number of detection added with <code>ajout_obs</code> function.</p></td>
     </tr>
     <tr>
       <th>distdata</th>
-      <td><p>data.frame distdata. Provient de la fonction <code>prepare_data_obs</code></p></td>
+      <td><p>`data.frame` distdata. Coming from <code>prepare_data_obs.</code></p></td>
     </tr>
     </table>
 

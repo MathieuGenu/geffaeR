@@ -11,7 +11,7 @@ variogram_intraTransect <- function(segdata_obs,
                                     n_sim = 100,
                                     distmat = NULL,
                                     region = NULL,
-                                    esp = "species"  # only for title   # only for title
+                                    esp = "species"  # only for title
 ) {
 
   # y = donnÃ©es de comptage

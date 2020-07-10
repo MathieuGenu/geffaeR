@@ -3,7 +3,7 @@
 \docType{data}
 \name{cds}
 \alias{cds}
-\title{cds rstan script.}
+\title{Cds rstan script.}
 \format{An object of class \code{character} of length 1.}
 \usage{
 cds

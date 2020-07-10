@@ -3,27 +3,27 @@
 #' Transform raw effort data into multiple sub data.frame for next analysis of
 #' other functions of the package.
 #'
-#' @param effort_base Data.frame with effort data.
-#' @param covariable Vector of covariable names to keep in output of the function.
+#' @param effort_base \code{data.frame} with effort data.
+#' @param covariable \code{vector} of covariable names to keep in output of the function.
 #' @param block_area Data.frame with 2 colnames :
 #'                     \enumerate{
 #'                       \item Block.
 #'                       \item Area.
 #'                     }
-#' @param shape Shapefile of the study area. It can be either a SpatialPolygonsDataFrame class object,
+#' @param shape Shapefile of the study area. It can be either a \code{SpatialPolygonsDataFrame} class object,
 #'  in this case it is not necessary to give shape_layer argument. Or it can be the name of the shape
-#'  object with its extension ".shp" (ex : "data/studyAreShapefile.shp").
-#' @param shape_layer Layer of the shapefile if shape is a character string.
+#'  object with its extension ".shp" (ex : "data/studyAreaShapefile.shp").
+#' @param shape_layer Layer of the shapefile if shape is a \code{character string}.
 #' @param New_projection New projection of longitude and latitude of columns
-#'        (POINT_X et POINT_Y) in Proj4String format,
+#'        (POINT_X et POINT_Y) in \code{Proj4String} format,
 #'        see : \code{\link[sp]{CRS}} for more infos.
 #' @param optimal Argument which allows to keep data sampled in optimal conditions.
 #'        Defaults settings are all data are kept. In case of optimal = T, indexes
-#'        \code{c("GG", "GM", "MG", "EG", "GE", "EE", "ME", "EM", "MM")} are kept.
+#'        \code{"c("GG", "GM", "MG", "EG", "GE", "EE", "ME", "EM", "MM")"} are kept.
 #' @return This function return a list containing:
 #'         \enumerate{
-#'           \item Legdata : Data.frame with infos at leg scale.
-#'           \item Segdata : Data.frame with infos at segment scale.
+#'           \item legdata : \code{data.frame} with infos at leg scale.
+#'           \item segdata : \code{data.frame} with infos at segment scale.
 #'         }
 #' @examples
 #'

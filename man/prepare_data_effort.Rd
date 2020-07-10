@@ -15,9 +15,9 @@ prepare_data_effort(
 )
 }
 \arguments{
-\item{effort_base}{Data.frame with effort data.}
+\item{effort_base}{\code{data.frame} with effort data.}
 
-\item{covariable}{Vector of covariable names to keep in output of the function.}
+\item{covariable}{\code{vector} of covariable names to keep in output of the function.}
 
 \item{block_area}{Data.frame with 2 colnames :
 \enumerate{
@@ -25,25 +25,25 @@ prepare_data_effort(
   \item Area.
 }}
 
-\item{shape}{Shapefile of the study area. It can be either a SpatialPolygonsDataFrame class object,
+\item{shape}{Shapefile of the study area. It can be either a \code{SpatialPolygonsDataFrame} class object,
 in this case it is not necessary to give shape_layer argument. Or it can be the name of the shape
-object with its extension ".shp" (ex : "data/studyAreShapefile.shp").}
+object with its extension ".shp" (ex : "data/studyAreaShapefile.shp").}
 
-\item{shape_layer}{Layer of the shapefile if shape is a character string.}
+\item{shape_layer}{Layer of the shapefile if shape is a \code{character string}.}
 
 \item{New_projection}{New projection of longitude and latitude of columns
-(POINT_X et POINT_Y) in Proj4String format,
+(POINT_X et POINT_Y) in \code{Proj4String} format,
 see : \code{\link[sp]{CRS}} for more infos.}
 
 \item{optimal}{Argument which allows to keep data sampled in optimal conditions.
 Defaults settings are all data are kept. In case of optimal = T, indexes
-\code{c("GG", "GM", "MG", "EG", "GE", "EE", "ME", "EM", "MM")} are kept.}
+\code{"c("GG", "GM", "MG", "EG", "GE", "EE", "ME", "EM", "MM")"} are kept.}
 }
 \value{
 This function return a list containing:
         \enumerate{
-          \item Legdata : Data.frame with infos at leg scale.
-          \item Segdata : Data.frame with infos at segment scale.
+          \item legdata : \code{data.frame} with infos at leg scale.
+          \item segdata : \code{data.frame} with infos at segment scale.
         }
 }
 \description{

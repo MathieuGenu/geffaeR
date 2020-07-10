@@ -46,7 +46,7 @@ packg_to_import <- c("rgdal", "maptools",  "sp", "raster","foreign", "lubridate"
                      "Rdistance", "dsm", "knitr", "fields", "ggthemes", "broom", "coda",
                      "purrr","VIM","Amelia","missMDA","FactoMineR", "rstan", "Rcpp",
                      "geoR", "MASS","WhatIf","arm","viridisLite","stats","utils",
-                     "mgcv","cli","crayon","crch")
+                     "mgcv","cli","crayon","crch","sf","ggspatial")
 for(pckg in packg_to_import){
   use_package(pckg, type="Imports")
 }
@@ -111,3 +111,4 @@ usethis::use_data(effort_example, overwrite = T)
 usethis::use_pkgdown()
 pkgdown::build_site()
 pkgdown::build_home()
+pkgdown::build_reference()

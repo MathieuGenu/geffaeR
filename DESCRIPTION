@@ -57,7 +57,9 @@ Imports:
     mgcv,
     cli,
     crayon,
-    crch
+    crch,
+    sf,
+    ggspatial
 VignetteBuilder: knitr
 Suggests: 
     rmarkdown
