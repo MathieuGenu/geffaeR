@@ -7,12 +7,12 @@ output:
       collapsed: false
       smooth_scroll: false
 vignette: >
-%\VignetteIndexEntry{Preparation of data, CDS and kriging}
+  %\VignetteIndexEntry{Preparation of data, CDS and kriging}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  ---
+---
   
-  ```{r, include = FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
 collapse = TRUE,
 comment = "#>"
