@@ -4,7 +4,9 @@
 \name{observation_example}
 \alias{observation_example}
 \title{Observation example data.}
-\format{An object of class \code{data.frame} with 130 rows and 18 columns.}
+\format{
+An object of class \code{data.frame} with 130 rows and 18 columns.
+}
 \usage{
 observation_example
 }

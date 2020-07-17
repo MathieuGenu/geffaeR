@@ -4,7 +4,9 @@
 \name{NEA_isobath100}
 \alias{NEA_isobath100}
 \title{Northern East Atlantic isobath100.}
-\format{An object of class \code{SpatialLinesDataFrame} with 9 rows and 1 columns.}
+\format{
+An object of class \code{SpatialLinesDataFrame} with 9 rows and 1 columns.
+}
 \usage{
 NEA_isobath100
 }

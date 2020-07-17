@@ -4,7 +4,9 @@
 \name{shape_example}
 \alias{shape_example}
 \title{Shape-file example.}
-\format{An object of class \code{SpatialPolygonsDataFrame} with 1 rows and 1 columns.}
+\format{
+An object of class \code{SpatialPolygonsDataFrame} with 1 rows and 1 columns.
+}
 \usage{
 shape_example
 }

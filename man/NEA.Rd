@@ -4,7 +4,9 @@
 \name{NEA}
 \alias{NEA}
 \title{Northern East Atlantic land contour.}
-\format{An object of class \code{SpatialPolygons} of length 68.}
+\format{
+An object of class \code{SpatialPolygons} of length 68.
+}
 \usage{
 NEA
 }

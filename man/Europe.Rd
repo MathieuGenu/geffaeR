@@ -4,7 +4,9 @@
 \name{Europe}
 \alias{Europe}
 \title{Europe land contour.}
-\format{An object of class \code{SpatialPolygonsDataFrame} with 59 rows and 12 columns.}
+\format{
+An object of class \code{SpatialPolygonsDataFrame} with 59 rows and 12 columns.
+}
 \usage{
 Europe
 }

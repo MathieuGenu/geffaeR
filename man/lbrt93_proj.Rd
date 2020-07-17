@@ -4,7 +4,9 @@
 \name{lbrt93_proj}
 \alias{lbrt93_proj}
 \title{Projection in Lambert 93.}
-\format{An object of class \code{character} of length 1.}
+\format{
+An object of class \code{character} of length 1.
+}
 \usage{
 lbrt93_proj
 }
