@@ -14,16 +14,16 @@
 #' to transform to neperian logarithm + 1 (\code{\link[base]{log1p}}).
 #' @param imputation Data imputation method to missing values of segdata and predata. 2 methods allowed :
 #'        \itemize{
-#'          \item{"PCA" : }{PCA method from \pkg{missMDA}}.
-#'          \item{"Amelia" : }{Amelia method from \pkg{Amelia}}.
+#'          \item "PCA" : PCA method from \pkg{missMDA}.
+#'          \item "Amelia" : Amelia method from \pkg{Amelia}.
 #'        }
 #'        Default method is PCA.
 #' @param saturate_predata Boolean. If \code{TRUE}, saturate function is applied on all varenviro
 #'  an varphysio columns of segdata. Saturate function excludes extreme valuesand keep values between
-#'  quantiles 95% and 5%.}
+#'  quantiles 95 percent and 5 percent.}
 #' @param saturate_segdata Boolean. If \code{TRUE}, saturate function is applied on all varenviro
 #'  an varphysio columns of predata. Saturate function excludes extreme valuesand keep values between
-#'  quantiles 95% and 5%.
+#'  quantiles 95 percent and 5 percent.
 #' @return This function return a list containing :
 #'         \enumerate{
 #'           \item predata : data.frame of predata.

@@ -37,8 +37,8 @@ to transform to neperian logarithm + 1 (\code{\link[base]{log1p}}).}
 
 \item{imputation}{Data imputation method to missing values of segdata and predata. 2 methods allowed :
 \itemize{
-  \item{"PCA" : }{PCA method from \pkg{missMDA}}.
-  \item{"Amelia" : }{Amelia method from \pkg{Amelia}}.
+  \item "PCA" : PCA method from \pkg{missMDA}.
+  \item "Amelia" : Amelia method from \pkg{Amelia}.
 }
 Default method is PCA.}
 
@@ -46,13 +46,9 @@ Default method is PCA.}
 in this case it is not necessary to give shape_layer argument. Or it can be the name of the shape
 object with its extension ".shp" (ex : "data/studyAreaShapefile.shp").}
 
-\item{saturate_predata}{Boolean. If \code{TRUE}, saturate function is applied on all varenviro
-an varphysio columns of segdata. Saturate function excludes extreme valuesand keep values between
-quantiles 95% and 5%.}}
-
 \item{saturate_segdata}{Boolean. If \code{TRUE}, saturate function is applied on all varenviro
 an varphysio columns of predata. Saturate function excludes extreme valuesand keep values between
-quantiles 95% and 5%.}
+quantiles 95 percent and 5 percent.}
 }
 \value{
 This function return a list containing :

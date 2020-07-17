@@ -47,6 +47,8 @@
 
 
 <meta property="og:title" content="Creation of predata and data impuation of missing data. — prep_predata" />
+<meta property="og:description" content="Creation of predata, a data.frame containing environmental parameters in a grid of the study area.
+Also it allows to impute missing data for predata and segdata." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -112,7 +114,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/Package_example.html">Preparation of data, CDS and kriging</a>
+      <a href="../articles/Package_example.html">UNKNOWN TITLE</a>
     </li>
   </ul>
 </li>
@@ -138,6 +140,8 @@
     </div>
 
     <div class="ref-description">
+    <p>Creation of predata, a data.frame containing environmental parameters in a grid of the study area.
+Also it allows to impute missing data for predata and segdata.</p>
     </div>
 
     <pre class="usage"><span class='fu'>prep_predata</span>(
@@ -199,17 +203,16 @@ in this case it is not necessary to give shape_layer argument. Or it can be the 
 object with its extension ".shp" (ex : "data/studyAreaShapefile.shp").</p></td>
     </tr>
     <tr>
-      <th>saturate_predata</th>
+      <th>saturate_segdata</th>
       <td><p>Boolean. If <code>TRUE</code>, saturate function is applied on all varenviro
-an varphysio columns of segdata. Saturate function excludes extreme valuesand keep values between
-quantiles 95<!-- % and 5%.}} --></p>
-<p>saturate_segdataBoolean. If <code>TRUE</code>, saturate function is applied on all varenviro
 an varphysio columns of predata. Saturate function excludes extreme valuesand keep values between
-quantiles 95<!-- % and 5%.} -->
+quantiles 95 percent and 5 percent.</p></td>
+    </tr>
+    </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-This function return a list containing :
-        <ol>
+    <p>This function return a list containing :</p><ol>
 <li><p>predata : data.frame of predata.</p></li>
 <li><p>segdata : data.frame of segdata.</p></li>
 <li><p>pca_pred : Output of <code><a href='https://rdrr.io/pkg/FactoMineR/man/PCA.html'>PCA</a></code> function on segdata.</p></li>
@@ -217,12 +220,8 @@ This function return a list containing :
 </ol>
 
 
-Creation of predata, a data.frame containing environmental parameters in a grid of the study area.
-Also it allows to impute missing data for predata and segdata.</p></td>
-    </tr>
-    </table>
-
-
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

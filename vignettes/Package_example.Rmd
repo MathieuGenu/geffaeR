@@ -7,15 +7,15 @@ output:
       collapsed: false
       smooth_scroll: false
 vignette: >
-  %\VignetteIndexEntry{Preparation of data, CDS and kriging}
+%\VignetteIndexEntry{Preparation of data, CDS and kriging}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
----
-
-```{r, include = FALSE}
+  ---
+  
+  ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+collapse = TRUE,
+comment = "#>"
 )
 ```
 
@@ -38,7 +38,7 @@ library(tidyverse)
 library(DT)
 htmltools::div(
   observation_example %>% 
-  datatable(options = list(pageLength = 5, scrollX = T), width = 700)
+    datatable(options = list(pageLength = 5, scrollX = T), width = 700)
 )
 ```
 
@@ -49,7 +49,7 @@ library(tidyverse)
 library(DT)
 htmltools::div(
   effort_example %>% 
-  datatable(options = list(pageLength = 5, scrollX = T), width = 700)
+    datatable(options = list(pageLength = 5, scrollX = T), width = 700)
 )
 ```
 <br>
@@ -71,12 +71,12 @@ Then, it is necessary to modify the data structure in a way to have the proper s
 ```{r}
 standard_effort <- change_effort_varName(effort_example)
 prepared_effort <- prepare_data_effort(effort_base = standard_effort, 
-                    shape = shape_example,
-                    optimal = T,
-                    block_area = data.frame(Block = c("ATL_N"), 
-                                            Area = c(shape_example$area)), 
-                    New_projection = lbrt93_proj,
-                    covariable = NULL)
+                                       shape = shape_example,
+                                       optimal = T,
+                                       block_area = data.frame(Block = c("ATL_N"), 
+                                                               Area = c(shape_example$area)), 
+                                       New_projection = lbrt93_proj,
+                                       covariable = NULL)
 str(prepared_effort)
 
 ```
@@ -91,12 +91,12 @@ segdata <- prepared_effort$segdata
 projection <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
 observation_output_TURTRU <- prepare_data_obs(sp = sp1, 
-                                       obs_base = standard_obs, 
-                                       legdata = legdata, 
-                                       segdata = segdata, 
-                                       shape = shape_example, 
-                                       shape_layer = shape_layer, 
-                                       projection = projection)
+                                              obs_base = standard_obs, 
+                                              legdata = legdata, 
+                                              segdata = segdata, 
+                                              shape = shape_example, 
+                                              shape_layer = shape_layer, 
+                                              projection = projection)
 str(observation_output_TURTRU)
 ```
 
@@ -110,9 +110,9 @@ When data are prepared the next step consist in adjusting a detection function o
 
 ```{r}
 detection_TURTRU <- plot_detection(distdata = observation_output_TURTRU$distdata,
-                            bin = seq(0.0,1.0, 0.05),
-                            key = "halfnorm",
-                            upper = 1.0)
+                                   bin = seq(0.0,1.0, 0.05),
+                                   key = "halfnorm",
+                                   upper = 1.0)
 ```
 
 This function as several outputs, it gives : the esw (effective strip width),
@@ -149,12 +149,12 @@ segdata <- prepared_effort$segdata
 projection <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
 observation_output_LARMEL <- prepare_data_obs(sp = sp2, 
-                                       obs_base = standard_obs, 
-                                       legdata = legdata, 
-                                       segdata = segdata, 
-                                       shape = shape_example, 
-                                       shape_layer = shape_layer, 
-                                       projection = projection)
+                                              obs_base = standard_obs, 
+                                              legdata = legdata, 
+                                              segdata = segdata, 
+                                              shape = shape_example, 
+                                              shape_layer = shape_layer, 
+                                              projection = projection)
 temp <- observation_output_LARMEL$distdata
 temp$distance <- sample(c(0, 0.2),size = nrow(temp), replace = TRUE) * ifelse(is.na(observation_output_LARMEL$distdata$distance), NA, 1)
 fit <- Distance::ds(temp, key = "unif", adjustment = "poly", formula = ~1, truncation = 0.2)
@@ -165,3 +165,4 @@ plot(fit)
 
 # 3. Kriging
 
+(coming soon)
