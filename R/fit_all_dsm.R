@@ -1,11 +1,16 @@
 #' @export
 
 get_k_best_models <- function(tab_model, k = 5, use_AIC = TRUE) {
-  if(use_AIC) {
-    tab_model <- tab_model[order(tab_model$AIC, decreasing = FALSE), ]
+  if(any(names(tab_model) == "stacking_weights")) {
+    writeLines("\tUsing stacking weights for model selection")
+    tab_model <- tab_model[order(tab_model$stacking_weights, decreasing = TRUE), ]
   } else {
-    writeLines("\tUsing Explained Deviance for model selection")
-    tab_model <- tab_model[order(tab_model$ExpDev, decreasing = TRUE), ]
+    if(use_AIC) {
+      tab_model <- tab_model[order(tab_model$AIC, decreasing = FALSE), ]
+    } else {
+      writeLines("\tUsing Explained Deviance for model selection")
+      tab_model <- tab_model[order(tab_model$ExpDev, decreasing = TRUE), ]
+    }
   }
   tab_model <- tab_model[1:k, "index"]
   return(tab_model)
@@ -23,7 +28,9 @@ fit_all_dsm <- function(distFit = NULL,
                         smooth_xy = TRUE,
                         k = 5,
                         weighted = FALSE,
-                        random = NULL
+                        random = NULL, # a character vector
+                        soap = list(xt = NULL, knots = NULL), # a list with xt = list(bnd = ) and knots,
+                        use_loo = FALSE # model selection with leave-one-out
                         ) {
   ## likelihood must be one of "negbin", "poisson" or "tweedie"
   ## default is "negbin" for negative binomial likelihood
@@ -31,7 +38,8 @@ fit_all_dsm <- function(distFit = NULL,
   # for prediction inside the prospected polygon,
   # should be set to TRUE to obtain stable estimates
   # for prediction outside, MUST be set to FALSE to keep extrapolation under control
-  ## k is the number of model to return (based on AIC or Deviance)
+  ## soap is a list to pass in order to use a soap-film smooth: must be prepared outside this function
+  ## k is the number of models to return for inference (based on AIC or Deviance)
   ## by default, use cubic B-splines with shrinkage
 
   rescale <- function(x) { (x - mean(x)) / sd(x) }
@@ -43,15 +51,36 @@ fit_all_dsm <- function(distFit = NULL,
 
   ## prepare smooth terms
   smoothers <- paste("s(", predictors, ", k = ", complexity, ", bs = 'cs')", sep = "")
-  # intercept <- ifelse(smooth_xy, "~ te(X, Y, bs = 'cs')", "~ 1")
-  intercept <- ifelse(smooth_xy, "~ te(longitude, latitude, bs = 'cs')", "~ 1")
+  ## need soap?
+  if(is.null(soap$xt) && is.null(soap$knots)) {
+    intercept <- ifelse(smooth_xy, "~ te(longitude, latitude, bs = 'cs')", "~ 1")
+    ## standardize
+    segdata[, c(predictors, "longitude", "latitude", "X", "Y")] <- apply(segdata[, c(predictors, "longitude", "latitude", "X", "Y")], 2, rescale)
+  } else {
+    intercept <- ifelse(smooth_xy, "~ s(longitude, latitude, bs = 'so', xt = soap$xt)", "~ 1")## standardize: do not use with soap
+    ## standardize: do not standardize long/lat with soap
+    segdata[, predictors] <- apply(segdata[, predictors], 2, rescale)
+  }
 
-  ## can include a random effect
+  ## include random effects: must be factors for mgcv
   if(!is.null(random)) {
-    if(!any(names(segdata_obs) == random)) {
-      stop("Check random effect: no matching column in segdata_obs")
+    if(!all(random %in% names(segdata))) {
+      stop("Check random effect: no matching column in table 'segdata'")
     } else {
-      intercept <- paste(intercept, " + s(", random, ", bs = 're')", sep = "")
+      if(!is.factor(segdata[, random[1]])) {
+        segdata[, random[1]] <- factor(as.character(segdata[, random[1]]), levels = unique(segdata[, random[1]]))
+        X[, random[1]] <- factor(as.character(X[, random[1]]), levels = unique(X[, random[1]]))
+      }
+      intercept <- paste(intercept, " + s(", random[1], ", bs = 're')", sep = "")
+      if(length(random) > 1) {
+        for(k in 1:lenght(random)) {
+          if(!is.factor(segdata[, random[1]])) {
+            segdata[, random[k]] <- factor(as.character(segdata[, random[k]]), levels = unique(segdata[, random[k]]))
+            X[, random[k]] <- factor(as.character(X[, random[k]]), levels = unique(X[, random[k]]))
+          }
+          intercept <- paste(intercept, " + s(", random[k], ", bs = 're')", sep = "")
+        }
+      }
     }
   }
 
@@ -92,8 +121,8 @@ fit_all_dsm <- function(distFit = NULL,
         make_cfact_2(calibration_data = segdata_obs,
                      test_data = segdata_obs,
                      var_name = covariable[tab[, j]],
-                     percent = F,
-                     near_by = T
+                     percent = FALSE,
+                     near_by = TRUE
                      )
       })
     })
@@ -114,93 +143,107 @@ fit_all_dsm <- function(distFit = NULL,
 
   ## response variable is either n (nb of observations) or y (nb of individuals)
   if(response != "ind") {
-    writeLines("response variable is the number of obsersations")
+    writeLines("response variable is the number of observations")
     obsdata$size <- 1
   } else {
     writeLines("response variable is the number of individuals")
   }
 
-  ## fit the models
-  if(!is.null(distFit)) {
-    my_dsm_fct <- function(x, tab = TRUE, segdata_obs) {
-      model <- dsm(as.formula(all_mods[x]),
-                   ddf.obj = distFit,
-                   segment.data = segdata_obs,
-                   observation.data = obsdata,
-                   strip.width = NULL,
-                   family = switch(likelihood,
-                                   negbin = nb(),
-                                   poisson = poisson(),
-                                   tweedie = tw()
-                                   ),
-                   method = "REML",
-                   weights = w[, x]
-                   )
-      ### store some results in a data frame
-      if(tab) {
-        return(data.frame(model = all_mods[x],
-                          index = x,
-                          Convergence = ifelse(model$converged, 1, 0),
-                          AIC = model$aic,
-                          # GCV = model$gcv.ubre,
-                          ResDev = model$deviance,
-                          NulDev = model$null.deviance,
-                          ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
-                          )
-        )
-      } else { return(model) }
-    }
+  ## detection
+  if(is.null(distFit) && is.null(esw)) {
+    stop("Must provide either a detection function as 'distFit', or esw")
   } else {
-    if(is.null(esw)) {
-      stop("Must Provide a value for esw")
+    if(!is.null(distFit)) {
+      writeLines("\tDetection function provided")
+      esw <- NULL
     } else {
-      if(length(esw) == 1 | length(esw) == nrow(segdata_obs)) {
-        my_dsm_fct <- function(x, tab = TRUE, segdata_obs) {
-          model <- dsm(as.formula(all_mods[x]),
-                       ddf.obj = NULL,
-                       strip.width = esw,
-                       segment.area = 2 * esw * segdata_obs$Effort,
-                       segment.data = segdata_obs,
-                       observation.data = obsdata,
-                       family = switch(likelihood,
-                                       negbin = nb(),
-                                       poisson = poisson(),
-                                       tweedie = tw()
-                                       ),
-                       method = "REML",
-                       weights = w[, x]
-                       )
-          ### store some results in a data frame
-          if(tab) {
-            return(data.frame(model = all_mods[x],
-                              index = x,
-                              Convergence = ifelse(model$converged, 1, 0),
-                              AIC = model$aic,
-                              # GCV = model$gcv.ubre,
-                              ResDev = model$deviance,
-                              NulDev = model$null.deviance,
-                              ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
-                              )
-                   )
-          } else { return(model) }
-        }
+      if(length(esw) == nrow(segdata)) {
+        writeLines("\tesw provided for each segment")
       } else {
-        stop("Please check esw: provide either a single value or a vector with same length as segdata_obs")
+        esw <- esw[1]
+        writeLines(paste("\tesw set to", esw, sep = " "))
       }
     }
   }
+  ## fit the models
+  my_dsm_fct <- function(x, tab = TRUE, segdata_obs) {
+    model <- dsm(as.formula(all_mods[x]),
+                 ddf.obj = distFit,
+                 strip.width = esw,
+                 segment.area = 2 * esw * segdata_obs$Effort, # takes precedence if non null
+                 segment.data = segdata_obs,
+                 observation.data = obsdata,
+                 family = switch(likelihood,
+                                 negbin = nb(),
+                                 poisson = poisson(),
+                                 tweedie = tw()
+                                 ),
+                  method = "REML",
+                  weights = w[, x]
+                  )
+    ### leave-one-out cross-validation
+    if(use_loo) {
+      # if loo, do not return tab
+      tab <- FALSE
+      # approximate posterior distribution with MV normal
+      beta <- mvtnorm::rmvnorm(1e3, mean = model$coefficients, sigma = model$Vp)
+      Z <- predict(model,
+                   newdata = model$model,
+                   off.set = model$offset,
+                   type = "lpmatrix"
+                   )
+      mu <- exp(as.matrix(beta %*% t(Z)))
+      # response variable from fitted dsm object
+      y <- model$model$count
+      # log pointwise posterior density
+      lppd = switch(likelihood,
+                    negbin = { apply(mu, 1, function(iter) { w[, x] * dnbinom(y, size = model$family$getTheta(trans = TRUE), mu = exp(model$offset) * iter, log = TRUE) }) },
+                    poisson = { apply(mu, 1, function(iter) { w[, x] * dpois(y, lambda = exp(model$offset) * iter, log = TRUE) }) },
+                    tweedie = { apply(mu, 1, function(iter) { w[, x] * log(tweedie::dtweedie(y, xi = model$family$getTheta(trans = TRUE), mu = exp(model$offset) * iter, phi = model$sig2)) }) }
+                    )
+      out <- loo::loo.matrix(t(lppd), save_psis = TRUE)
+    } else {
+      out <- model
+    }
+    ### store some results in a data frame
+    if(tab) {
+      return(data.frame(model = all_mods[x],
+                        index = x,
+                        Convergence = ifelse(model$converged, 1, 0),
+                        AIC = model$aic,
+                        # GCV = model$gcv.ubre,
+                        ResDev = model$deviance,
+                        NulDev = model$null.deviance,
+                        ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
+                        )
+            )
+    } else { return(out) }
+  }
   all_fits <- lapply(1:length(all_mods), my_dsm_fct, segdata_obs = segdata_obs)
   ## Collapse to a data frame
-  all_fits_binded <- do.call('rbind', all_fits)
+  all_fits <- do.call('rbind', all_fits)
+
+  ## leave-one-out cross-validation using Pareto Smoothing Importance Sampling
+  if(use_loo) {
+    all_psis <- lapply(1:length(all_mods), my_dsm_fct, segdata = segdata, use_loo = TRUE)
+    # this can be long
+    writeLines("\t\tEstimating stacking weights: please wait")
+    loow <- as.numeric(loo::stacking_weights(do.call('cbind',
+                                                     lapply(all_psis, function(l) {l$pointwise[, "elpd_loo"]})
+                                                     )
+                                             )
+                       )
+    all_fits$stacking_weights <- loow
+  }
 
   ## select the n-best models
-  best <- lapply(get_k_best_models(tab_model = all_fits_binded, k = k), my_dsm_fct, tab = FALSE, segdata_obs = X)
-  best_std <- lapply(get_k_best_models(tab_model = all_fits_binded, k = k), my_dsm_fct, tab = FALSE, segdata_obs = segdata_obs)
+  best <- lapply(get_k_best_models(tab_model = all_fits, k = k), my_dsm_fct, tab = FALSE, segdata = X)
+  best_std <- lapply(get_k_best_models(tab_model = all_fits, k = k), my_dsm_fct, tab = FALSE, segdata = segdata)
 
   ## wrap-up with the outputs
-  return(list(all_fits_binded = all_fits_binded,
+  return(list(all_fits_binded = all_fits,
               best_models = best,
-              best_models_std = best_std # pour le pred splines
+              best_models4plotting = best_std # pour le pred splines
               )
          )
 }
