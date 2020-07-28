@@ -16,7 +16,8 @@ prep_predata(
   layer,
   saturate_predata = F,
   saturate_segdata = F,
-  inbox_poly = T
+  inbox_poly = T,
+  col2keep = NULL
 )
 }
 \arguments{
@@ -49,6 +50,10 @@ object with its extension ".shp" (ex : "data/studyAreaShapefile.shp").}
 \item{saturate_segdata}{Boolean. If \code{TRUE}, saturate function is applied on all varenviro
 an varphysio columns of predata. Saturate function excludes extreme valuesand keep values between
 quantiles 95 percent and 5 percent.}
+
+\item{col2keep}{\code{character string} corresponding to the columns wanted to appear in output in predata.}
+
+\item{inbox}{When \code{TRUE}, keep only part of the grid that match with the study area.}
 }
 \value{
 This function return a list containing :

@@ -120,7 +120,7 @@ This function as several outputs, it gives : the esw (effective strip width),
 detection_TURTRU$esw
 ```
 
-its standard deviation (CV),
+its coefficient of variation (CV),
 ```{r}
 detection_TURTRU$esw_cv
 ```

@@ -40,9 +40,9 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE) {
                  type = "lpmatrix"
                  )
     slinpred <- beta %*% t(Z); rm(Z)
-    gridxy <- expand.grid(X = seq(min(segdata[, "X"], na.rm = TRUE), max(segdata[, "X"], na.rm = TRUE), length.out = 1e2),
-                          Y = seq(min(segdata[, "Y"], na.rm = TRUE), max(segdata[, "Y"], na.rm = TRUE), length.out = 1e2)
-                          )
+    # gridxy <- expand.grid(X = seq(min(segdata[, "X"], na.rm = TRUE), max(segdata[, "X"], na.rm = TRUE), length.out = 1e2),
+    #                       Y = seq(min(segdata[, "Y"], na.rm = TRUE), max(segdata[, "Y"], na.rm = TRUE), length.out = 1e2)
+    #                       )
     gridxy <- expand.grid(longitude = seq(min(segdata[, "longitude"], na.rm = TRUE), max(segdata[, "longitude"], na.rm = TRUE), length.out = 1e2),
                           latitude = seq(min(segdata[, "latitude"], na.rm = TRUE), max(segdata[, "latitude"], na.rm = TRUE), length.out = 1e2)
                           )

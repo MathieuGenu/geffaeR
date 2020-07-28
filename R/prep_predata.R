@@ -24,6 +24,8 @@
 #' @param saturate_segdata Boolean. If \code{TRUE}, saturate function is applied on all varenviro
 #'  an varphysio columns of predata. Saturate function excludes extreme valuesand keep values between
 #'  quantiles 95 percent and 5 percent.
+#' @param col2keep \code{character string} corresponding to the columns wanted to appear in output in predata.
+#' @param inbox When \code{TRUE}, keep only part of the grid that match with the study area.
 #' @return This function return a list containing :
 #'         \enumerate{
 #'           \item predata : data.frame of predata.
@@ -44,7 +46,8 @@ prep_predata <- function(segdata,
                          imputation = "Amelia",
                          shape,layer,
                          saturate_predata = F, saturate_segdata = F,
-                         inbox_poly = T) {
+                         inbox_poly = T,
+                         col2keep = NULL) {
 
   # check si toutes les covariables sont dans segdata
   if(!all(varphysio %in% colnames(segdata))) {
@@ -55,6 +58,7 @@ prep_predata <- function(segdata,
     miss_enviro <- varenviro[!(varenviro %in% colnames(segdata))]
     stop(paste(miss_enviro, "n'est pas/ ne sont pas, dans segdata",collapse = "\n"))
   }
+
 
   # dire à l'utilisateur qu'il faut bien que les données manquantes soient au format NA et pas autre chose
   message("Les données manquantes dans les tableaux grid et segdata doivent impérativement être sous la forme de NA
@@ -76,6 +80,12 @@ prep_predata <- function(segdata,
   # grille de la zone d'étude pour 2017
   grid <-  read.dbf(paste(gridfile_name, sep = "/"), as.is = TRUE)
   grid <- grid[which(duplicated(grid) == FALSE), ]
+
+  # check if col2keep are in colnames of grid
+  if(!all(col2keep %in% colnames(grid))){
+    miss_col2keep <- col2keep[!(col2keep %in% colnames(grid))]
+    stop(paste(miss_col2keep, "n'est pas/ ne sont pas, dans grid",collapse = "\n"))
+  }
 
   # colname of coord in grid in good format
   if(all(c("lat","lon") %in% colnames(grid))) {
@@ -104,14 +114,6 @@ prep_predata <- function(segdata,
   if(inbox_poly == T) {
     grid <- subset(grid, inbox == TRUE)
   }
-
-  # # !!! cas particulier pour ANT_GUY !!! #
-  # ## SL ## renommer champ correctement, annuler fev pour ne faire prédiction que sur oct
-  # grid$CHL_month     <- grid$CHL201710M
-  # grid$CHL_monthClim <- grid$CHLm10Clim
-  # grid$SST_month     <- grid$SST201710M
-  # grid$SST_monthClim <- grid$SSTm10Clim
-
 
   ### Covariable
   allvar <- c(varphysio, varenviro)
@@ -230,7 +232,7 @@ prep_predata <- function(segdata,
   }
 
   ### table : predata
-  predata <- data.frame(grid[, c("LONGITUDE", "LATITUDE", "POINT_X", "POINT_Y", "Area",
+  predata <- data.frame(grid[, c("LONGITUDE", "LATITUDE", "POINT_X", "POINT_Y", "Area", col2keep,
                                  allvar)])
   names(predata)[1:4] <- c("longitude", "latitude", "X", "Y")
   predata_xy <- predata[, c("longitude", "latitude")]
