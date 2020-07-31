@@ -34,27 +34,29 @@ plot_detection <- function(distdata, bin, key, upper = NULL) {
   if(nrow(distdata) < 2) {
     stop(paste("il doit y avoir au moins 2 lignes d'observation dans distdata"))
   }
-
+  # pourquoi a-t-on cette ligne en fait?
   if(!is.null(distdata$observer)) {
     distdata$observer <- distdata$observer_ID
   }
 
-  #distance sampling
-  fit = ds(distdata, key = "hn", adjustment = NULL)
-
   if(is.null(upper)) {
-    upper <- max(bin)
+    upper <- +Inf
   }
+
+  # distance sampling
+  fit = ds(distdata,
+           key = ifelse(key == "halfnorm", "hn", "hr"),
+           adjustment = NULL,
+           truncation = upper,
+           quiet = TRUE
+           )
 
   ### Compute the effective strip width of the transect
-  hn <- function(x, sigma) {
-    return(exp(-x^2/(2 * sigma^2)))
-  }
-  hz <- function(x, sigma, nu) {
-    return(1 - exp(-(x/sigma)^(-nu)))
-  }
-  get_summary <- function(x){
-    c(mean(x), HPDinterval(as.mcmc(x), prob = 0.95))
+  hn <- function(x, sigma) { exp(-(x^2) / (2 * sigma^2)) }
+  hz <- function(x, sigma, nu) { 1 - exp(-(x/sigma)^(-nu)) }
+
+  get_summary <- function(x, alpha = 0.05) {
+    c(mean(x), HPDinterval(as.mcmc(x), prob = 1 - alpha))
   }
 
   x <- seq(min(bin), max(bin), length.out = 1000)
@@ -65,9 +67,7 @@ plot_detection <- function(distdata, bin, key, upper = NULL) {
 
   if(key == "halfnorm") {
     simpleMC <- exp(rnorm(1000, my_coef, sqrt(as.numeric(my_mat))))
-    esw <- sapply(simpleMC, function(q) {
-      integrate(hn, 0, upper, sigma=q)$value
-    })
+    esw <- (pnorm(upper, 0, simpleMC) - 0.5) / dnorm(0, 0, simpleMC)
     y <- sapply(x, function(i) {
       sapply(simpleMC, hn, x = i)
     })
