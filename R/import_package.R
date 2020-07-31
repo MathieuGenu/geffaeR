@@ -2,7 +2,7 @@
 #' @import dplyr ggplot2 cowplot mvtnorm Distance captioner
 #' @import Rdistance dsm knitr fields broom
 #' @import purrr VIM Amelia missMDA FactoMineR rstan Rcpp
-#' @import geoR WhatIf viridisLite cli crayon crch sf
+#' @import geoR WhatIf viridisLite cli crayon crch sf loo glue
 #' @rawNamespace import(ggthemes, except = theme_map)
 #' @rawNamespace import(raster, except = c(intersect, union, select, extract))
 #' @rawNamespace import(reshape, except = c(stamp, rename))
@@ -14,4 +14,5 @@
 #' @importFrom utils combn
 #' @importFrom mgcv nb tw gam
 #' @importFrom ggspatial annotation_scale annotation_north_arrow
+#' @importFrom tweedie dtweedie
 NULL

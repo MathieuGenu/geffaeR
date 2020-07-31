@@ -46,36 +46,33 @@ fit_all_dsm <- function(distFit = NULL,
   ## raw data
   X <- segdata_obs
 
-  ## standardize
-  segdata_obs[, c(predictors, "longitude", "latitude", "X", "Y")] <- apply(segdata_obs[, c(predictors, "longitude", "latitude", "X", "Y")], 2, rescale)
-
   ## prepare smooth terms
   smoothers <- paste("s(", predictors, ", k = ", complexity, ", bs = 'cs')", sep = "")
   ## need soap?
   if(is.null(soap$xt) && is.null(soap$knots)) {
     intercept <- ifelse(smooth_xy, "~ te(longitude, latitude, bs = 'cs')", "~ 1")
     ## standardize
-    segdata[, c(predictors, "longitude", "latitude", "X", "Y")] <- apply(segdata[, c(predictors, "longitude", "latitude", "X", "Y")], 2, rescale)
+    segdata_obs[, c(predictors, "longitude", "latitude", "X", "Y")] <- apply(segdata_obs[, c(predictors, "longitude", "latitude", "X", "Y")], 2, rescale)
   } else {
-    intercept <- ifelse(smooth_xy, "~ s(longitude, latitude, bs = 'so', xt = soap$xt)", "~ 1")## standardize: do not use with soap
+    intercept <- ifelse(smooth_xy, "~ s(longitude, latitude, bs = 'so', xt = list(bnd = bnd))", "~ 1")
     ## standardize: do not standardize long/lat with soap
-    segdata[, predictors] <- apply(segdata[, predictors], 2, rescale)
+    segdata_obs[, predictors] <- apply(segdata_obs[, predictors], 2, rescale)
   }
 
   ## include random effects: must be factors for mgcv
   if(!is.null(random)) {
-    if(!all(random %in% names(segdata))) {
-      stop("Check random effect: no matching column in table 'segdata'")
+    if(!all(random %in% names(segdata_obs))) {
+      stop("Check random effect: no matching column in table 'segdata_obs'")
     } else {
-      if(!is.factor(segdata[, random[1]])) {
-        segdata[, random[1]] <- factor(as.character(segdata[, random[1]]), levels = unique(segdata[, random[1]]))
+      if(!is.factor(segdata_obs[, random[1]])) {
+        segdata_obs[, random[1]] <- factor(as.character(segdata_obs[, random[1]]), levels = unique(segdata_obs[, random[1]]))
         X[, random[1]] <- factor(as.character(X[, random[1]]), levels = unique(X[, random[1]]))
       }
       intercept <- paste(intercept, " + s(", random[1], ", bs = 're')", sep = "")
       if(length(random) > 1) {
         for(k in 1:lenght(random)) {
-          if(!is.factor(segdata[, random[1]])) {
-            segdata[, random[k]] <- factor(as.character(segdata[, random[k]]), levels = unique(segdata[, random[k]]))
+          if(!is.factor(segdata_obs[, random[1]])) {
+            segdata_obs[, random[k]] <- factor(as.character(segdata_obs[, random[k]]), levels = unique(segdata_obs[, random[k]]))
             X[, random[k]] <- factor(as.character(X[, random[k]]), levels = unique(X[, random[k]]))
           }
           intercept <- paste(intercept, " + s(", random[k], ", bs = 're')", sep = "")
@@ -157,7 +154,7 @@ fit_all_dsm <- function(distFit = NULL,
       writeLines("\tDetection function provided")
       esw <- NULL
     } else {
-      if(length(esw) == nrow(segdata)) {
+      if(length(esw) == nrow(segdata_obs)) {
         writeLines("\tesw provided for each segment")
       } else {
         esw <- esw[1]
@@ -166,23 +163,23 @@ fit_all_dsm <- function(distFit = NULL,
     }
   }
   ## fit the models
-  my_dsm_fct <- function(x, tab = TRUE, segdata_obs) {
+  my_dsm_fct <- function(x, tab = TRUE, segdata_obs, loo = FALSE, bnd = soap$xt, knots = soap$knots) {
     model <- dsm(as.formula(all_mods[x]),
                  ddf.obj = distFit,
                  strip.width = esw,
-                 segment.area = 2 * esw * segdata_obs$Effort, # takes precedence if non null
                  segment.data = segdata_obs,
                  observation.data = obsdata,
                  family = switch(likelihood,
                                  negbin = nb(),
                                  poisson = poisson(),
                                  tweedie = tw()
-                                 ),
-                  method = "REML",
-                  weights = w[, x]
-                  )
+                 ),
+                 method = "REML",
+                 weights = w[, x],
+                 knots = knots
+    )
     ### leave-one-out cross-validation
-    if(use_loo) {
+    if(loo) {
       # if loo, do not return tab
       tab <- FALSE
       # approximate posterior distribution with MV normal
@@ -225,7 +222,7 @@ fit_all_dsm <- function(distFit = NULL,
 
   ## leave-one-out cross-validation using Pareto Smoothing Importance Sampling
   if(use_loo) {
-    all_psis <- lapply(1:length(all_mods), my_dsm_fct, segdata = segdata, use_loo = TRUE)
+    all_psis <- lapply(1:length(all_mods), my_dsm_fct, segdata_obs = segdata_obs, loo = TRUE)
     # this can be long
     writeLines("\t\tEstimating stacking weights: please wait")
     loow <- as.numeric(loo::stacking_weights(do.call('cbind',
@@ -237,8 +234,8 @@ fit_all_dsm <- function(distFit = NULL,
   }
 
   ## select the n-best models
-  best <- lapply(get_k_best_models(tab_model = all_fits, k = k), my_dsm_fct, tab = FALSE, segdata = X)
-  best_std <- lapply(get_k_best_models(tab_model = all_fits, k = k), my_dsm_fct, tab = FALSE, segdata = segdata)
+  best <- lapply(get_k_best_models(tab_model = all_fits, k = k), my_dsm_fct, tab = FALSE, segdata_obs = X)
+  best_std <- lapply(get_k_best_models(tab_model = all_fits, k = k), my_dsm_fct, tab = FALSE, segdata_obs = segdata_obs)
 
   ## wrap-up with the outputs
   return(list(all_fits_binded = all_fits,

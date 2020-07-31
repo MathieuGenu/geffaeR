@@ -59,7 +59,10 @@ Imports:
     crayon,
     crch,
     sf,
-    ggspatial
+    ggspatial,
+    loo,
+    tweedie,
+    glue
 VignetteBuilder: knitr
 Suggests: 
     rmarkdown
