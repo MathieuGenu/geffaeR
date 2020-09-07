@@ -23,7 +23,7 @@ use_devtools()
 # just when we have to create a package
 # create_package("~/Documents/Projet/package/geffaeR")
 
-setwd("C:/Users/mgenu.RATUFA/Documents/Projet/package/geffaeR")
+# setwd("C:/Users/mgenu.RATUFA/Documents/Projet/package/geffaeR")
 
 
 # END OF FISRT PART ----

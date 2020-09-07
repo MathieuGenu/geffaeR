@@ -156,7 +156,8 @@ Also it allows to impute missing data for predata and segdata.</p>
   <span class='no'>layer</span>,
   <span class='kw'>saturate_predata</span> <span class='kw'>=</span> <span class='no'>F</span>,
   <span class='kw'>saturate_segdata</span> <span class='kw'>=</span> <span class='no'>F</span>,
-  <span class='kw'>inbox_poly</span> <span class='kw'>=</span> <span class='no'>T</span>
+  <span class='kw'>inbox_poly</span> <span class='kw'>=</span> <span class='no'>T</span>,
+  <span class='kw'>col2keep</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -207,6 +208,14 @@ object with its extension ".shp" (ex : "data/studyAreaShapefile.shp").</p></td>
       <td><p>Boolean. If <code>TRUE</code>, saturate function is applied on all varenviro
 an varphysio columns of predata. Saturate function excludes extreme valuesand keep values between
 quantiles 95 percent and 5 percent.</p></td>
+    </tr>
+    <tr>
+      <th>col2keep</th>
+      <td><p><code>character string</code> corresponding to the columns wanted to appear in output in predata.</p></td>
+    </tr>
+    <tr>
+      <th>inbox</th>
+      <td><p>When <code>TRUE</code>, keep only part of the grid that match with the study area.</p></td>
     </tr>
     </table>
 

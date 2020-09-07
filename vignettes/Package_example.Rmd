@@ -61,12 +61,16 @@ htmltools::div(
 To perform analysis on thoose data, it is necessary to modify its column name to match the need of packages (Distance, dsm). To do so, there are 2 functions ```change_effort_varName()``` and ```change_obs_varName()```.
 
 
-## 1.2 Prepare data
+## 1.2 Change data format
 
 Then, it is necessary to modify the data structure in a way to have the proper sub-dataframe for distance function. For this, effort dataframe is devided into 2 sub-dataframes :
 
-* dataframe at leg scale
-* dataframe at segment scale
+* legdata : effort data at leg scale
+* segdata :  effort data at segment scale
+
+```{r, echo = F, fig.retina = 3, out.width = '75%', fig.align='center'}
+knitr::include_graphics("effort_schema_prepare_data.png")
+```
 
 ```{r}
 standard_effort <- change_effort_varName(effort_example)
@@ -106,7 +110,7 @@ str(observation_output_TURTRU)
 
 ## 2.1 Case of non seabird 
 
-When data are prepared the next step consist in adjusting a detection function on the data with the function ```plot_detection()```. It is possible to choose betwwen a half-normal function or hazard-rate one. It is necessary to inform the distance between which we want to perform the function.
+After preparing and formatting the data, the next step consist in adjusting a detection function on the data with the function ```plot_detection()```. It is possible to choose between a half-normal function or hazard-rate one. It is necessary to inform the distance between which we want to apply the detection function.
 
 ```{r}
 detection_TURTRU <- plot_detection(distdata = observation_output_TURTRU$distdata,
@@ -133,14 +137,17 @@ detection_TURTRU$distFit
 summary(detection_TURTRU$distFit)
 ```
 
-and gives the detetction plot (graph)
-```{r}
+and gives the detetction plot, on the graph the red-dashed line correspond to the effective strip width (esw)
+
+
+```{r TURTRU_plot_detection}
 detection_TURTRU$graph
-```
+``` 
+
 
 ## 2.2 Case of seabird
 
-For Seabirds a strip-transect is applied, that means there is no distance assigned for seabirds observation, it is set to 0.2km. To apply a detection function, it is necessary to "hack" the method for estimating seabirds abundance. The "hacking" method consist in setting distance of observation as 0 or 0.2km with a sample function. there will be as many 0 as there are 0.2 in the distance column. That means from a distance of 0 to 0.2km all seabirds will be detected. Then the detection function is a uniform function from 0 to 0.2km with a detection probability of 1.
+For Seabirds a strip-transect is applied, that means there is no distance assigned for seabirds observation, it is set to 0.2km. To apply a detection function, it is necessary to "hack" the method for estimating seabirds abundance. The "hacking" method consist in setting distance of observation as 0 or 0.2km with a sample function. There will be as many 0 as there are 0.2 in the distance column. That means from a distance of 0 to 0.2km all seabirds will be detected. Then the detection function is a uniform function from 0 to 0.2km with a detection probability of 1.
 
 ```{r}
 sp2 <- unique(observation_example$species)[2]
