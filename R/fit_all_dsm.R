@@ -27,6 +27,7 @@ fit_all_dsm <- function(distFit = NULL,
                         max_cor = 0.5, nb_max_pred = 3, complexity = 4,
                         smooth_xy = TRUE,
                         k = 5,
+                        splines_by = NULL,
                         weighted = FALSE,
                         random = NULL, # a character vector
                         soap = list(xt = NULL, knots = NULL), # a list with xt = list(bnd = ) and knots,
@@ -41,13 +42,25 @@ fit_all_dsm <- function(distFit = NULL,
   ## soap is a list to pass in order to use a soap-film smooth: must be prepared outside this function
   ## k is the number of models to return for inference (based on AIC or Deviance)
   ## by default, use cubic B-splines with shrinkage
+  ## arg 'splines_by' is to have an interaction with splines
 
   rescale <- function(x) { (x - mean(x)) / sd(x) }
   ## raw data
   X <- segdata_obs
 
   ## prepare smooth terms
-  smoothers <- paste("s(", predictors, ", k = ", complexity, ", bs = 'cs')", sep = "")
+  if(is.null(splines_by)) {
+    smoothers <- paste("s(", predictors, ", k = ", complexity, ", bs = 'cs')", sep = "")
+  } else {
+    if(!is.character(splines_by)) {
+      stop("Arg. 'splines_by' must be character")
+    }
+    if(!any(names(segdata_obs) == splines_by)) {
+      stop(paste("No column named '", splines_by, "' in dataframe 'segdata_obs'", sep = ""))
+    }
+    smoothers <- paste("s(", predictors, ", k = ", complexity, ", bs = 'cs', by = ", splines_by, ")", sep = "")
+  }
+
   ## need soap?
   if(is.null(soap$xt) && is.null(soap$knots)) {
     intercept <- ifelse(smooth_xy, "~ te(longitude, latitude, bs = 'cs')", "~ 1")

@@ -4,8 +4,23 @@
 pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE) {
   # segdata is the original dataset used to calibrate the model
   # dsm_model is the dsm model you want to use
-  lower <- function(x) { as.numeric(coda::HPDinterval(coda::as.mcmc(x), prob = 0.95)[1]) }
-  upper <- function(x) { as.numeric(coda::HPDinterval(coda::as.mcmc(x), prob = 0.95)[2]) }
+  lower <- function(x) {
+    if(all(is.na(x))) {
+      return(NA)
+    } else {
+      x <- x[!is.na(x)]
+      return(as.numeric(coda::HPDinterval(coda::as.mcmc(x), prob = 0.95)[1]) )
+    }
+  }
+  upper <- function(x) {
+    if(all(is.na(x))) {
+      return(NA)
+    } else {
+      x <- x[!is.na(x)]
+      return(as.numeric(coda::HPDinterval(coda::as.mcmc(x), prob = 0.95)[2]) )
+    }
+    as.numeric(coda::HPDinterval(coda::as.mcmc(x), prob = 0.95)[2])
+  }
 
   var_name <- as.character(dsm_model$pred.formula)[grep(" + ", as.character(dsm_model$pred.formula), fixed = "TRUE")]
   var_name <- strsplit(var_name, split = " + ", fixed = TRUE)[[1]]
