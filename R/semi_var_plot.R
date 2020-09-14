@@ -1,3 +1,4 @@
+#' @import ggplot2
 #' @export
 
 # faire un plot de la semi-variance (semivarPlot)

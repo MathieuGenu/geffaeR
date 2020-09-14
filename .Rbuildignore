@@ -7,3 +7,9 @@
 ^docs$
 ^pkgdown$
 ^\.github$
+^index\.Rmd$
+^index\.md$
+^logo\.png$
+^readme\.md$
+^read$
+^script_creation_package\.R$

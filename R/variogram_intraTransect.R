@@ -1,4 +1,8 @@
-
+#' @import dplyr
+#' @import ggplot2
+#' @importFrom arm bayesglm
+#' @importFrom fields rdist
+#' @importFrom reshape melt
 #' @export
 
 variogram_intraTransect <- function(segdata_obs,
@@ -173,9 +177,11 @@ variogram_intraTransect <- function(segdata_obs,
     colnames(sumnull)<- c("lower", "median", "upper", "emp","distcl")
 
     # reprendre les simulations
-    null <- as.data.frame(null) ; names(null) <- as.character(as.numeric(distvario1))
+    null <- as.data.frame(null)
+    names(null) <- as.character(as.numeric(distvario1))
     null$sim <- as.character(1:n_sim)
-    null <- melt(null, id = "sim") ; null$variable <- as.numeric(distvario1)[as.numeric(null$variable)]
+    null <- melt(null, id = "sim")
+    null$variable <- as.numeric(distvario1)[as.numeric(null$variable)]
 
     # graphique avec ggplot2
     theme_set(theme_bw(base_size = 14))

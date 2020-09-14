@@ -62,7 +62,8 @@ Imports:
     ggspatial,
     loo,
     tweedie,
-    glue
+    glue,
+    DT
 VignetteBuilder: knitr
 Suggests: 
     rmarkdown

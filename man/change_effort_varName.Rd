@@ -2,7 +2,7 @@
 % Please edit documentation in R/change_varName.R
 \name{change_effort_varName}
 \alias{change_effort_varName}
-\title{Standardisation of column names.}
+\title{Standardisation of effort data column names.}
 \usage{
 change_effort_varName(effort_base)
 }
@@ -21,8 +21,4 @@ When "strate_sec" is not found at the end of the function, it creates a strate_s
       column automatically corresponding to the merge of "subRegion" and "strate". There are merged by "_".
       Example, for a row, if \code{strate = N1} and \code{subRegion = ATL} we will get
       \code{strateSec = ATL_N1}.
-}
-\examples{
-
-
 }

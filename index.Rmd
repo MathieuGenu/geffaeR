@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 # geffaeR <img src="man/figures/logo.png" align="right" width="120"/>
 
-When a lot of distance sampling campaign are made, analysis have to be done to estimate abundance with tools such as distance, dsm, kriging. But from a campaign to another, the objectives are not always the same, while the method remains the same. So geffaeR aims at simplify the process of analyzing observation campaign and avoid to have to rewrite functions and script to adapt for each study case.
+Distance sampling is a methodology used to estimate abundance/density of animal species from transect sampling. Abundance and density estimation can be realised with tools such as cds, kriging, density surface modelling. But from a campaign to another, the objectives are not always the same, while the method remains the same. So geffaeR aims at simplifying the process of analyzing observation campaign and avoid to have to rewrite functions and script to adapt for each study case.
 
 To illustrate geffaeR interest we can consider an example. For a particular campaign, we want a cds analysis for all the filed trip but for species a and b. For the other campaign we want a cds analysis for each session of the campaign for species b and c. So there are specificities that will be managed by the user but the method can be set to be generic and put in a package, so we don't have to modify the method for every campaign (illustrated fig1).
 

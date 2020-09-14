@@ -34,9 +34,10 @@ Analysis are performed on data collected with [SAMMOA](https://www.codelutin.com
 * Observation 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
 library(geffaeR)
-library(tidyverse)
+library(dplyr)
 library(DT)
-htmltools::div(
+library(htmltools)
+div(
   observation_example %>% 
     datatable(options = list(pageLength = 5, scrollX = T), width = 700)
 )
@@ -45,9 +46,10 @@ htmltools::div(
 * Effort
 ```{r, echo = FALSE}
 library(geffaeR)
-library(tidyverse)
+library(dplyr)
 library(DT)
-htmltools::div(
+library(htmltools)
+div(
   effort_example %>% 
     datatable(options = list(pageLength = 5, scrollX = T), width = 700)
 )
@@ -60,6 +62,24 @@ htmltools::div(
 
 To perform analysis on thoose data, it is necessary to modify its column name to match the need of packages (Distance, dsm). To do so, there are 2 functions ```change_effort_varName()``` and ```change_obs_varName()```.
 
+```{r}
+standard_effort <- change_effort_varName(effort_example)
+standard_obs <- change_obs_varName(observation_example)
+```
+
+
+## 1.2 verify matching between observation and effort
+
+A facultative step can be added at this stage of the analysis. We can perform a verification to be sure that each observation have a corresponding values in the effort data. To do so, it is necessary to give which column we want to verifiy if they have their equivalent in effort.
+```{r}
+colum_to_test <- c("segId","legId")
+verif_effort_obs(
+  var = colum_to_test,
+  standard_obs = standard_obs,
+  standard_effort = standard_effort
+)
+```
+This means that for "segId" and "legId" all values of observation data have an equivalent in effort data with non missing values.
 
 ## 1.2 Change data format
 
@@ -73,7 +93,6 @@ knitr::include_graphics("effort_schema_prepare_data.png")
 ```
 
 ```{r}
-standard_effort <- change_effort_varName(effort_example)
 prepared_effort <- prepare_data_effort(effort_base = standard_effort, 
                                        shape = shape_example,
                                        optimal = T,
@@ -88,10 +107,10 @@ str(prepared_effort)
 Observation dataframe is splitted into 4 sub-dataframes.
 
 ```{r}
-standard_obs <- change_obs_varName(observation_example)
 sp1 <- unique(observation_example$species)[1]
 legdata <- prepared_effort$legdata
 segdata <- prepared_effort$segdata
+# Projection used for shape (shape_example in this case)
 projection <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
 observation_output_TURTRU <- prepare_data_obs(sp = sp1, 
@@ -100,10 +119,10 @@ observation_output_TURTRU <- prepare_data_obs(sp = sp1,
                                               segdata = segdata, 
                                               shape = shape_example, 
                                               shape_layer = shape_layer, 
-                                              projection = projection)
+                                              projection = projection
+                                              )
 str(observation_output_TURTRU)
 ```
-
 
 
 # 2. Cds analysis

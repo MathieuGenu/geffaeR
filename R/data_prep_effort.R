@@ -25,8 +25,10 @@
 #'           \item legdata : \code{data.frame} with infos at leg scale.
 #'           \item segdata : \code{data.frame} with infos at segment scale.
 #'         }
+#' @import dplyr sp rgdal
+#' @importMethodsFrom raster as.character
+#' @importFrom lubridate ymd
 #' @examples
-#'
 #'
 #' @export
 
@@ -96,19 +98,19 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
 
   #-- legdata --#
   #-------------#
-    if("session" %in% colnames(effort)) {
-      legdata <- effort %>%
-        group_by(survey, strateSec, transect, legId, left, right, session) %>%
-        summarize(Effort = sum(segLength),
-                  seaState = unique(seaState),
-                  subjective = unique(subjective))
-    } else {
-      legdata <- effort %>%
-        group_by(survey, strateSec, transect, legId, left, right) %>%
-        summarize(Effort = sum(segLength),
-                  seaState = unique(seaState),
-                  subjective = unique(subjective))
-    }
+  if("session" %in% colnames(effort)) {
+    legdata <- effort %>%
+      group_by(survey, strateSec, transect, legId, left, right, session) %>%
+      summarize(Effort = sum(segLength),
+                seaState = unique(seaState),
+                subjective = unique(subjective))
+  } else {
+    legdata <- effort %>%
+      group_by(survey, strateSec, transect, legId, left, right) %>%
+      summarize(Effort = sum(segLength),
+                seaState = unique(seaState),
+                subjective = unique(subjective))
+  }
 
   legdata <- as.data.frame(legdata)
   names(legdata)[which(names(legdata) %in% c("strateSec", "transect", "legId"))] <- c("Region.Label", "Transect.Label",
@@ -117,7 +119,7 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
   # Assigner area à legdata en fonction du nom du block commun avec block_area
   legdata$Area <- sapply(legdata$Region.Label, function(id) {
     as.numeric(block_area$Area[which(block_area$Block == id)])
-    })
+  })
 
 
 
@@ -138,7 +140,7 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
   }
 
 
-  segdata$CenterTime <- lubridate::ymd(segdata$CenterTime)
+  segdata$CenterTime <- ymd(segdata$CenterTime)
   names(segdata)[1:11] <- c("date", "survey", "Transect.Label", "Sample.Label", "Seg", "Effort", "X", "Y",
                             "longitude", "latitude", "Region.Label")
 

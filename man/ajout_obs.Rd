@@ -12,10 +12,10 @@ individuals for legs for which observation have beebn made.}
 
 \item{legdata}{"Legdata" data.frame, built with \code{\link{prepare_data_effort}}.}
 
-\item{segdata}{"Segdata" data.frame, built with \code{\link{prepare_data_effort}}.}
-
-\item{coundata_seg}{data.frame containing the detection number and the total number of
+\item{countdata_seg}{data.frame containing the detection number and the total number of
 individuals for segments for which observation have beebn made.}
+
+\item{segdata}{"Segdata" data.frame, built with \code{\link{prepare_data_effort}}.}
 }
 \value{
 This function return a list containing :

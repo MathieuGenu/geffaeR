@@ -1,3 +1,6 @@
+#' @import ggplot2
+#' @importFrom coda HPDinterval as.mcmc
+#' @importFrom mvtnorm rmvnorm
 #' @export
 
 ### spline curves
@@ -203,7 +206,9 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
          )
 }
 
-
+#' @import ggplot2
+#' @importFrom MASS rnegbin
+#' @importFrom mvtnorm rmvnorm
 #' @export
 
 rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0) {

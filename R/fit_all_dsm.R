@@ -16,7 +16,13 @@ get_k_best_models <- function(tab_model, k = 5, use_AIC = TRUE) {
   return(tab_model)
 }
 
-
+#' @importFrom arm rescale
+#' @importFrom utils combn
+#' @importFrom mgcv nb tw
+#' @importFrom dsm dsm
+#' @importFrom mvtnorm rmvnorm
+#' @importFrom loo loo.matrix stacking_weights
+#' @importFrom tweedie dtweedie
 #' @export
 
 fit_all_dsm <- function(distFit = NULL,

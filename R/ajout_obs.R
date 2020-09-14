@@ -6,7 +6,7 @@
 #' @inheritParams prepare_data_obs
 #' @param countdata_leg data.frame containing the detection number and the total number of
 #' individuals for legs for which observation have beebn made.
-#' @param coundata_seg data.frame containing the detection number and the total number of
+#' @param countdata_seg data.frame containing the detection number and the total number of
 #' individuals for segments for which observation have beebn made.
 #' @return This function return a list containing :
 #'         \enumerate{

@@ -1,3 +1,5 @@
+#' @importFrom arm bayesglm
+#' @importFrom fields rdist
 #' @export
 
 

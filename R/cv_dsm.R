@@ -1,3 +1,4 @@
+#' @importFrom dsm dsm.var.gam
 #' @export
 
 cv_dsm <- function(dsm.fc, predata, inside = NULL) {

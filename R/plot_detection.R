@@ -23,18 +23,19 @@
 #'           estimated with mcmc chains.
 #'           \item distfit : distance object from \link[Distance]{ds} function.
 #'         }
-#' @examples
-#'
-#'
+#' @import ggplot2
+#' @importFrom coda HPDinterval as.mcmc
+#' @importFrom Distance ds
+#' @importFrom mvtnorm rmvnorm
 #' @export
-
 
 plot_detection <- function(distdata, bin, key, upper = NULL) {
   # renommer observer car capote la fonction ds() (nom attribué à une fonction pour ds)
   if(nrow(distdata) < 2) {
     stop(paste("il doit y avoir au moins 2 lignes d'observation dans distdata"))
   }
-  # pourquoi a-t-on cette ligne en fait?
+  # avoid conflict with "observer" name which is already attributed for distance package
+  # if we let observer column it will cause issues, better change its name
   if(!is.null(distdata$observer)) {
     distdata$observer <- distdata$observer_ID
   }

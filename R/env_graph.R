@@ -1,3 +1,6 @@
+#' @import ggplot2
+#' @importFrom viridisLite viridis
+#' @importFrom cowplot theme_map
 #' @export
 
 env_graph <- function(predata, varname = "Depth", XY = T) {

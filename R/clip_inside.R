@@ -1,3 +1,4 @@
+#' @importFrom sp coordinates CRS spTransform
 #' @export
 
 

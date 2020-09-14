@@ -1,4 +1,4 @@
-
+#' @importFrom geoR variofit
 #' @export
 
 # fitter le model "matern" ou "exponential", qui sert pour les autres fonctions

@@ -13,7 +13,6 @@ prep_predata(
   do_log_physio,
   imputation = "Amelia",
   shape,
-  layer,
   saturate_predata = F,
   saturate_segdata = F,
   inbox_poly = T,
@@ -47,13 +46,17 @@ Default method is PCA.}
 in this case it is not necessary to give shape_layer argument. Or it can be the name of the shape
 object with its extension ".shp" (ex : "data/studyAreaShapefile.shp").}
 
+\item{saturate_predata}{Boolean. If \code{TRUE}, saturate function is applied on all varenviro
+an varphysio columns of segdata. Saturate function excludes extreme valuesand keep values between
+quantiles 95 percent and 5 percent.}
+
 \item{saturate_segdata}{Boolean. If \code{TRUE}, saturate function is applied on all varenviro
 an varphysio columns of predata. Saturate function excludes extreme valuesand keep values between
 quantiles 95 percent and 5 percent.}
 
-\item{col2keep}{\code{character string} corresponding to the columns wanted to appear in output in predata.}
+\item{inbox_poly}{When \code{TRUE}, keep only part of the grid that match with the study area.}
 
-\item{inbox}{When \code{TRUE}, keep only part of the grid that match with the study area.}
+\item{col2keep}{\code{character string} corresponding to the columns wanted to appear in output in predata.}
 }
 \value{
 This function return a list containing :

@@ -7,7 +7,7 @@
 #' @param dig Digits to round output of the funtion.
 #' @param median Logical. If TRUE, indexes will be around median (mad). If FALSE, indexes will be around
 #'        mean (sd).
-#'
+#' @importFrom coda HPDinterval is.mcmc
 #' @examples
 #'
 #' @export

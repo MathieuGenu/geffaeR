@@ -153,7 +153,6 @@ Also it allows to impute missing data for predata and segdata.</p>
   <span class='no'>do_log_physio</span>,
   <span class='kw'>imputation</span> <span class='kw'>=</span> <span class='st'>"Amelia"</span>,
   <span class='no'>shape</span>,
-  <span class='no'>layer</span>,
   <span class='kw'>saturate_predata</span> <span class='kw'>=</span> <span class='no'>F</span>,
   <span class='kw'>saturate_segdata</span> <span class='kw'>=</span> <span class='no'>F</span>,
   <span class='kw'>inbox_poly</span> <span class='kw'>=</span> <span class='no'>T</span>,
@@ -204,18 +203,24 @@ in this case it is not necessary to give shape_layer argument. Or it can be the 
 object with its extension ".shp" (ex : "data/studyAreaShapefile.shp").</p></td>
     </tr>
     <tr>
+      <th>saturate_predata</th>
+      <td><p>Boolean. If <code>TRUE</code>, saturate function is applied on all varenviro
+an varphysio columns of segdata. Saturate function excludes extreme valuesand keep values between
+quantiles 95 percent and 5 percent.</p></td>
+    </tr>
+    <tr>
       <th>saturate_segdata</th>
       <td><p>Boolean. If <code>TRUE</code>, saturate function is applied on all varenviro
 an varphysio columns of predata. Saturate function excludes extreme valuesand keep values between
 quantiles 95 percent and 5 percent.</p></td>
     </tr>
     <tr>
-      <th>col2keep</th>
-      <td><p><code>character string</code> corresponding to the columns wanted to appear in output in predata.</p></td>
+      <th>inbox_poly</th>
+      <td><p>When <code>TRUE</code>, keep only part of the grid that match with the study area.</p></td>
     </tr>
     <tr>
-      <th>inbox</th>
-      <td><p>When <code>TRUE</code>, keep only part of the grid that match with the study area.</p></td>
+      <th>col2keep</th>
+      <td><p><code>character string</code> corresponding to the columns wanted to appear in output in predata.</p></td>
     </tr>
     </table>
 

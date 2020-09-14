@@ -22,6 +22,11 @@
 #'           \item countdata_seg : A data.frame that merge segment scale effort informations
 #'           with number of sightings and number of individuals (N and Y).
 #'         }
+#' @import dplyr
+#' @importFrom rgdal readOGR
+#' @importFrom sp coordinates CRS spTransform
+#' @importMethodsFrom raster as.character
+#' @import cli
 #' @examples
 #'
 #'

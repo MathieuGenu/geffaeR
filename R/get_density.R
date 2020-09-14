@@ -1,3 +1,5 @@
+#' @import dplyr
+#' @importFrom crch crch crch.control
 #' @export
 
 get_density <- function(distdata = NULL,

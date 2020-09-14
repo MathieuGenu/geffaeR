@@ -1,5 +1,6 @@
 # graphique des abondances
 
+#' @import ggplot2 cowplot viridisLite
 #' @export
 
 abundance_plot <- function(predata, stat = "mean", inside = NULL, abundance = TRUE, saturation = NULL) {

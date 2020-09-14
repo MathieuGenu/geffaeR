@@ -1,3 +1,4 @@
+#' @importFrom WhatIf whatif
 #' @export
 
 make_cfact_2 <- function(calibration_data,
@@ -20,9 +21,10 @@ make_cfact_2 <- function(calibration_data,
   # this simplifies computation A LOT!
   make_X <- function(calibration_data, test_data, var_name){
     X <- sapply(var_name,
-                function(k) { rescale2(ynew = test_data[, k],
-                                       y = calibration_data[, k]
-                )}
+                function(k) {
+                  rescale2(ynew = test_data[, k],
+                           y = calibration_data[, k]
+                  )}
     )
     X <- as.data.frame(X)
     names(X) <- var_name
@@ -33,14 +35,17 @@ make_cfact_2 <- function(calibration_data,
   Xtest = make_X(calibration_data = calibration_data, test_data = test_data, var_name)
 
   # Round the standardized values
-  Xcal <- round(Xcal, eps) ; Xtest <- round(Xtest, eps)
+  Xcal <- round(Xcal, eps)
+  Xtest <- round(Xtest, eps)
 
   # Remove duplicates
   dup <- duplicated(Xcal[, var_name])
-  Xcal <- Xcal[dup == FALSE, ] ; rm(dup)
+  Xcal <- Xcal[dup == FALSE, ]
+  rm(dup)
   if(rm.dup.test) {
     dup <- duplicated(Xtest[, var_name])
-    Xtest <- Xtest[dup == FALSE, ] ; rm(dup)
+    Xtest <- Xtest[dup == FALSE, ]
+    rm(dup)
   }
 
   # rename rows

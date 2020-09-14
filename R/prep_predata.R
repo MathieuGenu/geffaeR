@@ -20,12 +20,12 @@
 #'        Default method is PCA.
 #' @param saturate_predata Boolean. If \code{TRUE}, saturate function is applied on all varenviro
 #'  an varphysio columns of segdata. Saturate function excludes extreme valuesand keep values between
-#'  quantiles 95 percent and 5 percent.}
+#'  quantiles 95 percent and 5 percent.
 #' @param saturate_segdata Boolean. If \code{TRUE}, saturate function is applied on all varenviro
 #'  an varphysio columns of predata. Saturate function excludes extreme valuesand keep values between
 #'  quantiles 95 percent and 5 percent.
 #' @param col2keep \code{character string} corresponding to the columns wanted to appear in output in predata.
-#' @param inbox When \code{TRUE}, keep only part of the grid that match with the study area.
+#' @param inbox_poly When \code{TRUE}, keep only part of the grid that match with the study area.
 #' @return This function return a list containing :
 #'         \enumerate{
 #'           \item predata : data.frame of predata.
@@ -33,7 +33,13 @@
 #'           \item pca_pred : Output of \code{\link[FactoMineR]{PCA}} function on segdata.
 #'           \item pca_seg : Output of \code{\link[FactoMineR]{PCA}} function on predata.
 #'         }
-#'
+#' @import dplyr
+#' @importFrom Amelia amelia
+#' @importFrom FactoMineR PCA
+#' @importFrom foreign read.dbf
+#' @importFrom missMDA estim_ncpPCA imputePCA
+#' @importFrom sf st_read st_as_sf st_cast st_crs st_intersects st_transform
+#' @importFrom VIM aggr
 #' @examples
 #'
 #' @export
@@ -44,7 +50,7 @@ prep_predata <- function(segdata,
                          varenviro, do_log_enviro,
                          varphysio, do_log_physio,
                          imputation = "Amelia",
-                         shape,layer,
+                         shape,
                          saturate_predata = F, saturate_segdata = F,
                          inbox_poly = T,
                          col2keep = NULL) {

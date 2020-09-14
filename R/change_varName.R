@@ -1,4 +1,4 @@
-#' Standardisation of column names.
+#' Standardisation of effort data column names.
 #'
 #' Attribute standard names to column names of effort data.frame
 #' for the next steps of the analysis.
@@ -11,10 +11,6 @@
 #'       column automatically corresponding to the merge of "subRegion" and "strate". There are merged by "_".
 #'       Example, for a row, if \code{strate = N1} and \code{subRegion = ATL} we will get
 #'       \code{strateSec = ATL_N1}.
-#'
-#' @examples
-#'
-#'
 #' @export
 
 change_effort_varName <- function(effort_base){
@@ -140,7 +136,7 @@ change_effort_varName <- function(effort_base){
 
 }
 
-#' Standardisation of column names.
+#' Standardisation of observation data column names.
 #'
 #' Attribute standard names to column names of observation data.frame
 #' for the next steps of the analysis.
@@ -148,10 +144,6 @@ change_effort_varName <- function(effort_base){
 #' @param obs_base Data.frame containing column names to standardize.
 #'
 #' @return This function return the same data.frame as in input with the standardized column name.
-#'
-#' @examples
-#'
-#'
 #' @export
 
 

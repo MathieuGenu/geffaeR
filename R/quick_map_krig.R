@@ -1,3 +1,7 @@
+#' @import ggplot2
+#' @importFrom ggspatial annotation_north_arrow annotation_scale
+#' @importFrom sf st_as_sf
+#' @importFrom viridisLite viridis
 #' @export
 
 quick_map_krig <- function(df, df_proj, varname, lat, lon, NEA, lbrt93_proj, segdata_obs) {

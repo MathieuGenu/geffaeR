@@ -52,5 +52,4 @@ other functions of the package.
 }
 \examples{
 
-
 }

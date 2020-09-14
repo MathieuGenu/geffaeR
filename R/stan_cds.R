@@ -7,7 +7,8 @@
 #' on individuals and number of detection added with \code{\link{ajout_obs}} function.
 #' @param distdata `data.frame` distdata. Coming from \code{\link{prepare_data_obs}.}
 #' @return
-#'
+#' @import rstan
+#' @importFrom parallel detectCores
 #' @examples
 #'
 #'

@@ -36,7 +36,3 @@ It gives the ESW (effective-strip witdth), its standard deviation,
 a distance object from \link[Distance]{ds} function,
 and it gives the detection plot of the detection function adjusted.
 }
-\examples{
-
-
-}

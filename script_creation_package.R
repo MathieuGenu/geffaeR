@@ -46,7 +46,10 @@ packg_to_import <- c("rgdal", "maptools",  "sp", "raster","foreign", "lubridate"
                      "Rdistance", "dsm", "knitr", "fields", "ggthemes", "broom", "coda",
                      "purrr","VIM","Amelia","missMDA","FactoMineR", "rstan", "Rcpp",
                      "geoR", "MASS","arm","viridisLite","stats","utils",
-                     "mgcv","cli","crayon","crch","sf","ggspatial","loo","tweedie", "glue")
+                     "mgcv","cli","crayon","crch","sf","ggspatial","loo","tweedie", "glue",
+                     "DT", "htmltools", # pour la vignette
+                     "methods" # suggested by package checking
+                     )
 for(pckg in packg_to_import){
   use_package(pckg, type="Imports")
 }
@@ -115,3 +118,8 @@ pkgdown::build_home()
 pkgdown::build_reference()
 pkgdown::build_article("vignettes/Package_example.Rmd")
 usethis::use_github_action("pkgdown")
+
+
+# add files in Rbuildignore
+#--------------------------
+usethis::use_build_ignore(c("index.Rmd","index.md","logo.png","readme.md","read","script_creation_package.R"))
