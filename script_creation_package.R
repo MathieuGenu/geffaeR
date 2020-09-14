@@ -55,6 +55,8 @@ for(pckg in packg_to_import){
 }
 
 use_package("WhatIf", min_version = T)
+use_git_remote(name = "WhatIf",
+               url = "https://github.com/IQSS/WhatIf.git")
 
 
 # check package (regarder les erreurs et oublis dans documentation)
