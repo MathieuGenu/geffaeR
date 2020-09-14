@@ -27,7 +27,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
 
   var_name <- as.character(dsm_model$pred.formula)[grep(" + ", as.character(dsm_model$pred.formula), fixed = "TRUE")]
   var_name <- strsplit(var_name, split = " + ", fixed = TRUE)[[1]]
-  if(any(var_name %in% c("off.set", "offset"))) { var_name <- var_name[-which(var_name %in% c("off.set", "offset"))] }
+  if(any(var_name %in% c("off.set", "offset", random, splines_by))) { var_name <- var_name[-which(var_name %in% c("off.set", "offset", random, splines_by))] }
 
   nx <- 1e3
   n_sim <- 1e4
@@ -52,12 +52,12 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
     if(!all(random %in% names(dsm_model$data))) {
       stop("Check random effect: no corresponding match in data used for model calibration")
     } else {
-      rand <- as.data.frame(matrix(NA, dim = c(nx, length(random))))
+      rand <- as.data.frame(array(NA, dim = c(nx, length(random))))
       names(rand) <- random
       for(j in random) {
         rand[, j] <- factor(rep("new_level", nx), levels = levels(dsm_model$data[, j]))
       }
-      Xnew <- cbind(Xnew, rand); rm(rand)
+      Xnew <- cbind(Xnew, rand)
     }
   }
   ### approximate posterior distribution with MV normal
@@ -82,16 +82,18 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
     Z <- cbind(gridxy,
                as.data.frame(sapply(var_name[-which(var_name %in% c("longitude", "latitude"))], function(id) { rep(0, 1e4) }))
                )
+
     if(!is.null(splines_by)) {
       Z <- cbind(fact_by, Z)
       names(Z)[1] <- splines_by
     }
 
-    Z <- predict(dsm_model,
-                 newdata = Z,
-                 off.set = 1,
-                 type = "lpmatrix"
-                 )
+    if(!is.null(random)) {
+      Z <- cbind(Z, rand)
+    }
+
+    Z <- predict(dsm_model, newdata = Z, off.set = 1, type = "lpmatrix")
+
     if(!is.null(splines_by)) {
       Z[, grep(splines_by, names(Z), fixed = TRUE)] <- 0
     }
@@ -115,16 +117,17 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
   if(any(var_name %in% c("X", "Y", "longitude", "latitude"))) { var_name <- var_name[-which(var_name %in% c("X", "Y", "longitude", "latitude"))] }
 
   for(j in var_name) {
-    Z <- Xnew
-    Z[, j] <- (seq(min(segdata[, j], na.rm = TRUE), max(segdata[, j], na.rm = TRUE), length.out = nx) - mean(segdata[, j], na.rm = TRUE)) / sd(segdata[, j], na.rm = TRUE)
-    Z[, grep("longitude,latitude", names(as.data.frame(Z)), fixed = TRUE)] <- 0
     if(!is.null(splines_by)) {
-      for(k in levels(dsm_model$data[, splines_by])) {
+      for(k in 1:length(levels(dsm_model$data[, splines_by]))) {
+        Z <- Xnew
+        Z[, j] <- (seq(min(segdata[, j], na.rm = TRUE), max(segdata[, j], na.rm = TRUE), length.out = nx) - mean(segdata[, j], na.rm = TRUE)) / sd(segdata[, j], na.rm = TRUE)
         Z[, splines_by] <- factor(rep(levels(dsm_model$data[, splines_by])[k], nx),
                                   levels = levels(dsm_model$data[, splines_by])
                                   )
 
-        linpred <- beta %*% t(Z); rm(Z)
+        Z <- predict(dsm_model, newdata = Z, off.set = 1, type = "lpmatrix")
+        Z[, grep("longitude,latitude", names(as.data.frame(Z)), fixed = TRUE)] <- 0
+        linpred <- beta %*% t(Z)
         df_splines <- rbind(df_splines,
                             data.frame(x = seq(min(segdata[, j], na.rm = TRUE), max(segdata[, j], na.rm = TRUE), length.out = nx),
                                        y = apply(linpred, 2, mean),
@@ -132,7 +135,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
                                        upper = apply(linpred, 2, upper),
                                        param = rep(j, nx),
                                        scale = rep("log", nx),
-                                       level = rep(k, nx)
+                                       level = rep(levels(dsm_model$data[, splines_by])[k], nx)
                                        ),
                             data.frame(x = seq(min(segdata[, j], na.rm = TRUE), max(segdata[, j], na.rm = TRUE), length.out = nx),
                                        y = apply(exp(linpred), 2, mean),
@@ -140,11 +143,13 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
                                        upper = apply(exp(linpred), 2, upper),
                                        param = rep(j, nx),
                                        scale = rep("natural", nx),
-                                       level = rep(k, nx)
+                                       level = rep(levels(dsm_model$data[, splines_by])[k], nx)
                                        )
                             )
       }
     } else {
+      Z <- Xnew
+      Z[, j] <- (seq(min(segdata[, j], na.rm = TRUE), max(segdata[, j], na.rm = TRUE), length.out = nx) - mean(segdata[, j], na.rm = TRUE)) / sd(segdata[, j], na.rm = TRUE)
       Z <- predict(dsm_model, newdata = Z, off.set = 1, type = "lpmatrix")
       Z[, grep("longitude,latitude", names(as.data.frame(Z)), fixed = TRUE)] <- 0
       linpred <- beta %*% t(Z); rm(Z)
