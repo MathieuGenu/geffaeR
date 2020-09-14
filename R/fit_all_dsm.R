@@ -78,15 +78,15 @@ fit_all_dsm <- function(distFit = NULL,
       stop("Check random effect: no matching column in table 'segdata_obs'")
     } else {
       if(!is.factor(segdata_obs[, random[1]])) {
-        segdata_obs[, random[1]] <- factor(as.character(segdata_obs[, random[1]]), levels = unique(segdata_obs[, random[1]]))
-        X[, random[1]] <- factor(as.character(X[, random[1]]), levels = unique(X[, random[1]]))
+        segdata_obs[, random[1]] <- factor(as.character(segdata_obs[, random[1]]), levels = c(unique(segdata_obs[, random[1]]), "new_level"))
+        X[, random[1]] <- factor(as.character(X[, random[1]]), levels = c(unique(X[, random[1]]), "new_level"))
       }
       intercept <- paste(intercept, " + s(", random[1], ", bs = 're')", sep = "")
       if(length(random) > 1) {
         for(k in 1:lenght(random)) {
           if(!is.factor(segdata_obs[, random[1]])) {
-            segdata_obs[, random[k]] <- factor(as.character(segdata_obs[, random[k]]), levels = unique(segdata_obs[, random[k]]))
-            X[, random[k]] <- factor(as.character(X[, random[k]]), levels = unique(X[, random[k]]))
+            segdata_obs[, random[k]] <- factor(as.character(segdata_obs[, random[k]]), levels = c(unique(segdata_obs[, random[k]]), "new_level"))
+            X[, random[k]] <- factor(as.character(X[, random[k]]), levels = c(unique(X[, random[k]]), "new_level"))
           }
           intercept <- paste(intercept, " + s(", random[k], ", bs = 're')", sep = "")
         }
