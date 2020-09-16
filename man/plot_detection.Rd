@@ -4,7 +4,7 @@
 \alias{plot_detection}
 \title{Distance sampling analysis.}
 \usage{
-plot_detection(distdata, bin, key, upper = NULL, is_seabird)
+plot_detection(distdata, bin = NULL, key = NULL, upper = NULL, is_seabird)
 }
 \arguments{
 \item{distdata}{data.frame previously built with  \code{\link{prepare_data_obs}}.}

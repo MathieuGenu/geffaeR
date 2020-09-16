@@ -24,12 +24,13 @@
 #'           \item distfit : distance object from \link[Distance]{ds} function.
 #'         }
 #' @import ggplot2
+#' @import glue
 #' @importFrom coda HPDinterval as.mcmc
 #' @importFrom Distance ds
 #' @importFrom mvtnorm rmvnorm
 #' @export
 
-plot_detection <- function(distdata, bin, key, upper = NULL, is_seabird) {
+plot_detection <- function(distdata, bin = NULL, key = NULL, upper = NULL, is_seabird) {
 
   # renommer observer car capote la fonction ds() (nom attribué à une fonction pour ds)
   if(nrow(distdata) < 2) {
@@ -63,6 +64,13 @@ plot_detection <- function(distdata, bin, key, upper = NULL, is_seabird) {
 
   # Non-seabird case
   } else {
+
+    optional_args <- c(is.null(bin), is.null(upper), is.null(key))
+    if(any(optional_args)) {
+      stop(
+        glue("You must provide a value for : {glue_collapse(c('bin','upper','key')[optional_args], ', ', last = ' and ')}")
+      )
+    }
 
     fit = ds(distdata,
              key = ifelse(key == "halfnorm", "hn", "hr"),
