@@ -26,11 +26,15 @@ get_k_best_models <- function(tab_model, k = 5, use_AIC = TRUE) {
 #' @export
 
 fit_all_dsm <- function(distFit = NULL,
-                        segdata_obs, obsdata,
+                        segdata_obs,
+                        obsdata,
                         response = "ind",
                         predictors,
-                        likelihood = "negbin", esw = NULL,
-                        max_cor = 0.5, nb_max_pred = 3, complexity = 4,
+                        likelihood = "negbin",
+                        esw = NULL,
+                        max_cor = 0.5,
+                        nb_max_pred = 3,
+                        complexity = 4,
                         smooth_xy = TRUE,
                         k = 5,
                         splines_by = NULL,

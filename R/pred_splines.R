@@ -178,7 +178,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
                  ) +
       geom_ribbon(alpha = 0.3, fill = "midnightblue") +
       geom_line(color = "midnightblue") +
-      facet_grid(level ~ param, scales = "free_y") +
+      facet_grid(level ~ param, scales = "free") +
       scale_y_continuous(name = "Density") +
       scale_x_continuous(name = "Covariate") +
       theme_bw()
@@ -187,7 +187,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
                  ) +
       geom_ribbon(alpha = 0.3, fill = "midnightblue") +
       geom_line(color = "midnightblue") +
-      facet_grid(level ~ param, scales = "free_y") +
+      facet_grid(level ~ param, scales = "free") +
       scale_y_continuous(name = "Density") +
       scale_x_continuous(name = "Covariate") +
       theme_bw()
