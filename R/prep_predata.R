@@ -74,6 +74,7 @@ prep_predata <- function(segdata,
   segdata <- NULL
 
   ## prediction
+  # shape can be character dir or object directly
   if(any("character" %in% is(shape))){
     # pred.poly <- readOGR(dsn = paste(shape), layer = layer, verbose = F) # NC
     pred.poly <- st_read(paste(shape)) %>%
@@ -83,8 +84,14 @@ prep_predata <- function(segdata,
   }
 
   ### Covariable(s)
-  # grille de la zone d'étude pour 2017
-  grid <-  read.dbf(paste(gridfile_name, sep = "/"), as.is = TRUE)
+  # grille de la zone d'étude
+  # grid can be character dir or object directly
+  if(any("character" %in% is(gridfile_name))){
+    grid <-  read.dbf(paste(gridfile_name, sep = "/"), as.is = TRUE)
+  } else {
+    grid <- gridfile_name
+  }
+
   grid <- grid[which(duplicated(grid) == FALSE), ]
 
   # check if col2keep are in colnames of grid
