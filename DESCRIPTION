@@ -62,7 +62,10 @@ Imports:
     loo,
     tweedie,
     glue,
-    DT
+    DT,
+    htmltools,
+    methods,
+    gridExtra
 VignetteBuilder: knitr
 Suggests: 
     rmarkdown

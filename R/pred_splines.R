@@ -1,6 +1,10 @@
 #' @import ggplot2
+#' @import glue
 #' @importFrom coda HPDinterval as.mcmc
 #' @importFrom mvtnorm rmvnorm
+#' @importFrom gridExtra arrangeGrob
+#' @importFrom grid grobTree
+#' @importFrom cowplot draw_grob ggdraw
 #' @export
 
 ### spline curves
@@ -172,27 +176,88 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
     }
   }
 
+  # graph part : g_splines
+  g_fun <- function(df, theme, transformation) {
+
+    g <- ggplot(data = df_splines %>%
+                  filter(scale == transformation & param == unique(df_splines$param)[p]),
+                aes(x = x, y = y, ymin = lower, ymax = upper)
+    ) +
+      geom_ribbon(alpha = 0.3, fill = "midnightblue") +
+      geom_line(color = "midnightblue") +
+      facet_grid(level ~ param, scales = "free_x") +
+      scale_y_continuous(name = "Density") +
+      scale_x_continuous(name = "Covariate") +
+      theme_bw() +
+      theme
+
+    return(g)
+  }
+
+  # log and natural
   if(!is.null(splines_by)) {
-    g1 <- ggplot(data = df_splines %>% filter(scale == "log"),
-                 aes(x = x, y = y, ymin = lower, ymax = upper)
-                 ) +
-      geom_ribbon(alpha = 0.3, fill = "midnightblue") +
-      geom_line(color = "midnightblue") +
-      facet_grid(level ~ param, scales = "free") +
-      scale_y_continuous(name = "Density") +
-      scale_x_continuous(name = "Covariate") +
-      theme_bw()
-    g2 <- ggplot(data = df_splines %>% filter(scale == "natural"),
-                 aes(x = x, y = y, ymin = lower, ymax = upper)
-                 ) +
-      geom_ribbon(alpha = 0.3, fill = "midnightblue") +
-      geom_line(color = "midnightblue") +
-      facet_grid(level ~ param, scales = "free") +
-      scale_y_continuous(name = "Density") +
-      scale_x_continuous(name = "Covariate") +
-      theme_bw()
-    g_splines <- list(g1 = g1, g2 = g2)
+
+    list_g_param_log <- list()
+    list_g_param_natural <- list()
+
+    len_param <- length(unique(df_splines$param))
+
+    for(p in 1:len_param) {
+
+      # custom theme to create only one faceting in y axis
+      if(p > 1 & p < len_param){
+        theme_custom <- theme(
+          strip.background.y  = element_blank(),
+          strip.text.y = element_blank(),
+          axis.title.y = element_blank()
+        )
+      }
+      if(p == 1){
+        theme_custom <- theme(
+          strip.background.y  = element_blank(),
+          strip.text.y = element_blank(),
+        )
+      }
+      if(p == len_param){
+        theme_custom <- theme(
+          axis.title.y = element_blank()
+        )
+      }
+
+      g_param_log <- NULL
+      g_param_natural <- NULL
+
+      g_param_log <- g_fun(df = df_splines,
+                       theme = theme_custom,
+                       transformation = "log")
+
+      g_param_natural <- g_fun(df = df_splines,
+                               theme = theme_custom,
+                               transformation = "natural")
+
+      list_g_param_log[[p]] <- g_param_log
+      list_g_param_natural[[p]] <- g_param_natural
+    }
+
+    g1 <- do.call(arrangeGrob,
+                  c(list_g_param_natural,
+                    ncol = len_param,
+                    nrow = 1,
+                    top = "natural"))
+    g1 <- ggdraw() + draw_grob(grobTree(g1))
+
+    g2 <- do.call(arrangeGrob,
+                  c(list_g_param_log,
+                    ncol = len_param,
+                    nrow = 1,
+                    top = "log"))
+    g2 <- ggdraw() + draw_grob(grobTree(g2))
+
+
+    g_splines <- list(g1, g2)
+
   } else {
+
     g_splines <- ggplot(data = df_splines,
                         aes(x = x, y = y, ymin = lower, ymax = upper)
                         ) +
@@ -202,6 +267,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
       scale_y_continuous(name = "Density") +
       scale_x_continuous(name = "Covariate") +
       theme_bw()
+
   }
 
   return(list(df_splines = df_splines,

@@ -48,7 +48,7 @@ packg_to_import <- c("rgdal", "maptools",  "sp", "raster","foreign", "lubridate"
                      "geoR", "MASS","arm","viridisLite","stats","utils",
                      "mgcv","cli","crayon","crch","sf","ggspatial","loo","tweedie", "glue",
                      "DT", "htmltools", # pour la vignette
-                     "methods" # suggested by package checking
+                     "methods", "gridExtra" # suggested by package checking
                      )
 for(pckg in packg_to_import){
   use_package(pckg, type="Imports")
