@@ -41,7 +41,7 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
   # verifier si les colonnes sont bien dans le DF effort
   col_name_neces <- c("lon","lat","seaState","subjective",
                       "survey","strateSec","transect","legId","segLength",
-                      "segId","left","right")
+                      "segId","left","right","CenterTime")
 
 
   if(!all(col_name_neces %in% colnames(effort))){
