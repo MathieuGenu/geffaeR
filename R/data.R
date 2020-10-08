@@ -37,6 +37,13 @@
 #'
 "NEA"
 
+
+#' Northern East Atlantic land contour simplified centered on France
+#'
+#' Northern East Atlantic land contour for maps with a less important resolution for time economy...
+#'
+"NEA_simplified_FR"
+
 #' Northern East Atlantic isobath100.
 #'
 #' Northern East Atlantic isobath for depth of 100m.

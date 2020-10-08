@@ -84,6 +84,29 @@ devtools::build()
 load(paste("C:/Users/mgenu.RATUFA/Documents/Projet/donnees/data_package/Europe_fond2carte.RData"))
 load(paste("C:/Users/mgenu.RATUFA/Documents/Projet/donnees/data_package/NEA.RData"))
 
+# version simplifié NEA
+library(magrittr)
+library(sf)
+library(rmapshaper)
+sf_study_area <- NEA %>%
+  st_as_sf(crs=4326) %>%
+  st_crop(xmin = -10,
+          xmax = 15,
+          ymin = 35,
+          ymax = 55) %>%
+  st_union() %>%
+  as_Spatial() %>%
+  ms_simplify() %>%
+  st_as_sf()
+
+library(ggplot2)
+sf_study_area %>%
+  ggplot() +
+  geom_sf()
+
+NEA_simplified_FR <- sf_study_area %>%
+  as_Spatial()
+
 usethis::use_data(cds)
 usethis::use_data(cds_krig)
 usethis::use_data(Europe)
@@ -91,6 +114,7 @@ usethis::use_data(NEA, overwrite = T)
 usethis::use_data(NEA_isobath100)
 usethis::use_data(NEA_isobath200)
 usethis::use_data(lbrt93_proj)
+usethis::use_data(NEA_simplified_FR)
 
 
 # Data part #
