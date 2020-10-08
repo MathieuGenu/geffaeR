@@ -32,8 +32,15 @@
 #'
 #' @export
 
-prepare_data_obs <- function(sp, obs_base, legdata, segdata, shape, shape_layer, projection,
-                             truncation = NULL, remove_sp = NULL,
+prepare_data_obs <- function(sp,
+                             obs_base,
+                             legdata,
+                             segdata,
+                             shape,
+                             shape_layer,
+                             projection,
+                             truncation = NULL,
+                             remove_sp = NULL,
                              unit_km = FALSE) {
 
   # polygons sampling
@@ -136,8 +143,8 @@ prepare_data_obs <- function(sp, obs_base, legdata, segdata, shape, shape_layer,
   colnames(countdata_seg) <- c("Transect.Label", "Sample.Label", "Seg","n", "y")
 
   countdata_leg <- as.data.frame(countdata_seg %>%
-    group_by(Transect.Label, Sample.Label) %>%
-    summarize(n_detected = sum(n), n_ind = sum(y)))
+                                   group_by(Transect.Label, Sample.Label) %>%
+                                   summarize(n_detected = sum(n), n_ind = sum(y)))
 
   # creation des tableaux necessaires a l'analyse ----
   #--------------------------------------------------#
@@ -181,6 +188,15 @@ prepare_data_obs <- function(sp, obs_base, legdata, segdata, shape, shape_layer,
 
 
   distdata$detected[is.na(distdata$detected)] <- 0 # à verifier
+
+
+  # # add col2keep to distdata
+  # distdata %<>%
+  #   left_join(raw_obs %>%
+  #               select(.dots = c(col2keep,"legId")) %>%
+  #               `colnames<-`(c(col2keep,"legId")) %>%
+  #               unique(),
+  #             by = c("Sample.Label" = "legId"))
 
   ### table : obsdata
   if("session" %in% colnames(sp_data)) {

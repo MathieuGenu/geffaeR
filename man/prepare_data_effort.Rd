@@ -11,7 +11,8 @@ prepare_data_effort(
   shape,
   shape_layer,
   New_projection,
-  optimal = FALSE
+  optimal = FALSE,
+  col2keep = NULL
 )
 }
 \arguments{
@@ -38,6 +39,8 @@ see : \code{\link[sp]{CRS}} for more infos.}
 \item{optimal}{Argument which allows to keep data sampled in optimal conditions.
 Defaults settings are all data are kept. In case of optimal = T, indexes
 \code{"c("GG", "GM", "MG", "EG", "GE", "EE", "ME", "EM", "MM")"} are kept.}
+
+\item{col2keep}{Columns to keep from effort_base in output of the function.}
 }
 \value{
 This function return a list containing:

@@ -191,7 +191,7 @@ change_obs_varName <- function(obs_base) {
       colnames(obs_base)[lower_no_under_colnames %in% c("group","groupe","groupefr")] <- "group"
     }
     if (!("family" %in% colnames(obs_base))) {
-      colnames(obs_base)[lower_no_under_colnames %in% c("family","famille")] <- "family"
+      colnames(obs_base)[lower_no_under_colnames %in% c("family","famille","famillefr")] <- "family"
     }
     if (!("species" %in% colnames(obs_base))) {
       colnames(obs_base)[lower_no_under_colnames %in% c("species")] <- "species"

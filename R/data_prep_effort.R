@@ -20,6 +20,7 @@
 #' @param optimal Argument which allows to keep data sampled in optimal conditions.
 #'        Defaults settings are all data are kept. In case of optimal = T, indexes
 #'        \code{"c("GG", "GM", "MG", "EG", "GE", "EE", "ME", "EM", "MM")"} are kept.
+#' @param col2keep Columns to keep from effort_base in output of the function.
 #' @return This function return a list containing:
 #'         \enumerate{
 #'           \item legdata : \code{data.frame} with infos at leg scale.
@@ -33,8 +34,14 @@
 #' @export
 
 
-prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shape, shape_layer,
-                                New_projection, optimal = FALSE) {
+prepare_data_effort <- function(effort_base,
+                                covariable = NULL,
+                                block_area,
+                                shape,
+                                shape_layer,
+                                New_projection,
+                                optimal = FALSE,
+                                col2keep = NULL) {
 
   effort <- effort_base
 
@@ -113,8 +120,28 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
   }
 
   legdata <- as.data.frame(legdata)
+
   names(legdata)[which(names(legdata) %in% c("strateSec", "transect", "legId"))] <- c("Region.Label", "Transect.Label",
                                                                                        "Sample.Label")
+
+  # merge col2keep
+  if(!is.null(col2keep)){
+
+    col2keep <- col2keep[!(col2keep %in% colnames(legdata))]
+
+    legdata_col_joined <- legdata %>%
+      left_join(effort_base %>%
+                  select(.dots = c(col2keep,"legId")) %>%
+                  `colnames<-`(c(col2keep,"legId")),
+                by = c("Sample.Label"="legId"))
+
+    if(nrow(legdata) < nrow(legdata_col_joined)){
+      stop("col2keep are not unique at leg scale")
+    }
+
+    legdata <- legdata_col_joined
+
+  }
 
   # Assigner area à legdata en fonction du nom du block commun avec block_area
   legdata$Area <- sapply(legdata$Region.Label, function(id) {
@@ -129,13 +156,13 @@ prepare_data_effort <- function(effort_base, covariable = NULL, block_area, shap
     segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "legId", "segId",
                                      "segLength", "POINT_X",
                                      "POINT_Y", "lon", "lat", "strateSec",
-                                     "seaState", "subjective","session", allvar)
+                                     "seaState", "subjective","session", allvar, col2keep)
                                  ])
   } else {
     segdata <- data.frame(effort[, c("CenterTime", "survey", "transect", "legId", "segId",
                                      "segLength", "POINT_X",
                                      "POINT_Y", "lon", "lat", "strateSec",
-                                     "seaState", "subjective", allvar)
+                                     "seaState", "subjective", allvar, col2keep)
                                  ])
   }
 
