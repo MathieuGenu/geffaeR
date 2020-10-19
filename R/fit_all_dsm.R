@@ -1,17 +1,19 @@
 #' @export
 
-get_k_best_models <- function(tab_model, k = 5, use_AIC = TRUE) {
-  if(any(names(tab_model) == "stacking_weights")) {
-    writeLines("\tUsing stacking weights for model selection")
-    tab_model <- tab_model[order(tab_model$stacking_weights, decreasing = TRUE), ]
+get_k_best_models <- function(tab_model, k = 5, use_loo) {
+
+  if(use_loo) {
+
+    writeLines("\tUsing leave-one out for model selection")
+    tab_model <- tab_model[order(tab_model$looic, decreasing = FALSE), ]
+
   } else {
-    if(use_AIC) {
-      tab_model <- tab_model[order(tab_model$AIC, decreasing = FALSE), ]
-    } else {
-      writeLines("\tUsing Explained Deviance for model selection")
-      tab_model <- tab_model[order(tab_model$ExpDev, decreasing = TRUE), ]
-    }
+
+    writeLines("\tUsing AIC for model selection")
+    tab_model <- tab_model[order(tab_model$AIC, decreasing = FALSE), ]
+
   }
+
   tab_model <- tab_model[1:k, "index"]
   return(tab_model)
 }
@@ -42,7 +44,7 @@ fit_all_dsm <- function(distFit = NULL,
                         random = NULL, # a character vector
                         soap = list(xt = NULL, knots = NULL), # a list with xt = list(bnd = ) and knots,
                         use_loo = FALSE # model selection with leave-one-out
-                        ) {
+) {
   ## likelihood must be one of "negbin", "poisson" or "tweedie"
   ## default is "negbin" for negative binomial likelihood
   ## smooth_xy controls the intercept to include or not a bivariate smooth on x and y :
@@ -126,11 +128,11 @@ fit_all_dsm <- function(distFit = NULL,
     paste(y,
           apply(X = combn(predictors, n), MARGIN = 2, paste, collapse = " + "),
           sep = paste(intercept, "+", sep = " ")
-          )
+    )
   }
   all_mods <- c(paste("count", intercept, sep = " "),
                 unlist(lapply(1:nb_max_pred, mlist, y = "count", predictors = smoothers))
-                )
+  )
 
   ## remove combinations of variables that are too correlated
   all_mods <- all_mods[which(rm_combn < max_cor)]
@@ -143,7 +145,7 @@ fit_all_dsm <- function(distFit = NULL,
                      var_name = covariable[tab[, j]],
                      percent = FALSE,
                      near_by = TRUE
-                     )
+        )
       })
     })
     w <- cbind(rep(1, nrow(segdata_obs)), do.call('cbind', w))
@@ -203,6 +205,7 @@ fit_all_dsm <- function(distFit = NULL,
     )
     ### leave-one-out cross-validation
     if(loo) {
+
       # if loo, do not return tab
       tab <- FALSE
       # approximate posterior distribution with MV normal
@@ -211,7 +214,7 @@ fit_all_dsm <- function(distFit = NULL,
                    newdata = model$model,
                    off.set = model$offset,
                    type = "lpmatrix"
-                   )
+      )
       mu <- exp(as.matrix(beta %*% t(Z)))
       # response variable from fitted dsm object
       y <- model$model$count
@@ -220,50 +223,101 @@ fit_all_dsm <- function(distFit = NULL,
                     negbin = { apply(mu, 1, function(iter) { w[, x] * dnbinom(y, size = model$family$getTheta(trans = TRUE), mu = exp(model$offset) * iter, log = TRUE) }) },
                     poisson = { apply(mu, 1, function(iter) { w[, x] * dpois(y, lambda = exp(model$offset) * iter, log = TRUE) }) },
                     tweedie = { apply(mu, 1, function(iter) { w[, x] * log(tweedie::dtweedie(y, xi = model$family$getTheta(trans = TRUE), mu = exp(model$offset) * iter, phi = model$sig2)) }) }
-                    )
+      )
       out <- loo::loo.matrix(t(lppd), save_psis = TRUE)
+
     } else {
+
       out <- model
+
     }
     ### store some results in a data frame
     if(tab) {
-      return(data.frame(model = all_mods[x],
-                        index = x,
-                        Convergence = ifelse(model$converged, 1, 0),
-                        AIC = model$aic,
-                        # GCV = model$gcv.ubre,
-                        ResDev = model$deviance,
-                        NulDev = model$null.deviance,
-                        ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
-                        )
-            )
-    } else { return(out) }
+
+      return(
+        data.frame(model = all_mods[x],
+                   index = x,
+                   Convergence = ifelse(model$converged, 1, 0),
+                   AIC = model$aic,
+                   # GCV = model$gcv.ubre,
+                   ResDev = model$deviance,
+                   NulDev = model$null.deviance,
+                   ExpDev = 100 * round(1 - model$deviance/model$null.deviance, 3)
+        )
+      )
+
+    } else {
+
+      return(out)
+
+    }
   }
+
+  writeLines("\t\tFitting all possible models, please wait")
   all_fits <- lapply(1:length(all_mods), my_dsm_fct, segdata_obs = segdata_obs)
+
   ## Collapse to a data frame
   all_fits <- do.call('rbind', all_fits)
 
-  ## leave-one-out cross-validation using Pareto Smoothing Importance Sampling
+
+  # 5 best looic else 5 best AIC
   if(use_loo) {
+
+    ## leave-one-out cross-validation using Pareto Smoothing Importance Sampling
+    writeLines("\t\tEstimating loocv on all models: please wait")
     all_psis <- lapply(1:length(all_mods), my_dsm_fct, segdata_obs = segdata_obs, loo = TRUE)
-    # this can be long
-    writeLines("\t\tEstimating stacking weights: please wait")
-    loow <- as.numeric(loo::stacking_weights(do.call('cbind',
-                                                     lapply(all_psis, function(l) {l$pointwise[, "elpd_loo"]})
-                                                     )
-                                             )
-                       )
-    all_fits$stacking_weights <- loow
+
+    # get loo_ic and se_looic
+    loo_ic_coefs <- do.call(rbind,lapply(all_psis, function(x){x$estimates["looic",]}))
+    colnames(loo_ic_coefs) <- c("looic","se_looic")
+    all_fits <- cbind(all_fits, loo_ic_coefs)
+    all_fits$stacking_weights <- NULL
+
+    # all_fits filtered 5 best
+    all_fits_best <- all_fits %>%
+      arrange(looic) %>%
+      top_n(n=-k, wt=looic)
+
+    # get best loo order
+    index_order_best <- get_k_best_models(tab_model = all_fits_best, k = k, use_loo = T)
+
+    ## select the n-best models
+    best <- lapply(index_order_best, my_dsm_fct, tab = FALSE, segdata_obs = X)
+    best_std <- lapply(index_order_best, my_dsm_fct, tab = FALSE, segdata_obs = segdata_obs)
+
+    # estimating stacking weights
+    get_elpd_loo <- do.call('cbind', lapply(index_order_best, function(l) {all_psis[[l]]$pointwise[, "elpd_loo"]}))
+    loow <- as.numeric(loo::stacking_weights(get_elpd_loo))
+    all_fits$stacking_weights[index_order_best] <- loow
+
+  } else {
+
+    # all_fits filtered 5 best
+    all_fits_best <- all_fits %>%
+      arrange(AIC) %>%
+      top_n(n=-k, wt=AIC)
+
+    index_order_best <- get_k_best_models(tab_model = all_fits_best, k = k, use_loo = F)
+
+    ## select the n-best models
+    best <- lapply(index_order_best, my_dsm_fct, tab = FALSE, segdata_obs = X)
+    best_std <- lapply(index_order_best, my_dsm_fct, tab = FALSE, segdata_obs = segdata_obs)
+
+    # estimating stacking weights
+    writeLines("\t\tEstimating loocv on k best models: please wait")
+    all_psis <- lapply(index_order_best, my_dsm_fct, segdata_obs = segdata_obs, loo = TRUE)
+
+    get_elpd_loo <- do.call('cbind', lapply(1:k, function(l) {all_psis[[l]]$pointwise[, "elpd_loo"]}))
+    loow <- as.numeric(loo::stacking_weights(get_elpd_loo))
+    all_fits$stacking_weights[index_order_best] <- loow
+
   }
 
-  ## select the n-best models
-  best <- lapply(get_k_best_models(tab_model = all_fits, k = k), my_dsm_fct, tab = FALSE, segdata_obs = X)
-  best_std <- lapply(get_k_best_models(tab_model = all_fits, k = k), my_dsm_fct, tab = FALSE, segdata_obs = segdata_obs)
-
   ## wrap-up with the outputs
-  return(list(all_fits_binded = all_fits,
-              best_models = best,
-              best_models4plotting = best_std # pour le pred splines
-              )
-         )
+  return(
+    list(all_fits_binded = all_fits,
+         best_models = best,
+         best_models4plotting = best_std # pour le pred splines
+    )
+  )
 }
