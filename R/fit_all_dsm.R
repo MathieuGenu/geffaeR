@@ -4,12 +4,12 @@ get_k_best_models <- function(tab_model, k = 5, use_loo) {
 
   if(use_loo) {
 
-    writeLines("\tUsing leave-one out for model selection")
+    writeLines("\t* Using leave-one out for model selection")
     tab_model <- tab_model[order(tab_model$looic, decreasing = FALSE), ]
 
   } else {
 
-    writeLines("\tUsing AIC for model selection")
+    writeLines("\t* Using AIC for model selection")
     tab_model <- tab_model[order(tab_model$AIC, decreasing = FALSE), ]
 
   }
@@ -165,10 +165,10 @@ fit_all_dsm <- function(distFit = NULL,
 
   ## response variable is either n (nb of observations) or y (nb of individuals)
   if(response != "ind") {
-    writeLines("response variable is the number of observations")
+    writeLines("\t* Response variable is the number of observations")
     obsdata$size <- 1
   } else {
-    writeLines("response variable is the number of individuals")
+    writeLines("\t* Response variable is the number of individuals")
   }
 
   ## detection
@@ -176,14 +176,14 @@ fit_all_dsm <- function(distFit = NULL,
     stop("Must provide either a detection function as 'distFit', or esw")
   } else {
     if(!is.null(distFit)) {
-      writeLines("\tDetection function provided")
+      writeLines("\t* Detection function provided")
       esw <- NULL
     } else {
       if(length(esw) == nrow(segdata_obs)) {
-        writeLines("\tesw provided for each segment")
+        writeLines("\t* esw provided for each segment")
       } else {
         esw <- esw[1]
-        writeLines(paste("\tesw set to", esw, sep = " "))
+        writeLines(paste("\t* esw set to", esw, sep = " "))
       }
     }
   }
@@ -253,7 +253,7 @@ fit_all_dsm <- function(distFit = NULL,
     }
   }
 
-  writeLines("\t\tFitting all possible models, please wait")
+  writeLines("\t* Fitting all possible models, please wait")
   all_fits <- lapply(1:length(all_mods), my_dsm_fct, segdata_obs = segdata_obs)
 
   ## Collapse to a data frame
@@ -264,7 +264,7 @@ fit_all_dsm <- function(distFit = NULL,
   if(use_loo) {
 
     ## leave-one-out cross-validation using Pareto Smoothing Importance Sampling
-    writeLines("\t\tEstimating loocv on all models: please wait")
+    writeLines("\t* Estimating loocv on all models: please wait")
     all_psis <- lapply(1:length(all_mods), my_dsm_fct, segdata_obs = segdata_obs, loo = TRUE)
 
     # get loo_ic and se_looic
@@ -281,14 +281,22 @@ fit_all_dsm <- function(distFit = NULL,
     # get best loo order
     index_order_best <- get_k_best_models(tab_model = all_fits_best, k = k, use_loo = T)
 
-    ## select the n-best models
-    best <- lapply(index_order_best, my_dsm_fct, tab = FALSE, segdata_obs = X)
-    best_std <- lapply(index_order_best, my_dsm_fct, tab = FALSE, segdata_obs = segdata_obs)
-
     # estimating stacking weights
     get_elpd_loo <- do.call('cbind', lapply(index_order_best, function(l) {all_psis[[l]]$pointwise[, "elpd_loo"]}))
     loow <- as.numeric(loo::stacking_weights(get_elpd_loo))
     all_fits$stacking_weights[index_order_best] <- loow
+
+    all_fits_best_sw <- all_fits %>%
+      arrange(desc(stacking_weights)) %>%
+      top_n(n=k, wt=stacking_weights)
+
+    index_order_sw <- all_fits_best_sw$index
+
+    ## select the n-best models
+    best <- lapply(index_order_sw, my_dsm_fct, tab = FALSE, segdata_obs = X)
+    best_std <- lapply(index_order_sw, my_dsm_fct, tab = FALSE, segdata_obs = segdata_obs)
+
+
 
   } else {
 
@@ -299,19 +307,26 @@ fit_all_dsm <- function(distFit = NULL,
 
     index_order_best <- get_k_best_models(tab_model = all_fits_best, k = k, use_loo = F)
 
-    ## select the n-best models
-    best <- lapply(index_order_best, my_dsm_fct, tab = FALSE, segdata_obs = X)
-    best_std <- lapply(index_order_best, my_dsm_fct, tab = FALSE, segdata_obs = segdata_obs)
-
     # estimating stacking weights
-    writeLines("\t\tEstimating loocv on k best models: please wait")
+    writeLines("\t* Estimating loocv on k best models: please wait")
     all_psis <- lapply(index_order_best, my_dsm_fct, segdata_obs = segdata_obs, loo = TRUE)
 
     get_elpd_loo <- do.call('cbind', lapply(1:k, function(l) {all_psis[[l]]$pointwise[, "elpd_loo"]}))
     loow <- as.numeric(loo::stacking_weights(get_elpd_loo))
     all_fits$stacking_weights[index_order_best] <- loow
 
+    all_fits_best_sw <- all_fits %>%
+      arrange(desc(stacking_weights)) %>%
+      top_n(n=k, wt=stacking_weights)
+
+    index_order_sw <- all_fits_best_sw$index
+
+    ## select the n-best models
+    best <- lapply(index_order_sw, my_dsm_fct, tab = FALSE, segdata_obs = X)
+    best_std <- lapply(index_order_sw, my_dsm_fct, tab = FALSE, segdata_obs = segdata_obs)
+
   }
+
 
   ## wrap-up with the outputs
   return(
