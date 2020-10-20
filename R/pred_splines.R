@@ -282,7 +282,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
 #' @importFrom mvtnorm rmvnorm
 #' @export
 
-rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0) {
+rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0, by = NULL) {
   ### posterior predictive checks
   beta <- mvtnorm::rmvnorm(n_rep, mean = model_fit$coefficients, sigma = model_fit$Vp)
   Z <- predict(model_fit, type = "lpmatrix")
@@ -292,12 +292,12 @@ rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0) {
                    function(x) { MASS::rnegbin(n = length(x), mu = x, theta = transfo_overdispersion) }
                    )
              )
-
+  
   ### rootogram
   countdata <- model_fit$data$count
   f_histogram <- function(x, max_obs) { table(factor(x, levels = min_obs:max_obs)) }
   max_obs <- max(countdata, as.numeric(y_rep))
-
+  
   ### earth-mover distance
   cantonnier <- function(x, y, breaks, remove_zeroes = FALSE) {
     if(remove_zeroes) {
@@ -308,16 +308,38 @@ rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0) {
     y <- hist(y, breaks, plot = FALSE)$density
     return(emd = sum(abs(cumsum(x) - cumsum(y))))
   }
-  gof <- apply(y_rep, 1, cantonnier, y = countdata, breaks = min_obs:max_obs, remove_zeroes = TRUE)
+  
+  ### make df 
+  rootdf <- function(index) {
+    data.frame(mids = (min_obs:max_obs + (min_obs + 1):(max_obs + 1))/2,
+               y_obs = as.numeric(f_histogram(x = countdata[index], max_obs = max_obs)),
+               y_rep = apply(apply(y_rep[, index], 1, f_histogram, max_obs = max_obs), 1, mean)
+               )
+  }
 
+  ### by
+  index <- list(1:length(countdata))
+  out <- do.call('rbind', lapply(index, rootdf))
+  if(!is.null(by)) {
+    if(!any(names(model_fit$data) == by)) {
+      writeLines("\t* Ignoring 'by' argument as no matching column name in data")
+    }
+    else {
+      stratum <- model_fit$data[, by]
+      index <- lapply(unique(stratum), function(x) { which(stratum == x) })
+      out <- do.call('rbind', lapply(index, rootdf))
+      out$by <- rep(unique(stratum), each = length((min_obs:max_obs + (min_obs + 1):(max_obs + 1))/2))
+    }
+  }
+
+  ### goodness of fit
+  gof <- do.call('cbind', lapply(index, function(x) {apply(y_rep[, x], 1, cantonnier, y = countdata, breaks = min_obs:max_obs, remove_zeroes = TRUE)}))
+  
+  ###
   ### plot
   theme_set(theme_bw(base_size = 16))
-  g <- ggplot(data.frame(mids = (min_obs:max_obs + (min_obs + 1):(max_obs + 1))/2,
-                         y_obs = as.numeric(f_histogram(x = countdata, max_obs = max_obs)),
-                         y_rep = apply(apply(y_rep, 1, f_histogram, max_obs = max_obs), 1, mean)
-                         ),
-              aes(x = mids, y = y_rep)
-              ) +
+  g <- out %>% 
+    ggplot(aes(x = mids, y = y_rep)) +
     geom_rect(aes(xmin = mids - 0.5, xmax = mids + 0.5,
                   ymax = y_obs, ymin = 0),
               fill = "lightgrey", color = grey(0.6), alpha = 0.5
@@ -331,7 +353,10 @@ rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0) {
           strip.text = element_text(size = 12),
           strip.background = element_rect(fill = grey(0.95))
           )
-
+  if(any(names(out) == "by")) {
+    g <- g +
+      facet_wrap(~ by)
+  }
   ### wrap-up
   return(list(rootogram = g,
               earthMover = gof
