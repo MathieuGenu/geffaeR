@@ -271,7 +271,9 @@ fit_all_dsm <- function(distFit = NULL,
     loo_ic_coefs <- do.call(rbind,lapply(all_psis, function(x){x$estimates["looic",]}))
     colnames(loo_ic_coefs) <- c("looic","se_looic")
     all_fits <- cbind(all_fits, loo_ic_coefs)
-    all_fits$stacking_weights <- NULL
+
+    # initiate stacking_weights column
+    all_fits$stacking_weights <- NA
 
     # all_fits filtered 5 best
     all_fits_best <- all_fits %>%
@@ -304,6 +306,9 @@ fit_all_dsm <- function(distFit = NULL,
     all_fits_best <- all_fits %>%
       arrange(AIC) %>%
       top_n(n=-k, wt=AIC)
+
+    # initiate stacking_weights column
+    all_fits$stacking_weights <- NA
 
     index_order_best <- get_k_best_models(tab_model = all_fits_best, k = k, use_loo = F)
 
