@@ -117,8 +117,8 @@ usethis::use_data(lbrt93_proj)
 usethis::use_data(NEA_simplified_FR)
 
 
-# Data part #
-#-----------#
+
+# Data part ---------------------------------------------------------------
 
 source("C:/Users/mgenu.RATUFA/Documents/Projet/Build_example_for_package/res/01_build_study_area_with_effort_obs/")
 

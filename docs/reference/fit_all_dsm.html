@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Standardisation of observation data column names. — change_obs_varName • geffaeR</title>
+<title>Fit all possible model with the covariates given. — fit_all_dsm • geffaeR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,9 +46,8 @@
 
 
 
-<meta property="og:title" content="Standardisation of observation data column names. — change_obs_varName" />
-<meta property="og:description" content="Attribute standard names to column names of observation data.frame
-for the next steps of the analysis." />
+<meta property="og:title" content="Fit all possible model with the covariates given. — fit_all_dsm" />
+<meta property="og:description" content="Fit all possible model with the covariates given." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -134,30 +133,121 @@ for the next steps of the analysis." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Standardisation of observation data column names.</h1>
+    <h1>Fit all possible model with the covariates given.</h1>
     
-    <div class="hidden name"><code>change_obs_varName.Rd</code></div>
+    <div class="hidden name"><code>fit_all_dsm.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Attribute standard names to column names of observation data.frame
-for the next steps of the analysis.</p>
+    <p>Fit all possible model with the covariates given.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>change_obs_varName</span>(<span class='no'>obs_base</span>)</pre>
+    <pre class="usage"><span class='fu'>fit_all_dsm</span>(
+  <span class='kw'>distFit</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>segdata_obs</span>,
+  <span class='no'>obsdata</span>,
+  <span class='kw'>response</span> <span class='kw'>=</span> <span class='st'>"ind"</span>,
+  <span class='no'>predictors</span>,
+  <span class='kw'>likelihood</span> <span class='kw'>=</span> <span class='st'>"negbin"</span>,
+  <span class='kw'>esw</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>max_cor</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
+  <span class='kw'>nb_max_pred</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>complexity</span> <span class='kw'>=</span> <span class='fl'>4</span>,
+  <span class='kw'>smooth_xy</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>k</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>splines_by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>weighted</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>random</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>soap</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>xt</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>knots</span> <span class='kw'>=</span> <span class='kw'>NULL</span>),
+  <span class='kw'>use_loo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>obs_base</th>
-      <td><p>Data.frame containing column names to standardize.</p></td>
+      <th>distFit</th>
+      <td><p><code>distfit</code> object. One of <code>plot_detection</code> output or directly an output of <code>ds</code></p></td>
+    </tr>
+    <tr>
+      <th>segdata_obs</th>
+      <td><p>segdata data.frame with observation added with <code>ajout_obs</code>.</p></td>
+    </tr>
+    <tr>
+      <th>obsdata</th>
+      <td><p>Observation data.frame prepared with <code>prepare_data_obs</code>.</p></td>
+    </tr>
+    <tr>
+      <th>response</th>
+      <td><p>Response variable to choose between "ind" number of indiviudals or "obs" number of observation.</p></td>
+    </tr>
+    <tr>
+      <th>predictors</th>
+      <td><p>vector containing all covariates as character string.</p></td>
+    </tr>
+    <tr>
+      <th>likelihood</th>
+      <td><p>Likelihood must be one of "negbin", "poisson" or "tweedie". Default is "negbin".</p></td>
+    </tr>
+    <tr>
+      <th>esw</th>
+      <td><p>Value of <em>effective-strip width</em>.</p></td>
+    </tr>
+    <tr>
+      <th>max_cor</th>
+      <td><p>Maximum correlation threshold between two covariates tolerated.</p></td>
+    </tr>
+    <tr>
+      <th>nb_max_pred</th>
+      <td><p>Maximum number of covariates in a model.</p></td>
+    </tr>
+    <tr>
+      <th>complexity</th>
+      <td><p>k argument in smoothers.</p></td>
+    </tr>
+    <tr>
+      <th>smooth_xy</th>
+      <td><p>Controls the intercept to include or not a bivariate smooth on x and y :
+for prediction inside the prospected polygon, should be set to TRUE to obtain stable estimates for
+prediction outside, MUST be set to FALSE to keep extrapolation under control.</p></td>
+    </tr>
+    <tr>
+      <th>k</th>
+      <td><p>Number of models to return for inference.</p></td>
+    </tr>
+    <tr>
+      <th>splines_by</th>
+      <td><p>Interaction with splines given by one variable of segdata.</p></td>
+    </tr>
+    <tr>
+      <th>weighted</th>
+      <td><p>Either to compute weights or no.</p></td>
+    </tr>
+    <tr>
+      <th>random</th>
+      <td><p>variable of <code>segdata_obs</code> to include random effect.</p></td>
+    </tr>
+    <tr>
+      <th>soap</th>
+      <td><p>list to pass in order to use a soap-film smooth: must be prepared outside this function.</p></td>
+    </tr>
+    <tr>
+      <th>use_loo</th>
+      <td><p>Model selection with leave-one-out cross validation if TRUE, if FALSE it uses AIC to select models.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>This function return the same data.frame as in input with the standardized column name.</p>
+    <p>This function return a list containing:</p><ol>
+<li><p>all_fits_binded : <code>data.frame</code> Containing all fitting infos on models.</p></li>
+<li><p>best_models : <code>list</code> k best models with standardized value.</p></li>
+<li><p>best_models4plotting : <code>list</code> k best models with raw values (for plotting).</p></li>
+</ol>
+
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p>By default, use cubic B-splines with shrinkage (bs = 'cs').</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

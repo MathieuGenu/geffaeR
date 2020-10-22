@@ -1,3 +1,19 @@
+#' Prediction diagnostic.
+#'
+#' Visualize prediction fiiting and get
+#'
+#' @param segdata segdata data.frame built with \code{prepare_data_effort}
+#' @param dsm_model The dsm model you want to use, built with \code{fit_all_dsm}.
+#' @param remove_intercept Remove intercept of model (\code{beta[, 1] <- 0}).
+#' @param random Variable to include random effect.
+#' @param splines_by Interaction with splines given by one variable of segdata.
+#'
+#' @return \enumerate{
+#'           \item df_splines : \code{data.frame}.
+#'           \item g_splines : \code{ggplot}.
+#'           \item spatial : \code{data.frame}.
+#'         }
+#'
 #' @import ggplot2
 #' @import glue
 #' @importFrom coda HPDinterval as.mcmc
@@ -6,8 +22,7 @@
 #' @importFrom grid grobTree
 #' @importFrom cowplot draw_grob ggdraw
 #' @export
-
-### spline curves
+#' @examples
 pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = NULL, splines_by = NULL) {
   # segdata is the original dataset used to calibrate the model
   # dsm_model is the dsm model you want to use
@@ -292,12 +307,12 @@ rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0, by = NULL) {
                    function(x) { MASS::rnegbin(n = length(x), mu = x, theta = transfo_overdispersion) }
                    )
              )
-  
+
   ### rootogram
   countdata <- model_fit$data$count
   f_histogram <- function(x, max_obs) { table(factor(x, levels = min_obs:max_obs)) }
   max_obs <- max(countdata, as.numeric(y_rep))
-  
+
   ### earth-mover distance
   cantonnier <- function(x, y, breaks, remove_zeroes = FALSE) {
     if(remove_zeroes) {
@@ -308,8 +323,8 @@ rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0, by = NULL) {
     y <- hist(y, breaks, plot = FALSE)$density
     return(emd = sum(abs(cumsum(x) - cumsum(y))))
   }
-  
-  ### make df 
+
+  ### make df
   rootdf <- function(index) {
     data.frame(mids = (min_obs:max_obs + (min_obs + 1):(max_obs + 1))/2,
                y_obs = as.numeric(f_histogram(x = countdata[index], max_obs = max_obs)),
@@ -334,11 +349,11 @@ rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0, by = NULL) {
 
   ### goodness of fit
   gof <- do.call('cbind', lapply(index, function(x) {apply(y_rep[, x], 1, cantonnier, y = countdata, breaks = min_obs:max_obs, remove_zeroes = TRUE)}))
-  
+
   ###
   ### plot
   theme_set(theme_bw(base_size = 16))
-  g <- out %>% 
+  g <- out %>%
     ggplot(aes(x = mids, y = y_rep)) +
     geom_rect(aes(xmin = mids - 0.5, xmax = mids + 0.5,
                   ymax = y_obs, ymin = 0),

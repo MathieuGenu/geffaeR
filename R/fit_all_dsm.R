@@ -18,6 +18,37 @@ get_k_best_models <- function(tab_model, k = 5, use_loo) {
   return(tab_model)
 }
 
+#' Fit all possible model with the covariates given.
+#'
+#' @param distFit \code{distfit} object. One of \code{plot_detection} output or directly an output of \code{ds}
+#' @param segdata_obs segdata data.frame with observation added with \code{ajout_obs}.
+#' @param obsdata Observation data.frame prepared with \code{prepare_data_obs}.
+#' @param response Response variable to choose between "ind" number of indiviudals or "obs" number of observation.
+#' @param predictors vector containing all covariates as character string.
+#' @param likelihood Likelihood must be one of "negbin", "poisson" or "tweedie". Default is "negbin".
+#' @param esw Value of \emph{effective-strip width}.
+#' @param max_cor Maximum correlation threshold between two covariates tolerated.
+#' @param nb_max_pred Maximum number of covariates in a model.
+#' @param complexity k argument in smoothers.
+#' @param smooth_xy Controls the intercept to include or not a bivariate smooth on x and y :
+#' for prediction inside the prospected polygon, should be set to TRUE to obtain stable estimates for
+#' prediction outside, MUST be set to FALSE to keep extrapolation under control.
+#' @param k Number of models to return for inference.
+#' @param splines_by Interaction with splines given by one variable of segdata.
+#' @param weighted Either to compute weights or no.
+#' @param random variable of \code{segdata_obs} to include random effect.
+#' @param soap list to pass in order to use a soap-film smooth: must be prepared outside this function.
+#' @param use_loo Model selection with leave-one-out cross validation if TRUE, if FALSE it uses AIC to select models.
+#'
+#' @note By default, use cubic B-splines with shrinkage (bs = 'cs').
+#'
+#' @return This function return a list containing:
+#'         \enumerate{
+#'           \item all_fits_binded : \code{data.frame} Containing all fitting infos on models.
+#'           \item best_models : \code{list} k best models with standardized value.
+#'           \item best_models4plotting : \code{list} k best models with raw values (for plotting).
+#'         }
+#'
 #' @importFrom arm rescale
 #' @importFrom utils combn
 #' @importFrom mgcv nb tw

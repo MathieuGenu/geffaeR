@@ -35,6 +35,10 @@ reference:
   - get_mcmc_summary
 - subtitle: "DSM"
 - contents:
+  - fit_all_dsm
+  - pred_map_dsm
+  - pred_splines
+  - predict_dsm
   - prep_predata
 
 

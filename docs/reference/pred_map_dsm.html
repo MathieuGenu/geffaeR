@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Standardisation of observation data column names. — change_obs_varName • geffaeR</title>
+<title>Prediction map of fitted dsm model. — pred_map_dsm • geffaeR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,9 +46,8 @@
 
 
 
-<meta property="og:title" content="Standardisation of observation data column names. — change_obs_varName" />
-<meta property="og:description" content="Attribute standard names to column names of observation data.frame
-for the next steps of the analysis." />
+<meta property="og:title" content="Prediction map of fitted dsm model. — pred_map_dsm" />
+<meta property="og:description" content="Prediction map of fitted dsm model." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -134,30 +133,45 @@ for the next steps of the analysis." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Standardisation of observation data column names.</h1>
+    <h1>Prediction map of fitted dsm model.</h1>
     
-    <div class="hidden name"><code>change_obs_varName.Rd</code></div>
+    <div class="hidden name"><code>pred_map_dsm.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Attribute standard names to column names of observation data.frame
-for the next steps of the analysis.</p>
+    <p>Prediction map of fitted dsm model.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>change_obs_varName</span>(<span class='no'>obs_base</span>)</pre>
+    <pre class="usage"><span class='fu'>pred_map_dsm</span>(<span class='no'>predata</span>, <span class='no'>grid</span>, <span class='no'>var</span>, <span class='kw'>facet_param</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>title</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>obs_base</th>
-      <td><p>Data.frame containing column names to standardize.</p></td>
+      <th>predata</th>
+      <td><p>data.frame of prediction.</p></td>
+    </tr>
+    <tr>
+      <th>grid</th>
+      <td><p>gridata in <code>sf</code> format or <code>crs</code> value. It have to be usable by <code><a href='https://rdrr.io/pkg/sf/man/st_crs.html'>st_crs</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>var</th>
+      <td><p>Column name as character used as value to be plotted.</p></td>
+    </tr>
+    <tr>
+      <th>facet_param</th>
+      <td><p>Column name as character used as facetting parameter.</p></td>
+    </tr>
+    <tr>
+      <th>title</th>
+      <td><p>character string to put as title on the map.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>This function return the same data.frame as in input with the standardized column name.</p>
+    <p><code>ggplot</code> object.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -135,7 +135,8 @@ After preparing and formatting the data, the next step consist in adjusting a de
 detection_TURTRU <- plot_detection(distdata = observation_output_TURTRU$distdata,
                                    bin = seq(0.0,1.0, 0.05),
                                    key = "halfnorm",
-                                   upper = 1.0)
+                                   upper = 1.0,
+                                   is_seabird = F)
 ```
 
 This function as several outputs, it gives : the esw (effective strip width),
@@ -182,9 +183,10 @@ observation_output_LARMEL <- prepare_data_obs(sp = sp2,
                                               shape_layer = shape_layer, 
                                               projection = projection)
 temp <- observation_output_LARMEL$distdata
-temp$distance <- sample(c(0, 0.2),size = nrow(temp), replace = TRUE) * ifelse(is.na(observation_output_LARMEL$distdata$distance), NA, 1)
-fit <- Distance::ds(temp, key = "unif", adjustment = "poly", formula = ~1, truncation = 0.2)
-plot(fit)
+
+fit <- plot_detection(temp,
+                      is_seabird = T)
+plot(fit$distFit)
 
 ```
 

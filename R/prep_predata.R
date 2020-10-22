@@ -30,8 +30,10 @@
 #'         \enumerate{
 #'           \item predata : data.frame of predata.
 #'           \item segdata : data.frame of segdata.
-#'           \item pca_pred : Output of \code{\link[FactoMineR]{PCA}} function on segdata.
 #'           \item pca_seg : Output of \code{\link[FactoMineR]{PCA}} function on predata.
+#'           \item pca_pred : Output of \code{\link[FactoMineR]{PCA}} function on segdata.
+#'           \item seg_mipat : output of VIM::aggr on predata
+#'           \item pred_mipat : output of VIM::aggr on segdata
 #'         }
 #' @import dplyr
 #' @importFrom Amelia amelia

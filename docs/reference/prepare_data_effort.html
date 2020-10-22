@@ -151,7 +151,8 @@ other functions of the package.</p>
   <span class='no'>shape</span>,
   <span class='no'>shape_layer</span>,
   <span class='no'>New_projection</span>,
-  <span class='kw'>optimal</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+  <span class='kw'>optimal</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>col2keep</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -193,6 +194,10 @@ see : <code><a href='https://rdrr.io/pkg/sp/man/CRS-class.html'>CRS</a></code> f
       <td><p>Argument which allows to keep data sampled in optimal conditions.
 Defaults settings are all data are kept. In case of optimal = T, indexes
 <code>"c("GG", "GM", "MG", "EG", "GE", "EE", "ME", "EM", "MM")"</code> are kept.</p></td>
+    </tr>
+    <tr>
+      <th>col2keep</th>
+      <td><p>Columns to keep from effort_base in output of the function.</p></td>
     </tr>
     </table>
 
