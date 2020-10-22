@@ -16,6 +16,7 @@ reference:
   - NEA
   - NEA_isobath100
   - NEA_isobath200
+  - NEA_simplified_FR
   - observation_example
   - shape_example
 - title: "Functions"
@@ -38,7 +39,7 @@ reference:
   - fit_all_dsm
   - pred_map_dsm
   - pred_splines
-  - predict_dsm
+  - predict_all
   - prep_predata
 
 

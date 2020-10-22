@@ -188,6 +188,7 @@ fit <- plot_detection(temp,
                       is_seabird = T)
 plot(fit$distFit)
 
+
 ```
 
 

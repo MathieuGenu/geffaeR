@@ -143,7 +143,7 @@ usethis::use_data(effort_example, overwrite = T)
 pkgdown::build_site()
 pkgdown::build_home()
 pkgdown::build_reference()
-pkgdown::build_article("vignettes/Package_example.Rmd")
+pkgdown::build_article(name = "vignettes/Package_example.Rmd")
 usethis::use_github_action("pkgdown")
 
 
