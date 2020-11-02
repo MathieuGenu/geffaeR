@@ -134,6 +134,11 @@ autocruncher <- function(bnd,knots,nmax=200,k=10, xname="x", yname="y") {
 #' @examples
 #' @references This function uses \code{autocruncher}, a function created by Simon Wood and improved by David L. Miller
 #' (\link[gtihub link]{https://github.com/dill/soap_checker/blob/master/autocrunch.R}).
+#'
+#' @importFrom rmapshaper ms_simplify
+#' @importFrom mgcv inSide
+#' @importFrom raster crop
+#' @import sf dplyr ggplot2
 prepare_soap <- function(data,
                          contour = NULL,
                          polygon_pred = NULL,
