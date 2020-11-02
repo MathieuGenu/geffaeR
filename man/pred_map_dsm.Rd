@@ -21,5 +21,5 @@ pred_map_dsm(predata, grid, var, facet_param = NULL, title = NULL)
 \code{ggplot} object.
 }
 \description{
-Prediction map of fitted dsm model.
+Map of density surface modelling fitted with pred_splines.
 }

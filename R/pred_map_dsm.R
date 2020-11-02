@@ -1,5 +1,7 @@
 #' Prediction map of fitted dsm model.
 #'
+#' Map of density surface modelling fitted with pred_splines.
+#'
 #' @param predata data.frame of prediction.
 #' @param grid gridata in \code{sf} format or \code{crs} value. It have to be usable by \code{\link[sf]{st_crs}}.
 #' @param var Column name as character used as value to be plotted.
