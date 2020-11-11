@@ -4,14 +4,11 @@
 #'
 "cds"
 
-
-
-
-
-
-
-
-
+#' Data list to create a DSM example
+#'
+#' DSM list that gather a list of data needed to perform A DSM analysis.
+#'
+"DSM_pack_MOLMOL"
 
 #' Effort example data.
 #'

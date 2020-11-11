@@ -136,8 +136,13 @@ usethis::use_data(observation_example, overwrite = T)
 effort_example$CenterTime <- lubridate::date(effort_example$CenterTime)
 usethis::use_data(effort_example, overwrite = T)
 
-# pkgdown #
-#---------#
+# create MOLMOL data list for DSM
+load("C:/Users/mgenu.RATUFA/Documents/Projet/MOLMOL_data_vignette_geffaeR/res/DSM_pack_MOLMOL/DSM_pack_MOLMOL.RData")
+usethis::use_data(DSM_pack_MOLMOL, overwrite = T)
+
+
+# pkgdown ----------------------------------------------------------------
+
 # run one at the beginning
 # usethis::use_pkgdown()
 pkgdown::build_site()
