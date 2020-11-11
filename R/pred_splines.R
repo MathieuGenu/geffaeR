@@ -297,7 +297,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
 #' @importFrom mvtnorm rmvnorm
 #' @export
 
-rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0, by = NULL) {
+rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0, max_obs = 1e3, by = NULL) {
   ### posterior predictive checks
   beta <- mvtnorm::rmvnorm(n_rep, mean = model_fit$coefficients, sigma = model_fit$Vp)
   Z <- predict(model_fit, type = "lpmatrix")
@@ -307,6 +307,7 @@ rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0, by = NULL) {
                    function(x) { MASS::rnegbin(n = length(x), mu = x, theta = transfo_overdispersion) }
                    )
              )
+  y_rep <- ifelse(y_rep > max_obs, max_obs, y_rep)
 
   ### rootogram
   countdata <- model_fit$data$count
