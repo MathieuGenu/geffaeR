@@ -308,6 +308,11 @@ rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0, max_obs = 1e3, by 
                    )
              )
   y_rep <- ifelse(y_rep > max_obs, max_obs, y_rep)
+  ### check for NA
+  if(any(is.na(y_rep))){
+    rm_row <- apply(y_rep, 1, function(row) {any(is.na(row))})
+    y_rep <- y_rep[-rm_row, ]
+  }
 
   ### rootogram
   countdata <- model_fit$data$count
