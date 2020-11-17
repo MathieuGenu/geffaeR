@@ -172,13 +172,13 @@ prepare_soap <- function(data,
       }
 
       if(any(is(contour) != "sf")) {
-        contour %<>%
+        contour <-  contour %>%
           st_as_sf()
       }
 
       # contour should be crs = 4326
       if(st_crs(contour)[[1]] != 4326 | is.na(st_crs(contour)[[1]])) {
-        contour %<>%
+        contour <- contour %>%
           st_transform(crs = 4326)
       }
 
@@ -265,7 +265,7 @@ prepare_soap <- function(data,
 
   cropped_data <- raster::crop(data, ocean)
   df_cropped_data <- data.frame(cropped_data)
-  df_cropped_data %<>%
+  df_cropped_data <- df_cropped_data %>%
     rename(longitude = coords.x1,
            latitude = coords.x2)
 
