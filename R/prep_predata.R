@@ -1,7 +1,8 @@
 #' Creation of predata and data impuation of missing data.
 #'
 #' Creation of predata, a data.frame containing environmental parameters in a grid of the study area.
-#' Also it allows to impute missing data for predata and segdata.
+#' Also it allows to impute missing data for predata and segdata using PCA from the \pkg{missMDA}
+#' package or Amelia from \pkg{Amelia} package.
 #'
 #' @inheritParams prepare_data_obs
 #' @param gridfile_name Grid of the study area with all the environmental variables which
@@ -26,9 +27,11 @@
 #'  quantiles 95 percent and 5 percent.
 #' @param col2keep \code{character string} corresponding to the columns wanted to appear in output in predata.
 #' @param inbox_poly When \code{TRUE}, keep only part of the grid that match with the study area.
+#' @param verbose Boolean. whether or not to display the progress bar for "PCA" or iteration number for "amelia".
 #' @return This function return a list containing :
 #'         \enumerate{
-#'           \item predata : data.frame of predata.
+#'           \item predata : data.frame of predata. Corresponding to gridata keeping covariates, coordinates and
+#'           area of cells
 #'           \item segdata : data.frame of segdata.
 #'           \item pca_seg : Output of \code{\link[FactoMineR]{PCA}} function on predata.
 #'           \item pca_pred : Output of \code{\link[FactoMineR]{PCA}} function on segdata.
@@ -55,22 +58,22 @@ prep_predata <- function(segdata,
                          shape,
                          saturate_predata = F, saturate_segdata = F,
                          inbox_poly = T,
-                         col2keep = NULL) {
+                         col2keep = NULL,
+                         verbose = TRUE) {
 
   # check si toutes les covariables sont dans segdata
   if(!all(varphysio %in% colnames(segdata))) {
     miss_physio <- varphysio[!(varphysio %in% colnames(segdata))]
-    stop(paste(miss_physio, "n'est pas/ ne sont pas, dans segdata",collapse = "\n"))
+    stop(paste(miss_physio, "is not/ are not, in segdata",collapse = "\n"))
   }
   if(!all(varenviro %in% colnames(segdata))) {
     miss_enviro <- varenviro[!(varenviro %in% colnames(segdata))]
-    stop(paste(miss_enviro, "n'est pas/ ne sont pas, dans segdata",collapse = "\n"))
+    stop(paste(miss_enviro, "is not/ are not, in segdata",collapse = "\n"))
   }
 
 
   # dire à l'utilisateur qu'il faut bien que les données manquantes soient au format NA et pas autre chose
-  message("Les données manquantes dans les tableaux grid et segdata doivent impérativement être sous la forme de NA
-          et rien d'autre (pas de 0)")
+  message("missing data in grid and segdata must be as NAs and nothing else (not 0)")
 
   segdata_old <- segdata
   segdata <- NULL
@@ -94,12 +97,20 @@ prep_predata <- function(segdata,
     grid <- gridfile_name
   }
 
+  if(any(is(grid) %in% "sf")) {
+    grid <- grid %>%
+      as_Spatial() %>%
+      as.data.frame() %>%
+      rename(lon = coords.x1,
+             lat = coords.x2)
+  }
+
   grid <- grid[which(duplicated(grid) == FALSE), ]
 
   # check if col2keep are in colnames of grid
   if(!all(col2keep %in% colnames(grid))){
     miss_col2keep <- col2keep[!(col2keep %in% colnames(grid))]
-    stop(paste(miss_col2keep, "n'est pas/ ne sont pas, dans grid",collapse = "\n"))
+    stop(paste(miss_col2keep, "is not/ are not, in gridata",collapse = "\n"))
   }
 
   # colname of coord in grid in good format
@@ -134,7 +145,7 @@ prep_predata <- function(segdata,
   allvar <- c(varphysio, varenviro)
 
   if(!all(allvar %in% names(grid))) {
-    stop("Les covariables suivantes n'apparaissent pas dans la grille de prediction (grid) :",
+    stop("The following covariates doesn't appear in gridata :",
          allvar[which(allvar %in% names(grid) == FALSE)], sep = " ")
   }
 
@@ -158,6 +169,7 @@ prep_predata <- function(segdata,
   # saturer les variables
   # calculer les seuils pour la grille de prediction
   segdata_threshold <- apply(segdata[, allvar], 2, quantile, probs = c(0.025, 0.975), na.rm = TRUE)
+
   saturate <- function(x, threshold, upper = TRUE) {
     y <- x[which(!is.na(x))]
     if(upper) {
@@ -168,6 +180,7 @@ prep_predata <- function(segdata,
     x[which(!is.na(x))] <- y
     return(x)
   }
+
   if(saturate_segdata == T) {
     for (j in allvar) {
       segdata[, j] <- saturate(segdata[, j], threshold = segdata_threshold[1, j], upper = FALSE)
@@ -184,6 +197,7 @@ prep_predata <- function(segdata,
       mi_segdata[, j] <- log1p(mi_segdata[, j])
     }
   }
+
   if(!is.null(do_log_enviro)) {
     for(j in do_log_physio) {
       mi_segdata[, j] <- log1p(mi_segdata[, j])
@@ -193,28 +207,49 @@ prep_predata <- function(segdata,
   seg_mipat <- NULL
 
   if(any(apply(mi_segdata, 2, function(j) { any(is.na(j)) }))) {
+
     ### missingness patterns
     seg_mipat <- summary(VIM::aggr(mi_segdata, sortVar = TRUE, plot = F))
-    cat("il y a",sum(seg_mipat$missings$Count),"cases sans valeurs dans segdata","\n","\n", sep=" ")
+    cat("There are",sum(seg_mipat$missings$Count),"cells with missing values in segdata","\n","\n", sep=" ")
+
     if(any(seg_mipat$missings$Count == nrow(mi_segdata))) {
+
       writeLines(paste("Missing data imputation not done on data for segments because some variables
                        only have missing values.\n Please check",
                        seg_mipat$missings$Variable[which(seg_mipat$missings$Count == nrow(mi_segdata))], sep = ' '))
+
       seg_pca <- NULL
+
     } else {
+
       if(imputation == "PCA") {
+
         ## missMDA
         segdata[, c("longitude", "latitude", allvar)] <-
           imputePCA(mi_segdata,ncp = estim_ncpPCA(mi_segdata,ncp.max = ncol(mi_segdata),
                                                   method.cv = "Kfold",
-                                                  nbsim = 10
+                                                  nbsim = 10,
+                                                  verbose = verbose
           )$ncp)$completeObs
+
       } else {
         ## amelia
-        amelia_segdata <- amelia(mi_segdata, m = 10)
+
+        if(verbose == F){
+          p2s <- 0
+        } else {
+          p2s <- 1
+        }
+
+        amelia_segdata <- amelia(mi_segdata, m = 10, p2s = p2s)
         mi_segdata <- array(NA, dim = c(nrow(mi_segdata), ncol(mi_segdata), 10))
-        for(k in 1:10) { mi_segdata[ , , k] <- as.matrix(amelia_segdata$imputations[[k]]) }
+
+        for(k in 1:10) {
+          mi_segdata[ , , k] <- as.matrix(amelia_segdata$imputations[[k]])
+        }
+
         segdata[, c("longitude", "latitude", allvar)] <- as.data.frame(apply(mi_segdata, c(1, 2), mean))
+
       }
 
       # enlever echelle log
@@ -223,6 +258,7 @@ prep_predata <- function(segdata,
           segdata[, j] <- ifelse(exp(segdata[, j]) < 1, 0, exp(segdata[, j]) - 1)
         }
       }
+
       if(!is.null(do_log_physio)) {
         for(j in do_log_physio) {
           segdata[, j] <- ifelse(exp(segdata[, j]) < 1, 0, exp(segdata[, j]) - 1)
@@ -231,19 +267,24 @@ prep_predata <- function(segdata,
 
       # re-seuiler pour être cohérent
       if(saturate_segdata == T){
+
         for (j in allvar) {
           segdata[, j] <- saturate(segdata[, j], threshold = segdata_threshold[1, j], upper = FALSE)
           segdata[, j] <- saturate(segdata[, j], threshold = segdata_threshold[2, j], upper = TRUE)
         }
+
       }
 
       ### PCA analyses
       seg_pca <- PCA(segdata[, c("longitude", "latitude", allvar)], graph = FALSE)
     }
+
   } else {
+
     amelia_segdata <- NULL
     ### PCA analyses
     seg_pca <- PCA(segdata[, allvar], graph = FALSE)
+
   }
 
   ### table : predata
@@ -261,11 +302,14 @@ prep_predata <- function(segdata,
 
   # saturer les valeurs extremes si demandé
   if(saturate_predata == T) {
+
     predata_threshold <- apply(predata[, allvar], 2, quantile, probs = c(0.025, 0.975), na.rm = TRUE)
+
     for (j in allvar) {
       predata[, j] <- saturate(predata[, j], threshold = predata_threshold[1, j], upper = FALSE)
       predata[, j] <- saturate(predata[, j], threshold = predata_threshold[2, j], upper = TRUE)
     }
+
   }
 
   ## impute missing values
@@ -277,6 +321,7 @@ prep_predata <- function(segdata,
       mi_predata[, j] <- log1p(mi_predata[, j])
     }
   }
+
   if(!is.null(do_log_physio)) {
     for(j in do_log_physio) {
       mi_predata[, j] <- log1p(mi_predata[, j])
@@ -286,58 +331,88 @@ prep_predata <- function(segdata,
   pred_mipat <- NULL
 
   if(any(apply(mi_predata, 2, function(j) { any(is.na(j)) }))) {
+
     ### missingness patterns
     pred_mipat <- summary(VIM::aggr(mi_predata, sortVar = TRUE, plot = F))
-    cat("il y a",sum(pred_mipat$missings$Count),"cases sans valeurs dans predata","\n","\n", sep=" ")
+    cat("There are",sum(pred_mipat$missings$Count),"cells with missing values in predata","\n","\n", sep=" ")
+
     if(any(pred_mipat$missings$Count == nrow(mi_predata))) {
+
       writeLines(paste("Missing data imputation not done on data for predictions because some
                        variables only have missing values.\n Please check",
                        pred_mipat$missings$Variable[which(pred_mipat$missings$Count == nrow(mi_predata))], sep = ' '))
+
       ### PCA analyses
       pred_pca <- NULL
+
     } else {
+
       if(imputation == "PCA") {
+
         ## missMDA
         predata[, c("longitude", "latitude", allvar)] <-
           imputePCA(mi_predata,ncp = estim_ncpPCA(mi_predata,ncp.max = ncol(mi_predata),
                                                   method.cv = "Kfold",
-                                                  nbsim = 10)$ncp)$completeObs
+                                                  nbsim = 10,
+                                                  verbose = verbose)$ncp)$completeObs
+
       } else {
+
         ## amelia
-        amelia_predata <- amelia(mi_predata, m = 10)
+        if(verbose == F){
+          p2s <- 0
+        } else {
+          p2s <- 1
+        }
+
+        amelia_predata <- amelia(mi_predata, m = 10, p2s = p2s)
         mi_predata <- array(NA, dim = c(nrow(mi_predata), ncol(mi_predata), 10))
+
         for(k in 1:10) {
           mi_predata[ , , k] <- as.matrix(amelia_predata$imputations[[k]])
         }
+
         predata[, c("longitude", "latitude", allvar)] <- as.data.frame(apply(mi_predata, c(1, 2), mean))
+
       }
 
       # enlever echelle log
       if(!is.null(do_log_enviro)){
+
         for(j in do_log_enviro) {
           predata[, j] <- ifelse(exp(predata[, j]) < 1, 0, exp(predata[, j]) - 1)
         }
+
       }
+
       if(!is.null(do_log_physio)){
+
         for(j in do_log_physio) {
           predata[, j] <- ifelse(exp(predata[, j]) < 1, 0, exp(predata[, j]) - 1)
         }
+
       }
+
       # re-seuiler pour être cohérent
       if(saturate_predata == T) {
+
         for (j in allvar) {
           predata[, j] <- saturate(predata[, j], threshold = segdata_threshold[1, j], upper = FALSE)
           predata[, j] <- saturate(predata[, j], threshold = segdata_threshold[2, j], upper = TRUE)
         }
+
       }
 
       ### PCA analyses
       pred_pca <- PCA(predata[, c("longitude", "latitude", allvar)], graph = FALSE)
+
     }
   } else {
+
     amelia_predata <- NULL
     ### PCA analyses
     pred_pca <- PCA(predata[, allvar], graph = FALSE)
+
   }
 
   ## rassembler
