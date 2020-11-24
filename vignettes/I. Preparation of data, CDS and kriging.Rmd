@@ -1,5 +1,5 @@
 ---
-title: "Preparation of data, CDS and kriging"
+title: "I. Preparation of data and CDS"
 output: 
   rmarkdown::html_document:
     toc: true
@@ -7,12 +7,12 @@ output:
       collapsed: false
       smooth_scroll: false
 vignette: >
-  %\VignetteIndexEntry{Preparation of data, CDS and kriging}
+  %\VignetteIndexEntry{I. Preparation of data and CDS}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
   
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
 collapse = TRUE,
 comment = "#>"
@@ -32,7 +32,7 @@ This vignette presents :
 Analysis are performed on data collected with [SAMMOA](https://www.codelutin.com/page-detail-sammoa.html) software. This software allows observers to collect data while there are in aircraft or on boat. The outputs of this software are structured as below:
 
 * Observation 
-```{r, echo = FALSE, message=FALSE, warning=FALSE}
+```{r table obs, echo = FALSE, message=FALSE, warning=FALSE}
 library(geffaeR)
 library(dplyr)
 library(DT)
@@ -44,7 +44,7 @@ div(
 ```
 
 * Effort
-```{r, echo = FALSE}
+```{r table effort, echo = FALSE}
 library(geffaeR)
 library(dplyr)
 library(DT)
@@ -62,7 +62,7 @@ div(
 
 To perform analysis on thoose data, it is necessary to modify its column name to match the need of packages (Distance, dsm). To do so, there are 2 functions ```change_effort_varName()``` and ```change_obs_varName()```.
 
-```{r}
+```{r change_var_name}
 standard_effort <- change_effort_varName(effort_example)
 standard_obs <- change_obs_varName(observation_example)
 ```
@@ -71,7 +71,7 @@ standard_obs <- change_obs_varName(observation_example)
 ## 1.2 verify matching between observation and effort
 
 A facultative step can be added at this stage of the analysis. We can perform a verification to be sure that each observation have a corresponding values in the effort data. To do so, it is necessary to give which column we want to verifiy if they have their equivalent in effort.
-```{r}
+```{r verif obs effort}
 colum_to_test <- c("segId","legId")
 verif_effort_obs(
   var = colum_to_test,
@@ -88,11 +88,11 @@ Then, it is necessary to modify the data structure in a way to have the proper s
 * legdata : effort data at leg scale
 * segdata :  effort data at segment scale
 
-```{r, echo = F, fig.retina = 3, out.width = '75%', fig.align='center'}
-knitr::include_graphics("effort_schema_prepare_data.png")
+```{r scheme prepare effort, echo = F, fig.retina = 3, out.width = '75%', fig.align='center'}
+knitr::include_graphics(file.path(here::here(),"man/Figures/effort_schema_prepare_data.png"))
 ```
 
-```{r}
+```{r prepared_effort str}
 prepared_effort <- prepare_data_effort(effort_base = standard_effort, 
                                        shape = shape_example,
                                        optimal = T,
@@ -106,7 +106,7 @@ str(prepared_effort)
 
 Observation dataframe is splitted into 4 sub-dataframes.
 
-```{r}
+```{r str TURTRU}
 sp1 <- unique(observation_example$species)[1]
 legdata <- prepared_effort$legdata
 segdata <- prepared_effort$segdata
@@ -131,7 +131,7 @@ str(observation_output_TURTRU)
 
 After preparing and formatting the data, the next step consist in adjusting a detection function on the data with the function ```plot_detection()```. It is possible to choose between a half-normal function or hazard-rate one. It is necessary to inform the distance between which we want to apply the detection function.
 
-```{r}
+```{r TURTRU plot_detection}
 detection_TURTRU <- plot_detection(distdata = observation_output_TURTRU$distdata,
                                    bin = seq(0.0,1.0, 0.05),
                                    key = "halfnorm",
@@ -140,27 +140,27 @@ detection_TURTRU <- plot_detection(distdata = observation_output_TURTRU$distdata
 ```
 
 This function as several outputs, it gives : the esw (effective strip width),
-```{r}
+```{r TURTRU esw}
 detection_TURTRU$esw
 ```
 
 its coefficient of variation (CV),
-```{r}
+```{r TURTRU esw_cv}
 detection_TURTRU$esw_cv
 ```
 
 the output of distance function from the package [Distance](https://CRAN.R-project.org/package=Distance)
-```{r}
+```{r TURTRU distFit}
 detection_TURTRU$distFit
 ```
-```{r}
+```{r TURTRU summary}
 summary(detection_TURTRU$distFit)
 ```
 
 and gives the detetction plot, on the graph the red-dashed line correspond to the effective strip width (esw)
 
 
-```{r TURTRU_plot_detection}
+```{r TURTRU plot_detection graph}
 detection_TURTRU$graph
 ``` 
 
@@ -169,7 +169,7 @@ detection_TURTRU$graph
 
 For Seabirds a strip-transect is applied, that means there is no distance assigned for seabirds observation, it is set to 0.2km. To apply a detection function, it is necessary to "hack" the method for estimating seabirds abundance. The "hacking" method consist in setting distance of observation as 0 or 0.2km with a sample function. There will be as many 0 as there are 0.2 in the distance column. That means from a distance of 0 to 0.2km all seabirds will be detected. Then the detection function is a uniform function from 0 to 0.2km with a detection probability of 1.
 
-```{r}
+```{r plot_detection LARMEL}
 sp2 <- unique(observation_example$species)[2]
 legdata <- prepared_effort$legdata
 segdata <- prepared_effort$segdata
@@ -191,7 +191,3 @@ plot(fit$distFit)
 
 ```
 
-
-# 3. Kriging
-
-(coming soon)
