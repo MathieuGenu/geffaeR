@@ -14,8 +14,8 @@ vignette: >
   
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-collapse = TRUE,
-comment = "#>"
+  collapse = TRUE,
+  comment = "#>"
 )
 ```
 
@@ -89,7 +89,7 @@ Then, it is necessary to modify the data structure in a way to have the proper s
 * segdata :  effort data at segment scale
 
 ```{r scheme prepare effort, echo = F, fig.retina = 3, out.width = '75%', fig.align='center'}
-knitr::include_graphics(file.path(here::here(),"man/Figures/effort_schema_prepare_data.png"))
+knitr::include_graphics("effort_schema_prepare_data.png")
 ```
 
 ```{r prepared_effort str}

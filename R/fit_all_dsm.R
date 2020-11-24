@@ -169,6 +169,14 @@ fit_all_dsm <- function(distFit = NULL,
   all_mods <- all_mods[which(rm_combn < max_cor)]
   ## compute weights
   if(weighted) {
+    covariable <- predictors
+    if(is.null(covariable)) {
+      stop("covariable must not be NULL if weighted is TRUE")
+    }
+    if(!all(covariable %in% colnames(segdata_obs))) {
+      stop(paste0(covariable[!(covariable %in% colnames(segdata_obs))], " are not in segdata_obs"))
+    }
+
     w <- lapply(all_x, function(tab) {
       sapply(1:ncol(tab), function(j) {
         make_cfact_2(calibration_data = segdata_obs,

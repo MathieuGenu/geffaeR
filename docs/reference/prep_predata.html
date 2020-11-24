@@ -48,7 +48,8 @@
 
 <meta property="og:title" content="Creation of predata and data impuation of missing data. — prep_predata" />
 <meta property="og:description" content="Creation of predata, a data.frame containing environmental parameters in a grid of the study area.
-Also it allows to impute missing data for predata and segdata." />
+Also it allows to impute missing data for predata and segdata using PCA from the missMDA
+package or Amelia from Amelia package." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -114,7 +115,10 @@ Also it allows to impute missing data for predata and segdata." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/Package_example.html">Preparation of data, CDS and kriging</a>
+      <a href="../articles/II_DSM_example_with_MOLA_MOLA.html">II. DSM example with MOLA MOLA</a>
+    </li>
+    <li>
+      <a href="../articles/I_Preparation_of_data_CDS_and_kriging.html">I. Preparation of data and CDS</a>
     </li>
   </ul>
 </li>
@@ -141,7 +145,8 @@ Also it allows to impute missing data for predata and segdata." />
 
     <div class="ref-description">
     <p>Creation of predata, a data.frame containing environmental parameters in a grid of the study area.
-Also it allows to impute missing data for predata and segdata.</p>
+Also it allows to impute missing data for predata and segdata using PCA from the <span class="pkg">missMDA</span>
+package or Amelia from <span class="pkg">Amelia</span> package.</p>
     </div>
 
     <pre class="usage"><span class='fu'>prep_predata</span>(
@@ -156,7 +161,8 @@ Also it allows to impute missing data for predata and segdata.</p>
   <span class='kw'>saturate_predata</span> <span class='kw'>=</span> <span class='no'>F</span>,
   <span class='kw'>saturate_segdata</span> <span class='kw'>=</span> <span class='no'>F</span>,
   <span class='kw'>inbox_poly</span> <span class='kw'>=</span> <span class='no'>T</span>,
-  <span class='kw'>col2keep</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+  <span class='kw'>col2keep</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -222,12 +228,17 @@ quantiles 95 percent and 5 percent.</p></td>
       <th>col2keep</th>
       <td><p><code>character string</code> corresponding to the columns wanted to appear in output in predata.</p></td>
     </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>Boolean. whether or not to display the progress bar for "PCA" or iteration number for "amelia".</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>This function return a list containing :</p><ol>
-<li><p>predata : data.frame of predata.</p></li>
+<li><p>predata : data.frame of predata. Corresponding to gridata keeping covariates, coordinates and
+          area of cells</p></li>
 <li><p>segdata : data.frame of segdata.</p></li>
 <li><p>pca_seg : Output of <code><a href='https://rdrr.io/pkg/FactoMineR/man/PCA.html'>PCA</a></code> function on predata.</p></li>
 <li><p>pca_pred : Output of <code><a href='https://rdrr.io/pkg/FactoMineR/man/PCA.html'>PCA</a></code> function on segdata.</p></li>

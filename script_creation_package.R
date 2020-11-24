@@ -148,7 +148,7 @@ usethis::use_data(DSM_pack_MOLMOL, overwrite = T)
 pkgdown::build_site()
 pkgdown::build_home()
 pkgdown::build_reference()
-pkgdown::build_article(name = "vignettes/Package_example.Rmd")
+pkgdown::build_articles()
 usethis::use_github_action("pkgdown")
 
 

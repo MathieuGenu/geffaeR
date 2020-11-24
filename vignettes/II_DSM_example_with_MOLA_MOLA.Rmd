@@ -47,7 +47,7 @@ str(DSM_pack_MOLMOL[[5]], max.level = 1)
 Mola Mola known as Sunfish is a marine species that can reach 1ton ! It can live in temperate and tropical waters. It have a particular shape that makes it easy to recognize :
 
 ```{r molamola image, echo = F, out.width='250px'}
-knitr::include_graphics(paste0(here::here(),"/man/Figures/Mola_mola.jpg"))
+knitr::include_graphics("Mola_mola.jpg")
 ```
 
 ## How ?
@@ -211,7 +211,7 @@ To make the simpliest DSM with geffaeR, only 4 objects are necessary :
 6 functions of geffaeR are used in the DSM process (and 1 optional for soap smooth, dashed in the next figure) :
 
 ```{r, echo = F, out.width="50%", fig.align="center"}
-knitr::include_graphics(file.path(here::here(),"man/Figures/DSM_functions.png"))
+knitr::include_graphics("DSM_functions.png")
 ```
 
 ## 2.1 Simple DSM with geffaeR

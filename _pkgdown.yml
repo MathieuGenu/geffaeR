@@ -10,6 +10,7 @@ reference:
     Data in the package
 - contents:
   - cds
+  - DSM_pack_MOLMOL
   - effort_example
   - Europe
   - lbrt93_proj
@@ -41,5 +42,6 @@ reference:
   - pred_splines
   - predict_all
   - prep_predata
+  - prepare_soap
 
 

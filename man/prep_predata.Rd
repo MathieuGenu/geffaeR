@@ -16,7 +16,8 @@ prep_predata(
   saturate_predata = F,
   saturate_segdata = F,
   inbox_poly = T,
-  col2keep = NULL
+  col2keep = NULL,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -57,11 +58,14 @@ quantiles 95 percent and 5 percent.}
 \item{inbox_poly}{When \code{TRUE}, keep only part of the grid that match with the study area.}
 
 \item{col2keep}{\code{character string} corresponding to the columns wanted to appear in output in predata.}
+
+\item{verbose}{Boolean. whether or not to display the progress bar for "PCA" or iteration number for "amelia".}
 }
 \value{
 This function return a list containing :
         \enumerate{
-          \item predata : data.frame of predata.
+          \item predata : data.frame of predata. Corresponding to gridata keeping covariates, coordinates and
+          area of cells
           \item segdata : data.frame of segdata.
           \item pca_seg : Output of \code{\link[FactoMineR]{PCA}} function on predata.
           \item pca_pred : Output of \code{\link[FactoMineR]{PCA}} function on segdata.
@@ -71,7 +75,8 @@ This function return a list containing :
 }
 \description{
 Creation of predata, a data.frame containing environmental parameters in a grid of the study area.
-Also it allows to impute missing data for predata and segdata.
+Also it allows to impute missing data for predata and segdata using PCA from the \pkg{missMDA}
+package or Amelia from \pkg{Amelia} package.
 }
 \examples{
 
