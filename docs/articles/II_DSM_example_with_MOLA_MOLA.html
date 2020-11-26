@@ -154,13 +154,13 @@
 <div id="what" class="section level2">
 <h2 class="hasAnchor">
 <a href="#what" class="anchor"></a>What ?</h2>
-<p>Mola Mola known as Sunfish is a marine species that can reach 1ton ! It can live in temperate and tropical waters. It have a particular shape that makes it easy to recognize :</p>
+<p><em>Mola mola</em> known as Sunfish is a marine species that can reach 1ton ! It can live in temperate and tropical waters. It have a particular shape that makes it easy to recognize :</p>
 <p><img src="Mola_mola.jpg" width="250px"></p>
 </div>
 <div id="how" class="section level2">
 <h2 class="hasAnchor">
 <a href="#how" class="anchor"></a>How ?</h2>
-<p>The data were collected during the SAMM capaign. This campaign consist in flying over the sea and count all observation of marine mammals and Seabirds mainly. Part of the campaign occured in the Mediterranean sea.</p>
+<p>The data were collected during the SAMM campaign. This campaign consist in flying over the sea and count all observation of marine mammals and Seabirds mainly according to a particular transect. Part of the campaign occured in the Mediterranean sea.</p>
 <p><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/global%20view-1.png" width="700"></p>
 <p><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/map%20observation%20effort-1.png" width="50%"><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/map%20observation%20effort-2.png" width="50%"></p>
 </div>
@@ -205,9 +205,9 @@
 <span class="no">predata_output</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/prep_predata.html">prep_predata</a></span>(<span class="kw">segdata</span> <span class="kw">=</span> <span class="no">segdata</span>,
                                <span class="kw">gridfile_name</span> <span class="kw">=</span> <span class="no">grid</span>,
                                <span class="kw">varenviro</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"depth"</span>,<span class="st">"distCot"</span>),
-                               <span class="kw">do_log_enviro</span> <span class="kw">=</span> <span class="kw">NULL</span>,
+                               <span class="kw">do_log_enviro</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"depth"</span>,<span class="st">"distCot"</span>),
                                <span class="kw">varphysio</span> <span class="kw">=</span> <span class="st">"CHL_month"</span>,
-                               <span class="kw">do_log_physio</span> <span class="kw">=</span> <span class="kw">NULL</span>,
+                               <span class="kw">do_log_physio</span> <span class="kw">=</span> <span class="st">"CHL_month"</span>,
                                <span class="kw">imputation</span> <span class="kw">=</span> <span class="st">"Amelia"</span>,
                                <span class="kw">shape</span> <span class="kw">=</span> <span class="no">shape</span>,
                                <span class="kw">verbose</span> <span class="kw">=</span> <span class="no">F</span>
@@ -323,7 +323,7 @@
 <span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
 <span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
-<span class="co">#&gt; Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span>
+<span class="co">#&gt; Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</span>
 <span class="co">#&gt; Warning in log(mu): production de NaN</span>
 <span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
@@ -400,7 +400,7 @@ count ~ te(longitude, latitude, bs = ‘cs’)
 14.9
 </td>
 <td style="text-align:right;">
-0.0000424
+0.0000048
 </td>
 </tr>
 <tr>
@@ -414,19 +414,19 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 1
 </td>
 <td style="text-align:right;">
-6214.838
+6213.194
 </td>
 <td style="text-align:right;">
-1806.064
+1805.094
 </td>
 <td style="text-align:right;">
-2139.828
+2141.545
 </td>
 <td style="text-align:right;">
-15.6
+15.7
 </td>
 <td style="text-align:right;">
-0.2823986
+0.3363707
 </td>
 </tr>
 <tr>
@@ -440,19 +440,19 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(distCot, k = 4, bs = ‘cs’)
 1
 </td>
 <td style="text-align:right;">
-6223.654
+6222.905
 </td>
 <td style="text-align:right;">
-1805.083
+1805.054
 </td>
 <td style="text-align:right;">
-2126.796
+2127.556
 </td>
 <td style="text-align:right;">
-15.1
+15.2
 </td>
 <td style="text-align:right;">
-0.3140810
+0.3079135
 </td>
 </tr>
 <tr>
@@ -466,13 +466,13 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(depth, k = 4, bs = ‘cs’)
 1
 </td>
 <td style="text-align:right;">
-6225.747
+6225.611
 </td>
 <td style="text-align:right;">
-1803.874
+1803.829
 </td>
 <td style="text-align:right;">
-2121.041
+2121.106
 </td>
 <td style="text-align:right;">
 15.0
@@ -492,19 +492,19 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 1
 </td>
 <td style="text-align:right;">
-6214.226
+6212.175
 </td>
 <td style="text-align:right;">
-1807.436
+1805.480
 </td>
 <td style="text-align:right;">
-2143.916
+2145.563
 </td>
 <td style="text-align:right;">
-15.7
+15.9
 </td>
 <td style="text-align:right;">
-0.1759179
+0.0002250
 </td>
 </tr>
 <tr>
@@ -518,19 +518,19 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 1
 </td>
 <td style="text-align:right;">
-6214.912
+6213.044
 </td>
 <td style="text-align:right;">
-1805.378
+1804.421
 </td>
 <td style="text-align:right;">
-2140.263
+2142.153
 </td>
 <td style="text-align:right;">
-15.6
+15.8
 </td>
 <td style="text-align:right;">
-0.2275601
+0.3554860
 </td>
 </tr>
 </tbody>
@@ -550,7 +550,7 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 
 <span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(<span class="no">splines</span>, <span class="kw">max.level</span> <span class="kw">=</span> <span class="fl">1</span>)
 <span class="co">#&gt; List of 3</span>
-<span class="co">#&gt;  $ df_splines:'data.frame':  2000 obs. of  6 variables:</span>
+<span class="co">#&gt;  $ df_splines:'data.frame':  4000 obs. of  6 variables:</span>
 <span class="co">#&gt;  $ g_splines :List of 9</span>
 <span class="co">#&gt;   ..- attr(*, "class")= chr [1:2] "gg" "ggplot"</span>
 <span class="co">#&gt;  $ spatial   :'data.frame':  20000 obs. of  6 variables:</span>
@@ -561,12 +561,15 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 <li>df_splines : data.frame</li>
 <li>
 </ul>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># Visualize variable splines</span>
+<span class="no">splines</span>$<span class="no">g_splines</span></pre></body></html></div>
+<p><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 </div>
 <div id="predict-all-models-of-fit_all_dsm" class="section level3">
 <h3 class="hasAnchor">
 <a href="#predict-all-models-of-fit_all_dsm" class="anchor"></a>Predict all models of fit_all_dsm</h3>
 <p>This step consit in getting predicted values from models fitted with fit_all_dsm. The predicted values are set by the predict function of stats package.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># get predata</span>
+<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># get predata</span>
 <span class="no">predata</span> <span class="kw">&lt;-</span> <span class="no">predata_output</span>$<span class="no">predata</span>
 
 <span class="no">predicted_models</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/predict_all.html">predict_all</a></span>(
@@ -578,9 +581,9 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 
 <span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(<span class="no">predicted_models</span>)
 <span class="co">#&gt; 'data.frame':    127092 obs. of  4 variables:</span>
-<span class="co">#&gt;  $ mean : num  0.0168 0.0178 0.0153 0.0178 0.0155 ...</span>
-<span class="co">#&gt;  $ se   : num  0.01007 0.01071 0.00939 0.01072 0.00918 ...</span>
-<span class="co">#&gt;  $ cv   : num  0.6 0.601 0.614 0.601 0.591 0.595 0.576 0.574 0.522 0.521 ...</span>
+<span class="co">#&gt;  $ mean : num  0.0184 0.02 0.0197 0.0209 0.0184 ...</span>
+<span class="co">#&gt;  $ se   : num  0.0111 0.012 0.0117 0.0123 0.0108 ...</span>
+<span class="co">#&gt;  $ cv   : num  0.601 0.597 0.592 0.589 0.587 0.584 0.576 0.574 0.522 0.521 ...</span>
 <span class="co">#&gt;  $ model: chr  "stacking" "stacking" "stacking" "stacking" ...</span></pre></body></html></div>
 <p><code>predict_all</code> gives a data.frame of predicted values and standard error of the k best models of <code>fit_all_dsm</code> with a weighted combination of the k best named ‘stacking’ in the model column.</p>
 </div>
@@ -588,7 +591,7 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 <h3 class="hasAnchor">
 <a href="#prediction-map" class="anchor"></a>Prediction map</h3>
 <p><code>predict_map</code> allows to visualize prediction of <code>predict_all</code>.</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># get combination of all models  </span>
+<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="co"># get combination of all models  </span>
 <span class="no">pred_stack</span> <span class="kw">&lt;-</span> <span class="no">predicted_models</span> <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span>(<span class="no">model</span> <span class="kw">==</span> <span class="st">"stacking"</span>)
 
@@ -605,12 +608,185 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
   <span class="kw">grid</span> <span class="kw">=</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">gridata</span> <span class="kw">%&gt;%</span>
     <span class="fu">st_transform</span>(<span class="st">"+proj=aea +lat_1=43 +lat_2=62 +lat_0=30 +lon_0=10 +x_0=0 +y_0=0 +ellps=intl +units=m +no_defs"</span>),
   <span class="kw">var</span> <span class="kw">=</span> <span class="st">"stack_pred"</span>,
-  <span class="kw">title</span> <span class="kw">=</span> <span class="st">"Density prediction of Mola mola for 2011 and 2012 during SAMM campaign"</span>
+  <span class="kw">title</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html">substitute</a></span>(<span class="kw">expr</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"Density prediction of "</span>, <span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">italic</a></span>(<span class="st">"Mola mola"</span>), <span class="st">" for 2011 and 2012 during SAMM campaign"</span>))
+  <span class="co"># title = "Density prediction of Mola mola for 2011 and 2012 during SAMM campaign"</span>
 )
 
 <span class="no">map_pred</span></pre></body></html></div>
-<p><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<p><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 </div>
+</div>
+<div id="adding-a-categorical-variable" class="section level2">
+<h2 class="hasAnchor">
+<a href="#adding-a-categorical-variable" class="anchor"></a>2.2 Adding a categorical variable</h2>
+<p>The sampling occured during 2 seasons (summer and winter) and we can suggest a different number of Mola mola between summer and winter. Then it would be interesting to model <em>Mola mola</em> density according to the session variable.</p>
+<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">stringr</span>)
+
+<span class="co"># get distdata</span>
+<span class="no">distdata</span> <span class="kw">&lt;-</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">list_prepare_obs_MOLMOL</span>$<span class="no">MOLMOL_obs_output</span>$<span class="no">distdata</span>
+
+<span class="co"># map of Mola mola occurence per season</span>
+<span class="no">distdata</span> <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span>(<span class="no">detected</span> <span class="kw">!=</span> <span class="fl">0</span>) <span class="kw">%&gt;%</span>
+  <span class="fu">mutate</span>(<span class="kw">session</span> <span class="kw">=</span> <span class="kw pkg">stringr</span><span class="kw ns">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_extract.html">str_extract</a></span>(<span class="no">session</span>, <span class="st">"[:alpha:]+"</span>)) <span class="kw">%&gt;%</span>
+  <span class="fu">ggplot</span>() +
+  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">X</span>, <span class="kw">y</span> <span class="kw">=</span> <span class="no">Y</span>, <span class="kw">size</span> <span class="kw">=</span> <span class="no">size</span>, <span class="kw">colour</span> <span class="kw">=</span> <span class="no">size</span>)) +
+  <span class="fu">geom_sf</span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">NEA_simplified_FR</span> <span class="kw">%&gt;%</span> <span class="fu">st_as_sf</span>(), <span class="kw">mapping</span> <span class="kw">=</span> <span class="fu">aes</span>()) +
+  <span class="fu">coord_sf</span>(<span class="kw">xlim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>,<span class="fl">12</span>), <span class="kw">ylim</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">40</span>,<span class="fl">45</span>)) +
+  <span class="fu">facet_grid</span>(<span class="no">.</span>~<span class="no">session</span>) +
+  <span class="fu">scale_colour_viridis_c</span>() +
+  <span class="fu">theme_bw</span>()</pre></body></html></div>
+<p><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p>What has to be added to a simple DSM process ?</p>
+<ul>
+<li>
+<code>prep_predata</code> xith col2keep = “session”</li>
+<li>
+<code>fit_all_dsm</code> with splines_by = “session”</li>
+<li>
+<code>pred_splines</code> with splines_by = “session”</li>
+<li>
+<code>pred_map_dsm</code> with facet_param = “session”</li>
+</ul>
+<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">geffaeR</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">tidyverse</span>)
+
+<span class="co"># get segdata</span>
+<span class="no">segdata</span> <span class="kw">&lt;-</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">effort_output</span>$<span class="no">segdata</span> <span class="kw">%&gt;%</span>
+  <span class="fu">mutate</span>(<span class="kw">session</span> <span class="kw">=</span> <span class="fu">fct_drop</span>(<span class="no">session</span>))
+
+
+<span class="co"># get grid</span>
+<span class="no">grid</span> <span class="kw">&lt;-</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">gridata</span> <span class="kw">%&gt;%</span>
+  <span class="fu">rename</span>(<span class="kw">session</span> <span class="kw">=</span> <span class="no">session_</span>) <span class="kw">%&gt;%</span>
+  <span class="fu">mutate</span>(<span class="kw">session</span> <span class="kw">=</span> <span class="fu">fct_drop</span>(<span class="no">session</span>))
+
+<span class="co"># get shape </span>
+<span class="no">shape</span> <span class="kw">&lt;-</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">shape_med</span>
+
+<span class="co"># build predata outputs</span>
+<span class="no">predata_output</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/prep_predata.html">prep_predata</a></span>(<span class="kw">segdata</span> <span class="kw">=</span> <span class="no">segdata</span>,
+                               <span class="kw">gridfile_name</span> <span class="kw">=</span> <span class="no">grid</span>,
+                               <span class="kw">varenviro</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"depth"</span>,<span class="st">"distCot"</span>),
+                               <span class="kw">do_log_enviro</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"depth"</span>,<span class="st">"distCot"</span>),
+                               <span class="kw">varphysio</span> <span class="kw">=</span> <span class="st">"CHL_month"</span>,
+                               <span class="kw">do_log_physio</span> <span class="kw">=</span> <span class="st">"CHL_month"</span>,
+                               <span class="kw">shape</span> <span class="kw">=</span> <span class="no">shape</span>,
+                               <span class="kw">imputation</span> <span class="kw">=</span> <span class="st">"PCA"</span>,
+                               <span class="kw">col2keep</span> <span class="kw">=</span> <span class="st">"session"</span>,
+                               <span class="kw">verbose</span> <span class="kw">=</span> <span class="no">F</span>
+                               )
+<span class="co">#&gt; missing data in grid and segdata must be as NAs and nothing else (not 0)</span>
+<span class="co">#&gt; although coordinates are longitude/latitude, st_intersects assumes that they are planar</span>
+<span class="co">#&gt; although coordinates are longitude/latitude, st_intersects assumes that they are planar</span>
+<span class="co">#&gt; There are 79 cells with missing values in segdata </span>
+<span class="co">#&gt;  </span>
+<span class="co">#&gt; There are 601 cells with missing values in predata </span>
+<span class="co">#&gt; </span>
+
+<span class="no">effort_w_obs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/ajout_obs.html">ajout_obs</a></span>(<span class="kw">countdata_leg</span> <span class="kw">=</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">list_prepare_obs_MOLMOL</span>$<span class="no">MOLMOL_obs_output</span>$<span class="no">countdata_leg</span>,
+                          <span class="kw">legdata</span> <span class="kw">=</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">effort_output</span>$<span class="no">legdata</span>,
+                          <span class="kw">countdata_seg</span> <span class="kw">=</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">list_prepare_obs_MOLMOL</span>$<span class="no">MOLMOL_obs_output</span>$<span class="no">countdata_seg</span>,
+                          <span class="kw">segdata</span> <span class="kw">=</span> <span class="no">predata_output</span>$<span class="no">segdata</span>)
+
+<span class="co"># get segdata_completed_w_obs</span>
+<span class="no">segdata_completed_w_obs</span> <span class="kw">&lt;-</span> <span class="no">effort_w_obs</span>$<span class="no">segdata_obs</span>
+
+<span class="co"># get distFit</span>
+<span class="no">distFit</span> <span class="kw">&lt;-</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">list_plot_detection_MOLMOL</span>$<span class="no">plot_detectionMOLMOL</span>$<span class="no">all_session</span>$<span class="no">distFit</span>
+
+<span class="co"># get obsdata</span>
+<span class="no">obsdata</span> <span class="kw">&lt;-</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">list_prepare_obs_MOLMOL</span>$<span class="no">MOLMOL_obs_output</span>$<span class="no">obsdata</span>
+
+<span class="co"># get covariates on which we fit gam model (predictors)</span>
+<span class="no">predictors</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"CHL_month"</span>,<span class="st">"distCot"</span>,<span class="st">"depth"</span>)
+
+<span class="co"># fit models</span>
+<span class="no">fit_dsm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/fit_all_dsm.html">fit_all_dsm</a></span>(<span class="kw">distFit</span> <span class="kw">=</span> <span class="no">distFit</span>,
+                       <span class="kw">segdata_obs</span> <span class="kw">=</span> <span class="no">segdata_completed_w_obs</span>,
+                       <span class="kw">obsdata</span> <span class="kw">=</span> <span class="no">obsdata</span>,
+                       <span class="kw">predictors</span> <span class="kw">=</span> <span class="no">predictors</span>,
+                       <span class="kw">splines_by</span> <span class="kw">=</span> <span class="st">"session"</span>)
+<span class="co">#&gt;  * Response variable is the number of individuals</span>
+<span class="co">#&gt;  * Detection function provided</span>
+<span class="co">#&gt;  * Fitting all possible models, please wait</span>
+<span class="co">#&gt;  * Using AIC for model selection</span>
+<span class="co">#&gt;  * Estimating loocv on k best models: please wait</span>
+<span class="co">#&gt; Warning in log(mu): production de NaN</span>
+<span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
+<span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
+<span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
+<span class="co">#&gt; Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</span>
+<span class="co">#&gt; Warning in log(mu): production de NaN</span>
+<span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
+<span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
+<span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
+<span class="co">#&gt; Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</span>
+<span class="co">#&gt; Warning in log(mu): production de NaN</span>
+<span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
+<span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
+<span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
+<span class="co">#&gt; Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</span>
+<span class="co">#&gt; Warning in log(mu): production de NaN</span>
+<span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
+<span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
+<span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
+<span class="co">#&gt; Warning in log(mu): production de NaN</span>
+<span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
+<span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
+<span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
+<span class="co">#&gt; Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span>
+
+<span class="co"># get first model of fit_dsm</span>
+<span class="no">fit_dsm_1</span> <span class="kw">&lt;-</span> <span class="no">fit_dsm</span>$<span class="no">best_models4plotting</span><span class="kw">[[</span><span class="fl">1</span>]]
+
+<span class="no">splines</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/pred_splines.html">pred_splines</a></span>(
+  <span class="kw">segdata</span> <span class="kw">=</span> <span class="no">segdata_completed_w_obs</span>,
+  <span class="kw">dsm_model</span> <span class="kw">=</span> <span class="no">fit_dsm_1</span>,
+  <span class="kw">splines_by</span> <span class="kw">=</span> <span class="st">"session"</span>
+)
+
+<span class="no">splines</span>$<span class="no">g_splines</span>
+<span class="co">#&gt; [[1]]</span></pre></body></html></div>
+<p><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<pre><code>#&gt; 
+#&gt; [[2]]</code></pre>
+<p><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/unnamed-chunk-12-2.png" width="700"></p>
+<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">sf</span>)
+<span class="co"># get predata</span>
+<span class="no">predata</span> <span class="kw">&lt;-</span> <span class="no">predata_output</span>$<span class="no">predata</span>
+
+<span class="no">predicted_models</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/predict_all.html">predict_all</a></span>(
+  <span class="kw">listdsm</span> <span class="kw">=</span> <span class="no">fit_dsm</span>,
+  <span class="kw">predata</span> <span class="kw">=</span> <span class="no">predata</span>
+)
+<span class="co">#&gt;  * Predicting from 5 best models: please wait</span>
+<span class="co">#&gt;  * Stacking predictions and done ;)</span>
+
+
+<span class="co"># get combination of all models  </span>
+<span class="no">pred_stack</span> <span class="kw">&lt;-</span> <span class="no">predicted_models</span> <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span>(<span class="no">model</span> <span class="kw">==</span> <span class="st">"best_1"</span>)
+
+
+<span class="co"># Set predata as sf object </span>
+<span class="no">predata_custom</span> <span class="kw">&lt;-</span> <span class="no">predata</span> <span class="kw">%&gt;%</span>
+  <span class="fu">mutate</span>(<span class="kw">stack_pred</span> <span class="kw">=</span> <span class="no">pred_stack</span>$<span class="no">mean</span>) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/pkg/sf/man/st_as_sf.html">st_as_sf</a></span>(<span class="kw">coords</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>), <span class="kw">crs</span> <span class="kw">=</span> <span class="fl">4326</span>)
+
+
+<span class="co"># Build prediction map</span>
+<span class="no">map_pred</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/pred_map_dsm.html">pred_map_dsm</a></span>(
+  <span class="kw">predata</span> <span class="kw">=</span> <span class="no">predata_custom</span>,
+  <span class="kw">grid</span> <span class="kw">=</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">gridata</span> <span class="kw">%&gt;%</span>
+    <span class="fu"><a href="https://rdrr.io/pkg/sf/man/st_transform.html">st_transform</a></span>(<span class="st">"+proj=aea +lat_1=43 +lat_2=62 +lat_0=30 +lon_0=10 +x_0=0 +y_0=0 +ellps=intl +units=m +no_defs"</span>),
+  <span class="kw">var</span> <span class="kw">=</span> <span class="st">"stack_pred"</span>,
+  <span class="kw">title</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html">substitute</a></span>(<span class="kw">expr</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(<span class="st">"Density prediction of "</span>, <span class="fu"><a href="https://rdrr.io/r/grDevices/plotmath.html">italic</a></span>(<span class="st">"Mola mola"</span>), <span class="st">" for 2011 and 2012 during SAMM campaign"</span>)),
+  <span class="kw">facet_param</span> <span class="kw">=</span> <span class="st">"session"</span>
+)
+
+<span class="no">map_pred</span></pre></body></html></div>
+<p><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 </div>
 </div>
   </div>

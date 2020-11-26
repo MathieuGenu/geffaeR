@@ -44,14 +44,15 @@ str(DSM_pack_MOLMOL[[5]], max.level = 1)
 
 
 ## What ?
-Mola Mola known as Sunfish is a marine species that can reach 1ton ! It can live in temperate and tropical waters. It have a particular shape that makes it easy to recognize :
+
+_Mola mola_ known as Sunfish is a marine species that can reach 1ton ! It can live in temperate and tropical waters. It have a particular shape that makes it easy to recognize :
 
 ```{r molamola image, echo = F, out.width='250px'}
 knitr::include_graphics("Mola_mola.jpg")
 ```
 
 ## How ?
-The data were collected during the SAMM capaign. This campaign consist in flying over the sea and count all observation of marine mammals and Seabirds mainly. Part of the campaign occured in the Mediterranean sea.
+The data were collected during the SAMM campaign. This campaign consist in flying over the sea and count all observation of marine mammals and Seabirds mainly according to a particular transect. Part of the campaign occured in the Mediterranean sea.
 
 ```{r global view, echo=F, warning = F}
 suppressPackageStartupMessages(library(sf))
@@ -234,9 +235,9 @@ shape <- DSM_pack_MOLMOL$shape_med
 predata_output <- prep_predata(segdata = segdata,
                                gridfile_name = grid,
                                varenviro = c("depth","distCot"),
-                               do_log_enviro = NULL,
+                               do_log_enviro = c("depth","distCot"),
                                varphysio = "CHL_month",
-                               do_log_physio = NULL,
+                               do_log_physio = "CHL_month",
                                imputation = "Amelia",
                                shape = shape,
                                verbose = F
@@ -336,6 +337,13 @@ str(splines, max.level = 1)
 * df_splines : data.frame 
 * 
 
+
+```{r}
+# Visualize variable splines
+splines$g_splines
+```
+
+
 ### Predict all models of fit_all_dsm
 
 This step consit in getting predicted values from models fitted with fit_all_dsm. The predicted values are set by the predict function of stats package. 
@@ -377,7 +385,145 @@ map_pred <- pred_map_dsm(
   grid = DSM_pack_MOLMOL$gridata %>%
     st_transform("+proj=aea +lat_1=43 +lat_2=62 +lat_0=30 +lon_0=10 +x_0=0 +y_0=0 +ellps=intl +units=m +no_defs"),
   var = "stack_pred",
-  title = "Density prediction of Mola mola for 2011 and 2012 during SAMM campaign"
+  title = substitute(expr = paste("Density prediction of ", italic("Mola mola"), " for 2011 and 2012 during SAMM campaign"))
+  # title = "Density prediction of Mola mola for 2011 and 2012 during SAMM campaign"
+)
+
+map_pred
+
+```
+
+
+
+## 2.2 Adding a categorical variable
+
+The sampling occured during 2 seasons (summer and winter) and we can suggest a different number of Mola mola between summer and winter. Then it would be interesting to model *Mola mola* density according to the session variable.
+
+```{r}
+library(stringr)
+
+# get distdata
+distdata <- DSM_pack_MOLMOL$list_prepare_obs_MOLMOL$MOLMOL_obs_output$distdata
+
+# map of Mola mola occurence per season
+distdata %>% 
+  filter(detected != 0) %>% 
+  mutate(session = stringr::str_extract(session, "[:alpha:]+")) %>% 
+  ggplot() +
+  geom_point(aes(x = X, y = Y, size = size, colour = size)) +
+  geom_sf(data = NEA_simplified_FR %>% st_as_sf(), mapping = aes()) +
+  coord_sf(xlim = c(2,12), ylim = c(40,45)) +
+  facet_grid(.~session) +
+  scale_colour_viridis_c() +
+  theme_bw()
+   
+```
+
+What has to be added to a simple DSM process ?
+
+* `prep_predata` xith col2keep = "session"
+* `fit_all_dsm` with splines_by = "session"
+* `pred_splines` with splines_by = "session"
+* `pred_map_dsm` with facet_param = "session"
+
+
+```{r}
+library(geffaeR)
+library(tidyverse)
+
+# get segdata
+segdata <- DSM_pack_MOLMOL$effort_output$segdata %>% 
+  mutate(session = fct_drop(session))
+
+
+# get grid
+grid <- DSM_pack_MOLMOL$gridata %>% 
+  rename(session = session_) %>% 
+  mutate(session = fct_drop(session))
+
+# get shape 
+shape <- DSM_pack_MOLMOL$shape_med
+
+# build predata outputs
+predata_output <- prep_predata(segdata = segdata,
+                               gridfile_name = grid,
+                               varenviro = c("depth","distCot"),
+                               do_log_enviro = c("depth","distCot"),
+                               varphysio = "CHL_month",
+                               do_log_physio = "CHL_month",
+                               shape = shape,
+                               imputation = "PCA",
+                               col2keep = "session",
+                               verbose = F
+                               )
+
+effort_w_obs <- ajout_obs(countdata_leg = DSM_pack_MOLMOL$list_prepare_obs_MOLMOL$MOLMOL_obs_output$countdata_leg,
+                          legdata = DSM_pack_MOLMOL$effort_output$legdata,
+                          countdata_seg = DSM_pack_MOLMOL$list_prepare_obs_MOLMOL$MOLMOL_obs_output$countdata_seg,
+                          segdata = predata_output$segdata)
+
+# get segdata_completed_w_obs
+segdata_completed_w_obs <- effort_w_obs$segdata_obs
+
+# get distFit
+distFit <- DSM_pack_MOLMOL$list_plot_detection_MOLMOL$plot_detectionMOLMOL$all_session$distFit
+
+# get obsdata
+obsdata <- DSM_pack_MOLMOL$list_prepare_obs_MOLMOL$MOLMOL_obs_output$obsdata
+
+# get covariates on which we fit gam model (predictors)
+predictors <- c("CHL_month","distCot","depth")
+
+# fit models
+fit_dsm <- fit_all_dsm(distFit = distFit,
+                       segdata_obs = segdata_completed_w_obs,
+                       obsdata = obsdata,
+                       predictors = predictors,
+                       splines_by = "session")
+
+# get first model of fit_dsm
+fit_dsm_1 <- fit_dsm$best_models4plotting[[1]]
+
+splines <- pred_splines(
+  segdata = segdata_completed_w_obs,
+  dsm_model = fit_dsm_1,
+  splines_by = "session"
+)
+
+splines$g_splines
+
+```
+
+```{r}
+library(sf)
+# get predata
+predata <- predata_output$predata
+
+predicted_models <- predict_all(
+  listdsm = fit_dsm,
+  predata = predata
+)
+
+
+# get combination of all models  
+pred_stack <- predicted_models %>% 
+  filter(model == "best_1") 
+
+
+# Set predata as sf object 
+predata_custom <- predata %>% 
+  mutate(stack_pred = pred_stack$mean) %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326)  
+
+  
+# Build prediction map
+map_pred <- pred_map_dsm(
+  predata = predata_custom,
+  grid = DSM_pack_MOLMOL$gridata %>%
+    st_transform("+proj=aea +lat_1=43 +lat_2=62 +lat_0=30 +lon_0=10 +x_0=0 +y_0=0 +ellps=intl +units=m +no_defs"),
+  var = "stack_pred",
+  title = substitute(expr = paste("Density prediction of ", italic("Mola mola"), " for 2011 and 2012 during SAMM campaign")),
+  facet_param = "session"
 )
 
 map_pred
