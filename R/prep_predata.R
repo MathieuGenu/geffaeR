@@ -52,11 +52,14 @@
 
 prep_predata <- function(segdata,
                          gridfile_name,
-                         varenviro, do_log_enviro,
-                         varphysio, do_log_physio,
+                         varenviro,
+                         do_log_enviro,
+                         varphysio,
+                         do_log_physio,
                          imputation = "Amelia",
                          shape,
-                         saturate_predata = F, saturate_segdata = F,
+                         saturate_predata = F,
+                         saturate_segdata = F,
                          inbox_poly = T,
                          col2keep = NULL,
                          verbose = TRUE) {
@@ -107,10 +110,15 @@ prep_predata <- function(segdata,
 
   grid <- grid[which(duplicated(grid) == FALSE), ]
 
-  # check if col2keep are in colnames of grid
-  if(!all(col2keep %in% colnames(grid))){
+  # check if col2keep are in colnames of grid and segdata
+  if(!all(col2keep %in% colnames(grid))) {
     miss_col2keep <- col2keep[!(col2keep %in% colnames(grid))]
     stop(paste(miss_col2keep, "is not/ are not, in gridata",collapse = "\n"))
+  }
+
+  if(!all(col2keep %in% colnames(segdata_old))) {
+    miss_col2keep <- col2keep[!(col2keep %in% colnames(segdata_old))]
+    stop(paste(miss_col2keep, "is not/ are not, in segdata",collapse = "\n"))
   }
 
   # colname of coord in grid in good format
@@ -206,7 +214,7 @@ prep_predata <- function(segdata,
 
   seg_mipat <- NULL
 
-  if(any(apply(mi_segdata, 2, function(j) { any(is.na(j)) }))) {
+  if(any(apply(mi_segdata, 2, function(x) { any(is.na(x)) }))) {
 
     ### missingness patterns
     seg_mipat <- summary(VIM::aggr(mi_segdata, sortVar = TRUE, plot = F))
@@ -414,6 +422,12 @@ prep_predata <- function(segdata,
     pred_pca <- PCA(predata[, allvar], graph = FALSE)
 
   }
+
+
+  # add col2keep to segdata
+  segdata <- segdata %>%
+    left_join(segdata_old %>% select({col2keep}, Seg),
+              by = "Seg")
 
   ## rassembler
   return(list(predata = predata,
