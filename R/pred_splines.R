@@ -23,7 +23,7 @@
 #' @importFrom cowplot draw_grob ggdraw
 #' @export
 #' @examples
-pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = NULL, splines_by = NULL) {
+pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = NULL, splines_by = NULL, alpha = 0.8) {
   # segdata is the original dataset used to calibrate the model
   # dsm_model is the dsm model you want to use
   lower <- function(x) {
@@ -31,7 +31,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
       return(NA)
     } else {
       x <- x[!is.na(x)]
-      return(as.numeric(coda::HPDinterval(coda::as.mcmc(x), prob = 0.95)[1]) )
+      return(as.numeric(coda::HPDinterval(coda::as.mcmc(x), prob = alpha)[1]) )
     }
   }
   upper <- function(x) {
@@ -39,9 +39,8 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
       return(NA)
     } else {
       x <- x[!is.na(x)]
-      return(as.numeric(coda::HPDinterval(coda::as.mcmc(x), prob = 0.95)[2]) )
+      return(as.numeric(coda::HPDinterval(coda::as.mcmc(x), prob = alpha)[2]) )
     }
-    as.numeric(coda::HPDinterval(coda::as.mcmc(x), prob = 0.95)[2])
   }
 
   var_name <- as.character(dsm_model$pred.formula)[grep(" + ", as.character(dsm_model$pred.formula), fixed = "TRUE")]
@@ -124,7 +123,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
                           latitude = seq(min(segdata[, "latitude"], na.rm = TRUE), max(segdata[, "latitude"], na.rm = TRUE), length.out = 1e2)
                           )
     gridxy <- rbind(gridxy, gridxy)
-    gridxy$spatial <- c(apply(slinpred, 2, median), apply(exp(slinpred), 2, mean))
+    gridxy$spatial <- c(apply(slinpred, 2, median), apply(exp(slinpred), 2, median))
     gridxy$lower <- c(apply(slinpred, 2, lower), apply(exp(slinpred), 2, lower))
     gridxy$upper <- c(apply(slinpred, 2, upper), apply(exp(slinpred), 2, upper))
     gridxy$scale <- rep(c("log", "natural"), each = 1e4)
@@ -149,7 +148,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
         linpred <- beta %*% t(Z)
         df_splines <- rbind(df_splines,
                             data.frame(x = seq(min(segdata[, j], na.rm = TRUE), max(segdata[, j], na.rm = TRUE), length.out = nx),
-                                       y = apply(linpred, 2, mean),
+                                       y = apply(linpred, 2, median),
                                        lower = apply(linpred, 2, lower),
                                        upper = apply(linpred, 2, upper),
                                        param = rep(j, nx),
@@ -157,7 +156,7 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
                                        level = rep(levels(dsm_model$data[, splines_by])[k], nx)
                                        ),
                             data.frame(x = seq(min(segdata[, j], na.rm = TRUE), max(segdata[, j], na.rm = TRUE), length.out = nx),
-                                       y = apply(exp(linpred), 2, mean),
+                                       y = apply(exp(linpred), 2, median),
                                        lower = apply(exp(linpred), 2, lower),
                                        upper = apply(exp(linpred), 2, upper),
                                        param = rep(j, nx),
@@ -174,14 +173,14 @@ pred_splines <- function(segdata, dsm_model, remove_intercept = FALSE, random = 
       linpred <- beta %*% t(Z); rm(Z)
       df_splines <- rbind(df_splines,
                           data.frame(x = seq(min(segdata[, j], na.rm = TRUE), max(segdata[, j], na.rm = TRUE), length.out = nx),
-                                     y = apply(linpred, 2, mean),
+                                     y = apply(linpred, 2, median),
                                      lower = apply(linpred, 2, lower),
                                      upper = apply(linpred, 2, upper),
                                      param = rep(j, nx),
                                      scale = rep("log", nx)
                                      ),
                           data.frame(x = seq(min(segdata[, j], na.rm = TRUE), max(segdata[, j], na.rm = TRUE), length.out = nx),
-                                     y = apply(exp(linpred), 2, mean),
+                                     y = apply(exp(linpred), 2, median),
                                      lower = apply(exp(linpred), 2, lower),
                                      upper = apply(exp(linpred), 2, upper),
                                      param = rep(j, nx),
