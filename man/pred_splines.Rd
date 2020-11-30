@@ -9,7 +9,8 @@ pred_splines(
   dsm_model,
   remove_intercept = FALSE,
   random = NULL,
-  splines_by = NULL
+  splines_by = NULL,
+  alpha = 0.8
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ pred_splines(
 \item{random}{Variable to include random effect.}
 
 \item{splines_by}{Interaction with splines given by one variable of segdata.}
+
+\item{alpha}{}
 }
 \value{
 \enumerate{

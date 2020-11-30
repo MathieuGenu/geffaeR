@@ -316,8 +316,7 @@ fit_all_dsm <- function(distFit = NULL,
 
     # all_fits filtered 5 best
     all_fits_best <- all_fits %>%
-      arrange(looic) %>%
-      top_n(n=-k, wt=looic)
+      slice_min(looic, n = k)
 
     # get best loo order
     index_order_best <- get_k_best_models(tab_model = all_fits_best, k = k, use_loo = T)
@@ -328,8 +327,7 @@ fit_all_dsm <- function(distFit = NULL,
     all_fits$stacking_weights[index_order_best] <- loow
 
     all_fits_best_sw <- all_fits %>%
-      arrange(desc(stacking_weights)) %>%
-      top_n(n=k, wt=stacking_weights)
+      slice_min(looic, n = k)
 
     index_order_sw <- all_fits_best_sw$index
 
@@ -337,14 +335,16 @@ fit_all_dsm <- function(distFit = NULL,
     best <- lapply(index_order_sw, my_dsm_fct, tab = FALSE, segdata_obs = X)
     best_std <- lapply(index_order_sw, my_dsm_fct, tab = FALSE, segdata_obs = segdata_obs)
 
+    # order all_fits by looic
+    all_fits <- all_fits %>%
+      arrange(looic)
 
 
   } else {
 
-    # all_fits filtered 5 best
+    # all_fits filtered k best
     all_fits_best <- all_fits %>%
-      arrange(AIC) %>%
-      top_n(n=-k, wt=AIC)
+      slice_min(AIC, n = k)
 
     # initiate stacking_weights column
     all_fits$stacking_weights <- NA
@@ -360,8 +360,7 @@ fit_all_dsm <- function(distFit = NULL,
     all_fits$stacking_weights[index_order_best] <- loow
 
     all_fits_best_sw <- all_fits %>%
-      arrange(desc(stacking_weights)) %>%
-      top_n(n=k, wt=stacking_weights)
+      slice_min(AIC, n = k)
 
     index_order_sw <- all_fits_best_sw$index
 
@@ -369,7 +368,13 @@ fit_all_dsm <- function(distFit = NULL,
     best <- lapply(index_order_sw, my_dsm_fct, tab = FALSE, segdata_obs = X)
     best_std <- lapply(index_order_sw, my_dsm_fct, tab = FALSE, segdata_obs = segdata_obs)
 
+    # order all_fits by AIC
+    all_fits <- all_fits %>%
+      arrange(AIC)
+
   }
+
+
 
 
   ## wrap-up with the outputs

@@ -98,8 +98,9 @@
 
     
     
-<p>Density Surface Model (DSM) consist in adjusting gam family model on observation from a bunch of covariates associated with. Once a model is adjusted it can predict the response variable where no observation occured as far as there are covariates available. geffaeR uses <a href="https://github.com/DistanceDevelopment/dsm">DSM</a> package which gives a clear explanation on the use of Density Surface Model. In this vignette it is presented how to perform DSM with geffaeR and what is needed to do it applied on an example.</p>
-<p>Plan of the vignette :</p>
+<p>Density Surface Modelling (DSM) consist in adjusting a Generalized Additive Model (GAM) on count data, while taking simultaneously into account imperfect detection (with distance sampling data) and covariates to obtain smoothed spatial maps of density. Once a model is adjusted, if its fit to the data is good enough, it can be used to predict the response variable (density of animals) over large areas, and possibly outside of the surveyed area.</p>
+<p>geffaeR uses the <a href="https://github.com/DistanceDevelopment/dsm">DSM</a> package where ore information and a clear explanation on the use of Density Surface Models can be found (e.g. <a href="http://distancesampling.org/R/vignettes/mexico-analysis.html" class="uri">http://distancesampling.org/R/vignettes/mexico-analysis.html</a>). In this vignette it is presented how to fit a simple DSM with geffaeR and what is needed to do it applied on an applied example.</p>
+<p>The vignette is organized in two main parts:</p>
 <ol style="list-style-type: decimal">
 <li>Data presentation</li>
 <li>DSM with geffaeR</li>
@@ -107,7 +108,7 @@
 <div id="data-presentation" class="section level1">
 <h1 class="hasAnchor">
 <a href="#data-presentation" class="anchor"></a>1.Data presentation</h1>
-<p>To illustrate how to use DSM in geffaeR, it is proposed to use the <strong>DSM_pack_MOLMOL</strong> include in geffaeR data. It consist in a list of list bringing together all files needed for a DSM analysis.</p>
+<p>To illustrate how to fit DSMs in geffaeR, it is proposed to use the <strong>DSM_pack_MOLMOL</strong> included as data within geffaeR. It consist in a list of list bringing together all files needed for a DSM analysis.</p>
 <pre><code>#&gt; List of 2
 #&gt;  $ legdata:'data.frame': 1704 obs. of  11 variables:
 #&gt;  $ segdata:'data.frame': 3354 obs. of  19 variables:
@@ -151,38 +152,43 @@
 #&gt;  - attr(*, "sf_column")= chr "geometry"
 #&gt;  - attr(*, "agr")= Factor w/ 3 levels "constant","aggregate",..: NA NA NA NA NA NA NA NA NA NA ...
 #&gt;   ..- attr(*, "names")= chr  "Id" "distCot" "dist200" "distCanyon" ...</code></pre>
-<div id="what" class="section level2">
+<div id="what-is-this-bizarre-fish" class="section level2">
 <h2 class="hasAnchor">
-<a href="#what" class="anchor"></a>What ?</h2>
-<p><em>Mola mola</em> known as Sunfish is a marine species that can reach 1ton ! It can live in temperate and tropical waters. It have a particular shape that makes it easy to recognize :</p>
+<a href="#what-is-this-bizarre-fish" class="anchor"></a>What Is This Bizarre Fish?</h2>
+<p>The sunfish, <em>Mola mola</em>, is a marine fish species that can reach up to 1 ton! It can live in temperate and tropical waters. It have a particular shape that makes it easy to recognize :</p>
 <p><img src="Mola_mola.jpg" width="250px"></p>
+<p>There are some speculations that sunfish densities in the oceans have increased, but the evidence is scarce and indirect. Here the aim is to estimate the density of sunfish is the North-Western Mediterranean Sea.</p>
 </div>
 <div id="how" class="section level2">
 <h2 class="hasAnchor">
 <a href="#how" class="anchor"></a>How ?</h2>
-<p>The data were collected during the SAMM campaign. This campaign consist in flying over the sea and count all observation of marine mammals and Seabirds mainly according to a particular transect. Part of the campaign occured in the Mediterranean sea.</p>
+<p>The data were collected during the SAMM surveys (<em>Suivi Aérien de la Mégafaune Marine</em>, <a href="https://www.observatoire-pelagis.cnrs.fr/observatoire/Suivi-en-mer/suivi-aerien/" class="uri">https://www.observatoire-pelagis.cnrs.fr/observatoire/Suivi-en-mer/suivi-aerien/</a>) in 2011 and 2012. These surveys consist in flying over the sea in a plane (equiped with bubble windows) at a height of <span class="math inline">\(180\)</span> metres above sea level and at a speed of <span class="math inline">\(180\)</span> kilometers per hour along pre-defined transects. As the transects are flown over, two observers on either side of the plane scan the sea surface for sightings of marine megafauna.</p>
 <p><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/global%20view-1.png" width="700"></p>
 <p><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/map%20observation%20effort-1.png" width="50%"><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/map%20observation%20effort-2.png" width="50%"></p>
 </div>
 <div id="when" class="section level2">
 <h2 class="hasAnchor">
 <a href="#when" class="anchor"></a>When ?</h2>
-<p>The data sampling occured on 4 different years but for MOLA MOLA there are only available for 2 years : 2011, 2012.</p>
+<p>The SAMM surveys were carried out twice so far but in this vignette, only data from 2011 and 2012 will be used: 2011, 2012. These data correspond to two seasons: winter and summer.</p>
 </div>
 </div>
 <div id="dsm" class="section level1">
 <h1 class="hasAnchor">
 <a href="#dsm" class="anchor"></a>2. DSM</h1>
-<p>To make the simpliest DSM with geffaeR, only 4 objects are necessary :</p>
+<p>To fit some simple DSM with geffaeR, <span class="math inline">\(4\)</span> objects are necessary:</p>
 <ul>
 <li>segdata (output of <code>prepare_effort()</code>)</li>
-<li>gridata (sf object)</li>
 <li>shape (shape of the study area)</li>
 <li>observation (countdata_leg and contdata_seg outputs of <code>prepare_obs()</code>)</li>
 <li>esw / distFit : output of <code><a href="../reference/plot_detection.html">plot_detection()</a></code>
 </li>
 </ul>
-<p>6 functions of geffaeR are used in the DSM process (and 1 optional for soap smooth, dashed in the next figure) :</p>
+<p>To also predict, a fifth object will be needed:</p>
+<ul>
+<li>gridata (sf object)</li>
+</ul>
+<p>The object collates all the locations at which we may want to predict sunfish densities from a fitted DSM.</p>
+<p><span class="math inline">\(6\)</span> functions in geffaeR are used in the DSM process (and <span class="math inline">\(1\)</span> is optional for using a soap smooth, dashed in the flowchart below) :</p>
 <p><img src="DSM_functions.png" width="50%" style="display: block; margin: auto;"></p>
 <div id="simple-dsm-with-geffaer" class="section level2">
 <h2 class="hasAnchor">
@@ -190,7 +196,7 @@
 <div id="prepare-predata-and-segdata-for-dsm" class="section level3">
 <h3 class="hasAnchor">
 <a href="#prepare-predata-and-segdata-for-dsm" class="anchor"></a>Prepare predata and segdata for DSM</h3>
-<p>This step consist in imputing missing values of covariates of segdata and gridata.</p>
+<p>The first step consist in imputing missing values of covariates of segdata and gridata. Missing data imputation is done either using the Amelia package (<a href="https://cran.r-project.org/web/packages/Amelia/index.html" class="uri">https://cran.r-project.org/web/packages/Amelia/index.html</a>) or the missMDA package (<a href="https://cran.r-project.org/web/packages/missMDA/" class="uri">https://cran.r-project.org/web/packages/missMDA/</a>). Missing data imputation is used to ensure that a complete dataset with no missing values for any of the covariates will be used during model fitting. It is up to the user to check that the imputed values are realistic and plausible. Here we will consider two physiographic covariates, seafloor depth and distance to the nearest coastline, and one environmental covariate, chlorophyll a concentration averaged over a month. We can choose to use a logarithm transformation during missing data imputation to ensure that only positive values will be imputed. Here the missMDA package is used by specifying imputation = “PCA” below.</p>
 <div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">geffaeR</span>)
 
 <span class="co"># get segdata</span>
@@ -204,22 +210,22 @@
 
 <span class="no">predata_output</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/prep_predata.html">prep_predata</a></span>(<span class="kw">segdata</span> <span class="kw">=</span> <span class="no">segdata</span>,
                                <span class="kw">gridfile_name</span> <span class="kw">=</span> <span class="no">grid</span>,
-                               <span class="kw">varenviro</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"depth"</span>,<span class="st">"distCot"</span>),
-                               <span class="kw">do_log_enviro</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"depth"</span>,<span class="st">"distCot"</span>),
-                               <span class="kw">varphysio</span> <span class="kw">=</span> <span class="st">"CHL_month"</span>,
-                               <span class="kw">do_log_physio</span> <span class="kw">=</span> <span class="st">"CHL_month"</span>,
-                               <span class="kw">imputation</span> <span class="kw">=</span> <span class="st">"Amelia"</span>,
+                               <span class="kw">varenviro</span> <span class="kw">=</span> <span class="st">"CHL_month"</span>,
+                               <span class="kw">do_log_enviro</span> <span class="kw">=</span> <span class="st">"CHL_month"</span>,
+                               <span class="kw">varphysio</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"depth"</span>,<span class="st">"distCot"</span>),
+                               <span class="kw">do_log_physio</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"depth"</span>, <span class="st">"distCot"</span>),
+                               <span class="kw">imputation</span> <span class="kw">=</span> <span class="st">"PCA"</span>,
                                <span class="kw">shape</span> <span class="kw">=</span> <span class="no">shape</span>,
                                <span class="kw">verbose</span> <span class="kw">=</span> <span class="no">F</span>
                                )
 <span class="co">#&gt; missing data in grid and segdata must be as NAs and nothing else (not 0)</span>
 <span class="co">#&gt; although coordinates are longitude/latitude, st_intersects assumes that they are planar</span>
 <span class="co">#&gt; although coordinates are longitude/latitude, st_intersects assumes that they are planar</span>
-<span class="co">#&gt; There are 79 cells with missing values in segdata </span>
+<span class="co">#&gt; There are 38 cells with missing values in segdata </span>
 <span class="co">#&gt;  </span>
-<span class="co">#&gt; There are 601 cells with missing values in predata </span>
+<span class="co">#&gt; There are 343 cells with missing values in predata </span>
 <span class="co">#&gt; </span></pre></body></html></div>
-<p>What is inside predata_output :</p>
+<p>The output of a call to this function is a wee bit complicated:</p>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(<span class="no">predata_output</span>, <span class="kw">max.level</span> <span class="kw">=</span> <span class="fl">1</span>)
 <span class="co">#&gt; List of 6</span>
 <span class="co">#&gt;  $ predata   :'data.frame':  21182 obs. of  8 variables:</span>
@@ -244,6 +250,7 @@
 <div id="add-observations-on-segdata" class="section level3">
 <h3 class="hasAnchor">
 <a href="#add-observations-on-segdata" class="anchor"></a>Add observations on segdata</h3>
+<p>Once a complete dataset for covariates is available and satisfactory, sightings of the species of interest, namely the sunfish can be join to these data. Note that the effort data here has been segmented in a pre-processing step. The function to join sightings to the covariate data is named, pardon my French! <em>ajout_obs</em>:</p>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">effort_w_obs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/ajout_obs.html">ajout_obs</a></span>(<span class="kw">countdata_leg</span> <span class="kw">=</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">list_prepare_obs_MOLMOL</span>$<span class="no">MOLMOL_obs_output</span>$<span class="no">countdata_leg</span>,
                           <span class="kw">legdata</span> <span class="kw">=</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">effort_output</span>$<span class="no">legdata</span>,
                           <span class="kw">countdata_seg</span> <span class="kw">=</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">list_prepare_obs_MOLMOL</span>$<span class="no">MOLMOL_obs_output</span>$<span class="no">countdata_seg</span>,
@@ -266,9 +273,9 @@
 <span class="co">#&gt;   ..$ seaState      : int [1:3354] 3 1 2 2 2 3 3 3 1 2 ...</span>
 <span class="co">#&gt;   ..$ Area          : num [1:3354] 22560 22560 22560 22560 22560 ...</span>
 <span class="co">#&gt;   ..$ subjective    : Factor w/ 19 levels "EE","EG","EM",..: 6 6 6 8 8 6 6 6 6 6 ...</span>
-<span class="co">#&gt;   ..$ CHL_month     : num [1:3354] 0.344 0.181 0.191 0.137 0.133 ...</span>
 <span class="co">#&gt;   ..$ depth         : num [1:3354] 335 343 363 480 343 ...</span>
 <span class="co">#&gt;   ..$ distCot       : num [1:3354] 5 6 3.61 4.12 6 ...</span>
+<span class="co">#&gt;   ..$ CHL_month     : num [1:3354] 0.344 0.181 0.191 0.137 0.133 ...</span>
 <span class="co">#&gt;   ..$ n             : num [1:3354] 0 0 1 1 0 0 0 0 0 0 ...</span>
 <span class="co">#&gt;   ..$ y             : num [1:3354] 0 0 1 1 0 0 0 0 0 0 ...</span>
 <span class="co">#&gt;  $ legdata_obs:'data.frame': 1704 obs. of  13 variables:</span>
@@ -285,17 +292,17 @@
 <span class="co">#&gt;   ..$ Area          : num [1:1704] 22560 22560 22560 22560 22560 ...</span>
 <span class="co">#&gt;   ..$ n_detected    : num [1:1704] 0 0 0 0 0 1 1 2 0 10 ...</span>
 <span class="co">#&gt;   ..$ n_ind         : num [1:1704] 0 0 0 0 0 1 1 2 0 10 ...</span></pre></body></html></div>
-<p>segdata in effort_w_obs has 2 columns added “n” corresponding to the number of observation and “y” corresponding to the number of individuals counted.</p>
+<p>The dataframe segdata in effort_w_obs has now two additional 2 column: one called “n” corresponding to the number of sightings made on segment of effort; and “y” corresponding to the total number of individuals counted.</p>
 </div>
 <div id="fit-all-possible-model" class="section level3">
 <h3 class="hasAnchor">
 <a href="#fit-all-possible-model" class="anchor"></a>Fit all possible model</h3>
-<p>The next step consist in fitting all possible models and choose the best model to use for DSM with <code>fit_all_dsm</code> function. The minimum required to use this function are :</p>
+<p>The next step consist in fitting all possible models and choose the best model to use for DSM with <code>fit_all_dsm</code> function. The minimum requirements to use this function are :</p>
 <ul>
-<li>segdata completed (output of <code>prep_predata</code>) and with observation (outputof <code>ajout_obs</code>).</li>
-<li>distFit or esw (outputs of <code>plot_detection</code>)</li>
+<li>segdata completed (output of <code>prep_predata</code>) and with observation (output of <code>ajout_obs</code>).</li>
+<li>distFit or esw (outputs of <code>plot_detection</code>, see the vignette ???)</li>
 <li>obsdata</li>
-<li>predictors : covariates of segdata which will be uesd to fit gam models.</li>
+<li>predictors : covariates of segdata which will be used to fit gam models.</li>
 </ul>
 <div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co"># get segdata_completed_w_obs</span>
 <span class="no">segdata_completed_w_obs</span> <span class="kw">&lt;-</span> <span class="no">effort_w_obs</span>$<span class="no">segdata_obs</span>
@@ -307,18 +314,24 @@
 <span class="no">obsdata</span> <span class="kw">&lt;-</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">list_prepare_obs_MOLMOL</span>$<span class="no">MOLMOL_obs_output</span>$<span class="no">obsdata</span>
 
 <span class="co"># get covariates on which we fit gam model (predictors)</span>
-<span class="no">predictors</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"CHL_month"</span>,<span class="st">"distCot"</span>,<span class="st">"depth"</span>)
+<span class="no">predictors</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"CHL_month"</span>, <span class="st">"distCot"</span>, <span class="st">"depth"</span>)
 
 <span class="co"># fit models</span>
 <span class="no">fit_dsm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/fit_all_dsm.html">fit_all_dsm</a></span>(<span class="kw">distFit</span> <span class="kw">=</span> <span class="no">distFit</span>,
                        <span class="kw">segdata_obs</span> <span class="kw">=</span> <span class="no">segdata_completed_w_obs</span>,
                        <span class="kw">obsdata</span> <span class="kw">=</span> <span class="no">obsdata</span>,
-                       <span class="kw">predictors</span> <span class="kw">=</span> <span class="no">predictors</span>)
+                       <span class="kw">predictors</span> <span class="kw">=</span> <span class="no">predictors</span>
+                       )
 <span class="co">#&gt;  * Response variable is the number of individuals</span>
 <span class="co">#&gt;  * Detection function provided</span>
 <span class="co">#&gt;  * Fitting all possible models, please wait</span>
 <span class="co">#&gt;  * Using AIC for model selection</span>
 <span class="co">#&gt;  * Estimating loocv on k best models: please wait</span>
+<span class="co">#&gt; Warning in log(mu): production de NaN</span>
+<span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
+<span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
+<span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
+<span class="co">#&gt; Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</span>
 <span class="co">#&gt; Warning in log(mu): production de NaN</span>
 <span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
@@ -338,11 +351,8 @@
 <span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
 <span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
-<span class="co">#&gt; Warning in log(mu): production de NaN</span>
-<span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
-<span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
-<span class="co">#&gt; MCSE estimates will be over-optimistic.</span></pre></body></html></div>
-<p>fit_all_dsm gives in output a table that sum up model fitting according to different indicators and 2 list of the k best models (5 by default) sorted by their “stacking_weights”. Both lists are the same but one has standardized covariates (best_models) and the other has the raw values (best_models4plotting).</p>
+<span class="co">#&gt; Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span></pre></body></html></div>
+<p>A call to fit_all_dsm() yields as output a table that sums up model fitting according to different indicators and 2 list of the k best models (5 by default) sorted by their “stacking_weights”. Both lists are the same but one has standardized covariates (that is mean-centered and unit-variance, labelled best_models) and the other has the raw values (best_models4plotting, which will be used for plotting purposes).</p>
 <pre><code>#&gt; Warning: le package 'kableExtra' a été compilé avec la version R 3.6.2
 #&gt; 
 #&gt; Attachement du package : 'kableExtra'
@@ -400,7 +410,7 @@ count ~ te(longitude, latitude, bs = ‘cs’)
 14.9
 </td>
 <td style="text-align:right;">
-0.0000048
+0.0000025
 </td>
 </tr>
 <tr>
@@ -414,19 +424,19 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 1
 </td>
 <td style="text-align:right;">
-6213.194
+6204.778
 </td>
 <td style="text-align:right;">
-1805.094
+1806.174
 </td>
 <td style="text-align:right;">
-2141.545
+2155.712
 </td>
 <td style="text-align:right;">
-15.7
+16.2
 </td>
 <td style="text-align:right;">
-0.3363707
+0.0004884
 </td>
 </tr>
 <tr>
@@ -440,19 +450,19 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(distCot, k = 4, bs = ‘cs’)
 1
 </td>
 <td style="text-align:right;">
-6222.905
+6222.264
 </td>
 <td style="text-align:right;">
-1805.054
+1804.929
 </td>
 <td style="text-align:right;">
-2127.556
+2128.215
 </td>
 <td style="text-align:right;">
 15.2
 </td>
 <td style="text-align:right;">
-0.3079135
+0.2518762
 </td>
 </tr>
 <tr>
@@ -466,13 +476,13 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(depth, k = 4, bs = ‘cs’)
 1
 </td>
 <td style="text-align:right;">
-6225.611
+6225.649
 </td>
 <td style="text-align:right;">
-1803.829
+1803.691
 </td>
 <td style="text-align:right;">
-2121.106
+2121.118
 </td>
 <td style="text-align:right;">
 15.0
@@ -492,19 +502,19 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 1
 </td>
 <td style="text-align:right;">
-6212.175
+6203.360
 </td>
 <td style="text-align:right;">
-1805.480
+1807.225
 </td>
 <td style="text-align:right;">
-2145.563
+2160.803
 </td>
 <td style="text-align:right;">
-15.9
+16.4
 </td>
 <td style="text-align:right;">
-0.0002250
+0.0169447
 </td>
 </tr>
 <tr>
@@ -518,19 +528,19 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 1
 </td>
 <td style="text-align:right;">
-6213.044
+6204.752
 </td>
 <td style="text-align:right;">
-1804.421
+1805.386
 </td>
 <td style="text-align:right;">
-2142.153
+2156.313
 </td>
 <td style="text-align:right;">
-15.8
+16.3
 </td>
 <td style="text-align:right;">
-0.3554860
+0.7306882
 </td>
 </tr>
 </tbody>
@@ -558,8 +568,7 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 <!-- Décrire ce qu'il y a dans les outputs de pred_splines -->
 <ul>
 <li>g_splines : correspond to the ggplot graph that gives splines of each variable of the model.</li>
-<li>df_splines : data.frame</li>
-<li>
+<li>df_splines : a data.frame to be used for further plotting if needs be</li>
 </ul>
 <div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># Visualize variable splines</span>
 <span class="no">splines</span>$<span class="no">g_splines</span></pre></body></html></div>
@@ -568,7 +577,7 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 <div id="predict-all-models-of-fit_all_dsm" class="section level3">
 <h3 class="hasAnchor">
 <a href="#predict-all-models-of-fit_all_dsm" class="anchor"></a>Predict all models of fit_all_dsm</h3>
-<p>This step consit in getting predicted values from models fitted with fit_all_dsm. The predicted values are set by the predict function of stats package.</p>
+<p>This step consists in getting predicted values from models fitted with the output of fit_all_dsm.</p>
 <div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># get predata</span>
 <span class="no">predata</span> <span class="kw">&lt;-</span> <span class="no">predata_output</span>$<span class="no">predata</span>
 
@@ -581,11 +590,11 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 
 <span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(<span class="no">predicted_models</span>)
 <span class="co">#&gt; 'data.frame':    127092 obs. of  4 variables:</span>
-<span class="co">#&gt;  $ mean : num  0.0184 0.02 0.0197 0.0209 0.0184 ...</span>
-<span class="co">#&gt;  $ se   : num  0.0111 0.012 0.0117 0.0123 0.0108 ...</span>
-<span class="co">#&gt;  $ cv   : num  0.601 0.597 0.592 0.589 0.587 0.584 0.576 0.574 0.522 0.521 ...</span>
+<span class="co">#&gt;  $ mean : num  0.0182 0.0201 0.0198 0.0213 0.0181 ...</span>
+<span class="co">#&gt;  $ se   : num  0.0109 0.012 0.0117 0.0126 0.0106 ...</span>
+<span class="co">#&gt;  $ cv   : num  0.6 0.597 0.593 0.59 0.585 0.584 0.576 0.574 0.522 0.521 ...</span>
 <span class="co">#&gt;  $ model: chr  "stacking" "stacking" "stacking" "stacking" ...</span></pre></body></html></div>
-<p><code>predict_all</code> gives a data.frame of predicted values and standard error of the k best models of <code>fit_all_dsm</code> with a weighted combination of the k best named ‘stacking’ in the model column.</p>
+<p><code>predict_all</code> gives a data.frame of predicted values and standard error of the k best models of <code>fit_all_dsm</code> with a weighted combination of the k best named ‘stacking’ in the model column. By default, stacking is used on the <em>5</em> models with the smallest AIC.</p>
 </div>
 <div id="prediction-map" class="section level3">
 <h3 class="hasAnchor">
@@ -619,7 +628,7 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 <div id="adding-a-categorical-variable" class="section level2">
 <h2 class="hasAnchor">
 <a href="#adding-a-categorical-variable" class="anchor"></a>2.2 Adding a categorical variable</h2>
-<p>The sampling occured during 2 seasons (summer and winter) and we can suggest a different number of Mola mola between summer and winter. Then it would be interesting to model <em>Mola mola</em> density according to the session variable.</p>
+<p>The sampling occurred during 2 seasons (summer and winter) and we can expect difference in sunfish densities between summer and winter. Covariate effects may also be different between winter and summer, and we may want to allow for this possibility during modelling.</p>
 <div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">stringr</span>)
 
 <span class="co"># get distdata</span>
@@ -637,10 +646,10 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
   <span class="fu">scale_colour_viridis_c</span>() +
   <span class="fu">theme_bw</span>()</pre></body></html></div>
 <p><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
-<p>What has to be added to a simple DSM process ?</p>
+<p>What has to be added to the simple DSM process ?</p>
 <ul>
 <li>
-<code>prep_predata</code> xith col2keep = “session”</li>
+<code>prep_predata</code> with col2keep = “session”</li>
 <li>
 <code>fit_all_dsm</code> with splines_by = “session”</li>
 <li>
@@ -667,10 +676,10 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 <span class="co"># build predata outputs</span>
 <span class="no">predata_output</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/prep_predata.html">prep_predata</a></span>(<span class="kw">segdata</span> <span class="kw">=</span> <span class="no">segdata</span>,
                                <span class="kw">gridfile_name</span> <span class="kw">=</span> <span class="no">grid</span>,
-                               <span class="kw">varenviro</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"depth"</span>,<span class="st">"distCot"</span>),
-                               <span class="kw">do_log_enviro</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"depth"</span>,<span class="st">"distCot"</span>),
-                               <span class="kw">varphysio</span> <span class="kw">=</span> <span class="st">"CHL_month"</span>,
-                               <span class="kw">do_log_physio</span> <span class="kw">=</span> <span class="st">"CHL_month"</span>,
+                               <span class="kw">varenviro</span> <span class="kw">=</span> <span class="st">"CHL_month"</span>,
+                               <span class="kw">do_log_enviro</span> <span class="kw">=</span> <span class="st">"CHL_month"</span>,
+                               <span class="kw">varphysio</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"depth"</span>, <span class="st">"distCot"</span>),
+                               <span class="kw">do_log_physio</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"depth"</span>, <span class="st">"distCot"</span>),
                                <span class="kw">shape</span> <span class="kw">=</span> <span class="no">shape</span>,
                                <span class="kw">imputation</span> <span class="kw">=</span> <span class="st">"PCA"</span>,
                                <span class="kw">col2keep</span> <span class="kw">=</span> <span class="st">"session"</span>,
@@ -679,9 +688,9 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 <span class="co">#&gt; missing data in grid and segdata must be as NAs and nothing else (not 0)</span>
 <span class="co">#&gt; although coordinates are longitude/latitude, st_intersects assumes that they are planar</span>
 <span class="co">#&gt; although coordinates are longitude/latitude, st_intersects assumes that they are planar</span>
-<span class="co">#&gt; There are 79 cells with missing values in segdata </span>
+<span class="co">#&gt; There are 38 cells with missing values in segdata </span>
 <span class="co">#&gt;  </span>
-<span class="co">#&gt; There are 601 cells with missing values in predata </span>
+<span class="co">#&gt; There are 343 cells with missing values in predata </span>
 <span class="co">#&gt; </span>
 
 <span class="no">effort_w_obs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/ajout_obs.html">ajout_obs</a></span>(<span class="kw">countdata_leg</span> <span class="kw">=</span> <span class="no">DSM_pack_MOLMOL</span>$<span class="no">list_prepare_obs_MOLMOL</span>$<span class="no">MOLMOL_obs_output</span>$<span class="no">countdata_leg</span>,
@@ -706,7 +715,8 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
                        <span class="kw">segdata_obs</span> <span class="kw">=</span> <span class="no">segdata_completed_w_obs</span>,
                        <span class="kw">obsdata</span> <span class="kw">=</span> <span class="no">obsdata</span>,
                        <span class="kw">predictors</span> <span class="kw">=</span> <span class="no">predictors</span>,
-                       <span class="kw">splines_by</span> <span class="kw">=</span> <span class="st">"session"</span>)
+                       <span class="kw">splines_by</span> <span class="kw">=</span> <span class="st">"session"</span>
+                       )
 <span class="co">#&gt;  * Response variable is the number of individuals</span>
 <span class="co">#&gt;  * Detection function provided</span>
 <span class="co">#&gt;  * Fitting all possible models, please wait</span>
@@ -727,10 +737,12 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
 <span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
 <span class="co">#&gt; Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</span>
+<span class="co">#&gt; Warning in log(z): production de NaN</span>
 <span class="co">#&gt; Warning in log(mu): production de NaN</span>
 <span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
 <span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
+<span class="co">#&gt; Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span>
 <span class="co">#&gt; Warning in log(mu): production de NaN</span>
 <span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
@@ -752,6 +764,7 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 <pre><code>#&gt; 
 #&gt; [[2]]</code></pre>
 <p><img src="II_DSM_example_with_MOLA_MOLA_files/figure-html/unnamed-chunk-12-2.png" width="700"></p>
+<p>Now we can visualize the differences between winter and summer in the estimated relationships with covariates. Predictions can also be made for each season.</p>
 <div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">sf</span>)
 <span class="co"># get predata</span>
 <span class="no">predata</span> <span class="kw">&lt;-</span> <span class="no">predata_output</span>$<span class="no">predata</span>

@@ -7,6 +7,7 @@
 #' @param remove_intercept Remove intercept of model (\code{beta[, 1] <- 0}).
 #' @param random Variable to include random effect.
 #' @param splines_by Interaction with splines given by one variable of segdata.
+#' @param alpha
 #'
 #' @return \enumerate{
 #'           \item df_splines : \code{data.frame}.
@@ -305,7 +306,7 @@ rootogram_nb <- function(model_fit, n_rep = 1e3, min_obs = 0, max_obs = 1e3, by 
   y_rep <- t(apply(exp(linpred), 1,
                    function(x) { MASS::rnegbin(n = length(x), mu = x, theta = transfo_overdispersion) }
                    )
-             ) 
+             )
   ### check for NA
   if(any(is.na(y_rep))){
     rm_row <- apply(y_rep, 1, function(row) {any(is.na(row))})
