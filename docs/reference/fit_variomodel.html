@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Prediction diagnostic. — pred_splines • geffaeR</title>
+<title>Fitting a variogram model. — fit_variomodel • geffaeR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Prediction diagnostic. — pred_splines" />
-<meta property="og:description" content="Visualize prediction fiiting and get" />
+<meta property="og:title" content="Fitting a variogram model. — fit_variomodel" />
+<meta property="og:description" content="Fitting a variogram model from a &quot;variogram&quot; object." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -136,62 +136,33 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Prediction diagnostic.</h1>
+    <h1>Fitting a variogram model.</h1>
     
-    <div class="hidden name"><code>pred_splines.Rd</code></div>
+    <div class="hidden name"><code>fit_variomodel.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Visualize prediction fiiting and get</p>
+    <p>Fitting a variogram model from a "variogram" object.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>pred_splines</span>(
-  <span class='no'>segdata</span>,
-  <span class='no'>dsm_model</span>,
-  <span class='kw'>remove_intercept</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>random</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>splines_by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.8</span>
-)</pre>
+    <pre class="usage"><span class='fu'>fit_variomodel</span>(<span class='no'>variogram</span>, <span class='kw'>form</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"matern"</span>, <span class='st'>"exponential"</span>))</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>segdata</th>
-      <td><p>segdata data.frame built with <code>prepare_data_effort</code></p></td>
+      <th>variogram</th>
+      <td><p>Object of class variogram <code><a href='https://rdrr.io/pkg/geoR/man/variog.html'>variog</a></code>.</p></td>
     </tr>
     <tr>
-      <th>dsm_model</th>
-      <td><p>The dsm model you want to use, built with <code>fit_all_dsm</code>.</p></td>
-    </tr>
-    <tr>
-      <th>remove_intercept</th>
-      <td><p>Remove intercept of model (<code>beta[, 1] &lt;- 0</code>).</p></td>
-    </tr>
-    <tr>
-      <th>random</th>
-      <td><p>Variable to include random effect.</p></td>
-    </tr>
-    <tr>
-      <th>splines_by</th>
-      <td><p>Interaction with splines given by one variable of segdata.</p></td>
-    </tr>
-    <tr>
-      <th>alpha</th>
-      <td></td>
+      <th>form</th>
+      <td><p>Shape of the adjusted function. Could be either "matern" or "exponential".</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    
-<ol>
-<li><p>df_splines : <code>data.frame</code>.</p></li>
-<li><p>g_splines : <code>ggplot</code>.</p></li>
-<li><p>spatial : <code>data.frame</code>.</p></li>
-</ol>
-
+    <p>vario_model : object of class "variomodel" and "variofit, see details on the <code><a href='https://rdrr.io/pkg/geoR/man/variofit.html'>variofit</a></code> page</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

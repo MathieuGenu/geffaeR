@@ -331,7 +331,7 @@
 <span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
 <span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
-<span class="co">#&gt; Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</span>
+<span class="co">#&gt; Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span>
 <span class="co">#&gt; Warning in log(mu): production de NaN</span>
 <span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
@@ -346,7 +346,6 @@
 <span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
 <span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
-<span class="co">#&gt; Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span>
 <span class="co">#&gt; Warning in log(mu): production de NaN</span>
 <span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
@@ -389,28 +388,54 @@ stacking_weights
 <tbody>
 <tr>
 <td style="text-align:left;">
-count ~ te(longitude, latitude, bs = ‘cs’)
+count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’) + s(distCot, k = 4, bs = ‘cs’)
+</td>
+<td style="text-align:right;">
+5
 </td>
 <td style="text-align:right;">
 1
 </td>
 <td style="text-align:right;">
+6203.360
+</td>
+<td style="text-align:right;">
+1807.225
+</td>
+<td style="text-align:right;">
+2160.803
+</td>
+<td style="text-align:right;">
+16.4
+</td>
+<td style="text-align:right;">
+0.1034205
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’) + s(depth, k = 4, bs = ‘cs’)
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
 1
 </td>
 <td style="text-align:right;">
-6225.529
+6204.752
 </td>
 <td style="text-align:right;">
-1804.515
+1805.386
 </td>
 <td style="text-align:right;">
-2120.993
+2156.313
 </td>
 <td style="text-align:right;">
-14.9
+16.3
 </td>
 <td style="text-align:right;">
-0.0000025
+0.0566959
 </td>
 </tr>
 <tr>
@@ -436,7 +461,7 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 16.2
 </td>
 <td style="text-align:right;">
-0.0004884
+0.6030632
 </td>
 </tr>
 <tr>
@@ -462,7 +487,33 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(distCot, k = 4, bs = ‘cs’)
 15.2
 </td>
 <td style="text-align:right;">
-0.2518762
+0.2368190
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+count ~ te(longitude, latitude, bs = ‘cs’)
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+6225.529
+</td>
+<td style="text-align:right;">
+1804.515
+</td>
+<td style="text-align:right;">
+2120.993
+</td>
+<td style="text-align:right;">
+14.9
+</td>
+<td style="text-align:right;">
+0.0000015
 </td>
 </tr>
 <tr>
@@ -489,58 +540,6 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(depth, k = 4, bs = ‘cs’)
 </td>
 <td style="text-align:right;">
 NA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’) + s(distCot, k = 4, bs = ‘cs’)
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-6203.360
-</td>
-<td style="text-align:right;">
-1807.225
-</td>
-<td style="text-align:right;">
-2160.803
-</td>
-<td style="text-align:right;">
-16.4
-</td>
-<td style="text-align:right;">
-0.0169447
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’) + s(depth, k = 4, bs = ‘cs’)
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-6204.752
-</td>
-<td style="text-align:right;">
-1805.386
-</td>
-<td style="text-align:right;">
-2156.313
-</td>
-<td style="text-align:right;">
-16.3
-</td>
-<td style="text-align:right;">
-0.7306882
 </td>
 </tr>
 </tbody>
@@ -590,9 +589,9 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 
 <span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(<span class="no">predicted_models</span>)
 <span class="co">#&gt; 'data.frame':    127092 obs. of  4 variables:</span>
-<span class="co">#&gt;  $ mean : num  0.0182 0.0201 0.0198 0.0213 0.0181 ...</span>
-<span class="co">#&gt;  $ se   : num  0.0109 0.012 0.0117 0.0126 0.0106 ...</span>
-<span class="co">#&gt;  $ cv   : num  0.6 0.597 0.593 0.59 0.585 0.584 0.576 0.574 0.522 0.521 ...</span>
+<span class="co">#&gt;  $ mean : num  0.0178 0.0202 0.0193 0.0212 0.0179 ...</span>
+<span class="co">#&gt;  $ se   : num  0.0106 0.012 0.0114 0.0124 0.0104 ...</span>
+<span class="co">#&gt;  $ cv   : num  0.597 0.594 0.59 0.587 0.582 0.581 0.573 0.571 0.521 0.52 ...</span>
 <span class="co">#&gt;  $ model: chr  "stacking" "stacking" "stacking" "stacking" ...</span></pre></body></html></div>
 <p><code>predict_all</code> gives a data.frame of predicted values and standard error of the k best models of <code>fit_all_dsm</code> with a weighted combination of the k best named ‘stacking’ in the model column. By default, stacking is used on the <em>5</em> models with the smallest AIC.</p>
 </div>
@@ -727,6 +726,17 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
 <span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
 <span class="co">#&gt; Warning: Some Pareto k diagnostic values are too high. See help('pareto-k-diagnostic') for details.</span>
+<span class="co">#&gt; Warning in log(z): production de NaN</span>
+
+<span class="co">#&gt; Warning in log(z): production de NaN</span>
+
+<span class="co">#&gt; Warning in log(z): production de NaN</span>
+
+<span class="co">#&gt; Warning in log(z): production de NaN</span>
+
+<span class="co">#&gt; Warning in log(z): production de NaN</span>
+
+<span class="co">#&gt; Warning in log(z): production de NaN</span>
 <span class="co">#&gt; Warning in log(mu): production de NaN</span>
 <span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
@@ -742,7 +752,6 @@ count~ te(longitude, latitude, bs = ‘cs’) +s(CHL_month, k = 4, bs = ‘cs’
 <span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>
 <span class="co">#&gt; MCSE estimates will be over-optimistic.</span>
-<span class="co">#&gt; Warning: Some Pareto k diagnostic values are slightly high. See help('pareto-k-diagnostic') for details.</span>
 <span class="co">#&gt; Warning in log(mu): production de NaN</span>
 <span class="co">#&gt; Warning: Relative effective sample sizes ('r_eff' argument) not specified.</span>
 <span class="co">#&gt; For models fit with MCMC, the reported PSIS effective sample sizes and </span>

@@ -1,9 +1,23 @@
+#' Get spatial density / Abundance prediction.
+#'
+#' Give spatial density from adjusted covariance model.
+#'
+#'
+#' @param segdata_obs data.frame. Output of \code{\link[geffaeR]{ajout_obs}}.
+#' @param esw Effective (half) Strip-Width determined by \code{\link[geffaeR]{plot_detection}}.
+#' @param vario_model output of \code{\link[geffaeR]{fit_variomodel}}.
+#' @param predict_coord_xy data.frame with X and Y columns for longitude and latitude,
+#' giving area where the kriging prediction is made.
+#' @param fast_inversion
+#' @param saturate If TRUE, allows to exclude extreme prediction by keeping values under 0.999 quantile
+#' @param intraTransect Boolean. Consider only distance between point on the same segment for the kriging distance ?
+#'
+#' @return data.frame of mean prediction and its se (standard error) with coordinates (X and Y).
+#'
+#' @examples
 #' @importFrom arm bayesglm
 #' @importFrom fields rdist
 #' @export
-
-
-# fonction pour prédire
 predict_kriging <- function(segdata_obs,
                             esw,
                             vario_model,
@@ -156,7 +170,7 @@ predict_kriging <- function(segdata_obs,
     if(nrow(covariance_mat) != nrow(laplacian_mat)) { stop("Dimension mismatch") }
     return(as.numeric(sill - diag(covariance_mat %*% t(laplacian_mat[, -ncol(laplacian_mat)])) + laplacian_mat[, ncol(laplacian_mat)]))
   }
-  lambda <- lapply(cmat, laplacien) # liste de matrices
+  lambda <- lapply(cmat, laplacien) # matrix list
 
   mean_pred <- drop(do.call('c', lapply(lambda, krig_pred)))
   var_pred <- drop(do.call('c', lapply(1:length(lambda), function(id) {krig_var(covariance_mat = cmat[[id]], laplacian_mat = lambda[[id]])})))

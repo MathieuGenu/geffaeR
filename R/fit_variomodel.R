@@ -1,8 +1,17 @@
+#' Fitting a variogram model.
+#'
+#' Fitting a variogram model from a "variogram" object.
+#'
+#' @param variogram Object of class variogram \code{\link[geoR]{variog}}.
+#' @param form Shape of the adjusted function. Could be either "matern" or "exponential".
+#'
+#' @return vario_model : object of class "variomodel" and "variofit, see details on the \code{\link[geoR]{variofit}} page
+#'
+#' @examples
 #' @importFrom geoR variofit
 #' @export
-
-# fitter le model "matern" ou "exponential", qui sert pour les autres fonctions
 fit_variomodel <- function(variogram, form = c("matern", "exponential")) {
+
   vario_model <- geoR::variofit(variogram,
                                 cov.model = form,
                                 fix.nugget = FALSE,
@@ -17,5 +26,6 @@ fit_variomodel <- function(variogram, form = c("matern", "exponential")) {
                                       as.numeric(quantile(variogram$u, prob = 0.8)),l = 10)
                                 ),
                                 messages = F)
+
   return(vario_model = vario_model)
 }

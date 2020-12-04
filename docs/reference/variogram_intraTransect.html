@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Prediction diagnostic. — pred_splines • geffaeR</title>
+<title>Build a variogram object — variogram_intraTransect • geffaeR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,9 @@
 
 
 
-<meta property="og:title" content="Prediction diagnostic. — pred_splines" />
-<meta property="og:description" content="Visualize prediction fiiting and get" />
+<meta property="og:title" content="Build a variogram object — variogram_intraTransect" />
+<meta property="og:description" content="Create an object of class variogram (output of variog) and gives distance matrix
+and a diagnostic graph if asked." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -136,60 +137,88 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Prediction diagnostic.</h1>
+    <h1>Build a variogram object</h1>
     
-    <div class="hidden name"><code>pred_splines.Rd</code></div>
+    <div class="hidden name"><code>variogram_intraTransect.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Visualize prediction fiiting and get</p>
+    <p>Create an object of class variogram (output of <code><a href='https://rdrr.io/pkg/geoR/man/variog.html'>variog</a></code>) and gives distance matrix
+and a diagnostic graph if asked.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>pred_splines</span>(
-  <span class='no'>segdata</span>,
-  <span class='no'>dsm_model</span>,
-  <span class='kw'>remove_intercept</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>random</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>splines_by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.8</span>
+    <pre class="usage"><span class='fu'>variogram_intraTransect</span>(
+  <span class='no'>segdata_obs</span>,
+  <span class='no'>obs</span>,
+  <span class='no'>esw</span>,
+  <span class='kw'>intraTransect</span> <span class='kw'>=</span> <span class='no'>T</span>,
+  <span class='kw'>breaks</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>pairs.min</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>n_sim</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>distmat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>region</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>esp</span> <span class='kw'>=</span> <span class='st'>"species"</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>segdata</th>
-      <td><p>segdata data.frame built with <code>prepare_data_effort</code></p></td>
+      <th>segdata_obs</th>
+      <td><p>data.frame. Output of <code><a href='ajout_obs.html'>ajout_obs</a></code>.</p></td>
     </tr>
     <tr>
-      <th>dsm_model</th>
-      <td><p>The dsm model you want to use, built with <code>fit_all_dsm</code>.</p></td>
+      <th>obs</th>
+      <td><p>character. Choose what kind obs observation is analyzed, "n_ind" : number of individuals
+counted or "n_detection" number of detection.</p></td>
     </tr>
     <tr>
-      <th>remove_intercept</th>
-      <td><p>Remove intercept of model (<code>beta[, 1] &lt;- 0</code>).</p></td>
+      <th>esw</th>
+      <td><p>Effective (half) Strip-Width determined by <code><a href='plot_detection.html'>plot_detection</a></code>.</p></td>
     </tr>
     <tr>
-      <th>random</th>
-      <td><p>Variable to include random effect.</p></td>
+      <th>intraTransect</th>
+      <td><p>Boolean. Consider only distance between point on the same segment for the kriging distance ?</p></td>
     </tr>
     <tr>
-      <th>splines_by</th>
-      <td><p>Interaction with splines given by one variable of segdata.</p></td>
+      <th>breaks</th>
+      <td><p>Breaks point of the variogram. Default is NULL which create default breaks : <code><a href='https://rdrr.io/r/base/c.html'>c(-0.01, 0.001, 1, seq(2.5, 100, 2.5))</a></code>.</p></td>
     </tr>
     <tr>
-      <th>alpha</th>
-      <td></td>
+      <th>plot</th>
+      <td><p>Boolean. Get diagnostic plot in output (default is TRUE).</p></td>
+    </tr>
+    <tr>
+      <th>pairs.min</th>
+      <td><p>(default is 100)</p></td>
+    </tr>
+    <tr>
+      <th>n_sim</th>
+      <td><p>(default is 100)</p></td>
+    </tr>
+    <tr>
+      <th>distmat</th>
+      <td><p>Object of class matrix giving distance matrix</p></td>
+    </tr>
+    <tr>
+      <th>region</th>
+      <td><p>Region of segdata_obs on which adjusting function. Default is NULL,
+meaning it takes all the regions in segdata_obs</p></td>
+    </tr>
+    <tr>
+      <th>esp</th>
+      <td><p>Species name for graph title.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    
-<ol>
-<li><p>df_splines : <code>data.frame</code>.</p></li>
-<li><p>g_splines : <code>ggplot</code>.</p></li>
-<li><p>spatial : <code>data.frame</code>.</p></li>
+    <p>Gives a list of :</p><ol>
+<li><p>variogram : object of class variogram</p></li>
+<li><p>g : coefficient of variation of esw in percent.</p></li>
+<li><p>distmat : Barplot of detections depending of distance, with confindence
+          estimated with mcmc chains.</p></li>
 </ol>
 
 

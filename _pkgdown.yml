@@ -43,5 +43,9 @@ reference:
   - predict_all
   - prep_predata
   - prepare_soap
-
-
+- subtitle: "Kriging"
+- contents:
+  - fit_variomodel
+  - predict_kriging
+  - quick_map_krig
+  - variogram_intraTransect

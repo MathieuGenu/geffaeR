@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Prediction diagnostic. — pred_splines • geffaeR</title>
+<title>Get spatial density / Abundance prediction. — predict_kriging • geffaeR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +46,8 @@
 
 
 
-<meta property="og:title" content="Prediction diagnostic. — pred_splines" />
-<meta property="og:description" content="Visualize prediction fiiting and get" />
+<meta property="og:title" content="Get spatial density / Abundance prediction. — predict_kriging" />
+<meta property="og:description" content="Give spatial density from adjusted covariance model." />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -136,62 +136,58 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Prediction diagnostic.</h1>
+    <h1>Get spatial density / Abundance prediction.</h1>
     
-    <div class="hidden name"><code>pred_splines.Rd</code></div>
+    <div class="hidden name"><code>predict_kriging.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Visualize prediction fiiting and get</p>
+    <p>Give spatial density from adjusted covariance model.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>pred_splines</span>(
-  <span class='no'>segdata</span>,
-  <span class='no'>dsm_model</span>,
-  <span class='kw'>remove_intercept</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>random</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>splines_by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>alpha</span> <span class='kw'>=</span> <span class='fl'>0.8</span>
+    <pre class="usage"><span class='fu'>predict_kriging</span>(
+  <span class='no'>segdata_obs</span>,
+  <span class='no'>esw</span>,
+  <span class='no'>vario_model</span>,
+  <span class='kw'>predict_coord_xy</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>fast_inversion</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>saturate</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>intraTransect</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>segdata</th>
-      <td><p>segdata data.frame built with <code>prepare_data_effort</code></p></td>
+      <th>segdata_obs</th>
+      <td><p>data.frame. Output of <code><a href='ajout_obs.html'>ajout_obs</a></code>.</p></td>
     </tr>
     <tr>
-      <th>dsm_model</th>
-      <td><p>The dsm model you want to use, built with <code>fit_all_dsm</code>.</p></td>
+      <th>esw</th>
+      <td><p>Effective (half) Strip-Width determined by <code><a href='plot_detection.html'>plot_detection</a></code>.</p></td>
     </tr>
     <tr>
-      <th>remove_intercept</th>
-      <td><p>Remove intercept of model (<code>beta[, 1] &lt;- 0</code>).</p></td>
+      <th>vario_model</th>
+      <td><p>output of <code><a href='fit_variomodel.html'>fit_variomodel</a></code>.</p></td>
     </tr>
     <tr>
-      <th>random</th>
-      <td><p>Variable to include random effect.</p></td>
+      <th>predict_coord_xy</th>
+      <td><p>data.frame with X and Y columns for longitude and latitude,
+giving area where the kriging prediction is made.</p></td>
     </tr>
     <tr>
-      <th>splines_by</th>
-      <td><p>Interaction with splines given by one variable of segdata.</p></td>
+      <th>saturate</th>
+      <td><p>If TRUE, allows to exclude extreme prediction by keeping values under 0.999 quantile</p></td>
     </tr>
     <tr>
-      <th>alpha</th>
-      <td></td>
+      <th>intraTransect</th>
+      <td><p>Boolean. Consider only distance between point on the same segment for the kriging distance ?</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    
-<ol>
-<li><p>df_splines : <code>data.frame</code>.</p></li>
-<li><p>g_splines : <code>ggplot</code>.</p></li>
-<li><p>spatial : <code>data.frame</code>.</p></li>
-</ol>
-
+    <p>data.frame of mean prediction and its se (standard error) with coordinates (X and Y).</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
