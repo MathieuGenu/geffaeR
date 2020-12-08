@@ -7,7 +7,7 @@
 #' @param remove_intercept Remove intercept of model (\code{beta[, 1] <- 0}).
 #' @param random Variable to include random effect.
 #' @param splines_by Interaction with splines given by one variable of segdata.
-#' @param alpha
+#' @param alpha coverage level for confidence interval.
 #'
 #' @return \enumerate{
 #'           \item df_splines : \code{data.frame}.
