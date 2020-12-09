@@ -24,7 +24,7 @@ pred_splines(
 
 \item{splines_by}{Interaction with splines given by one variable of segdata.}
 
-\item{alpha}{}
+\item{alpha}{coverage level for confidence interval.}
 }
 \value{
 \enumerate{

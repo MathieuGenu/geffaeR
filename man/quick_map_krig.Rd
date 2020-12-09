@@ -11,7 +11,8 @@ quick_map_krig(df_sf, varname, segdata_obs = NULL)
 
 \item{varname}{Choose which column of df to plot between "mean_pred" or "se_pred".}
 
-\item{segdata_obs}{data.frame. Output of \code{\link[geffaeR]{ajout_obs}}.}
+\item{segdata_obs}{Optionnal. Allows to plot observations on the map,
+default is NULL. Output of \code{\link[geffaeR]{ajout_obs}}.}
 }
 \description{
 Map projection of \code{\link[geffaeR]{predict_kriging}} output.
