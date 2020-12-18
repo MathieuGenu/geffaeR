@@ -38,7 +38,7 @@ predict_abund <- function(listdsm, predata, n_sim = 5e2, abund_by = NULL, alpha 
   	nom <- "abundance"
   	X <- rep(1, nrow(predata))
   }
-  
+
   ## useful functions
   lower <- function(x) {
     if(all(is.na(x))) {
@@ -60,7 +60,7 @@ predict_abund <- function(listdsm, predata, n_sim = 5e2, abund_by = NULL, alpha 
   ## get models
   dsmodels <- listdsm$best_models
   k <- length(dsmodels)
-  
+
   ## same order as in fit_all_dsm to ensure indexes are correct
   w <- listdsm$all_fits_binded %>%
     arrange(desc(stacking_weights)) %>%
@@ -71,11 +71,11 @@ predict_abund <- function(listdsm, predata, n_sim = 5e2, abund_by = NULL, alpha 
   ### approximate posterior distribution with MV normal
   # output is a dataframe with iterations as rows and three columns 'grouping', 'estimate' and 'iter'
   out <- lapply(dsmodels, function(dsm_model) {
-    dd <- exp(mvtnorm::rmvnorm(n_sim, mean = dsm_model$coefficients, sigma = dsm_model$Vp) %*% 
+    dd <- exp(mvtnorm::rmvnorm(n_sim, mean = dsm_model$coefficients, sigma = dsm_model$Vp) %*%
                 t(predict(dsm_model, newdata = predata, off.set = 1, type = "lpmatrix")))
     # handles NA
     rm_na <- sapply(1:ncol(dd), function(j) { !all(is.na(dd[, j])) })
-    dd <- dd[, rm_na] %*% 
+    dd <- dd[, rm_na] %*%
       diag(predata$Area[rm_na]) %*% # scale to area
       X[rm_na, ] %>% # grouping
       as.matrix() %>%
@@ -86,14 +86,14 @@ predict_abund <- function(listdsm, predata, n_sim = 5e2, abund_by = NULL, alpha 
       mutate(iter = rep(1:n_sim, times = length(nom))) %>% # check this is correct
       as.data.frame()
     return(dd)
-  } 
+  }
   )
   # reorganize to a long format data.frame
   out <- do.call('rbind', out) %>%
     mutate(model = rep(1:k, each = n_sim * length(nom))) %>%
     left_join(w %>% mutate(model = 1:k) %>% select(model, stacking_weights), # need to specify correct column in w here, must be ordered correctly
               by = "model"
-              ) %>% 
+              ) %>%
     mutate(stacked_estimate = stacking_weights * estimate) %>%
     as.data.frame()
 
@@ -105,6 +105,8 @@ predict_abund <- function(listdsm, predata, n_sim = 5e2, abund_by = NULL, alpha 
     group_by(grouping, model) %>%
     summarize(mean = round(mean(estimate), 0),
               se = round(sd(estimate), 0),
+              median = round(median(estimate), 0),
+              mad = round(mad(estimate), 0),
               lower = round(lower(estimate), 0),
               upper = round(upper(estimate), 0)
               ) %>%
@@ -117,6 +119,8 @@ predict_abund <- function(listdsm, predata, n_sim = 5e2, abund_by = NULL, alpha 
     group_by(grouping, model) %>%
     summarize(mean = round(mean(estimate), 0),
               se = round(sd(estimate), 0),
+              median = round(median(estimate), 0),
+              mad = round(mad(estimate), 0),
               lower = round(lower(estimate), 0),
               upper = round(upper(estimate), 0)
               ) %>%
