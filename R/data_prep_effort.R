@@ -52,7 +52,8 @@ prepare_data_effort <- function(effort_base,
 
 
   if(!all(col_name_neces %in% colnames(effort))){
-    var_alone <- col_name_neces[!(col_name_neces %in% colnames(effort))]
+    var_alone <- setdiff(col_name_neces, colnames(effort))
+
     stop(paste("Les variables : ",var_alone, "ne sont pas dans le tableau effort.", sep="\n",collapse = ", "),
          paste("utiliser la fonction change_effort_varName","\n",sep=""))
   }
