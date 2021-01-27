@@ -161,6 +161,7 @@ prepare_soap <- function(data,
 
   bbox <- c(xmin = x[1], xmax = x[2], ymin = y[1], ymax = y[2])
 
+
   if(is.null(polygon_pred)) {
 
     # force NEA to be a particular file
@@ -185,6 +186,11 @@ prepare_soap <- function(data,
       land <- contour
 
     } else {
+
+      # check if segdata coords are in NEA range
+      if(!(all(between(x, -60, 60), between(y,30,80)))) {
+        stop("Your data is outside the default contour, you must provide an object to 'contour' argument")
+      }
 
       land <- NEA %>%
         st_as_sf()
@@ -278,8 +284,10 @@ prepare_soap <- function(data,
   # plot ocean, knots, df_cropped_data
   gg_cropped_data <- ggplot() +
     geom_sf(data = sf_ocean) +
-    geom_point(data = knots, aes(x = longitude, y = latitude), colour = alpha('red',1)) +
-    geom_point(data = knots[crunch_ind, ], aes(x = longitude, y = latitude), colour = alpha("green",0.5)) +
+    geom_point(data = knots,
+               aes(x = longitude, y = latitude), colour = alpha('red',1)) +
+    geom_point(data = knots[crunch_ind, ],
+               aes(x = longitude, y = latitude), colour = alpha("green",0.5)) +
     geom_sf(st_as_sf(df_cropped_data,
                      coords = c("longitude","latitude"),
                      crs = 4326),
@@ -287,8 +295,8 @@ prepare_soap <- function(data,
             colour = alpha("blue", 0.5),
             fill = alpha("blue", 0.5),
             shape = 22) +
-    geom_sf(data = sf_deleted_points, mapping = aes(), colour = "black") +
-    ggtitle(paste0("There were ",nrow(data)-nrow(df_cropped_data)," obs deleted during the crop")) +
+    geom_sf(data = sf_deleted_points, mapping = aes(), colour = "black", shape = 22) +
+    ggtitle(paste0("There were ",nrow(data)-nrow(df_cropped_data)," lines of segdata discarded during the crop")) +
     theme_light()
 
 
