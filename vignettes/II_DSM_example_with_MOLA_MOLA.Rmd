@@ -15,25 +15,27 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.retina = 3
 )
 library(mathUtil)
+suppressPackageStartupMessages(library(ggplot2))
+theme_set(theme_light())
 ```
 
 Density Surface Modelling (DSM) consist in adjusting a Generalized Additive Model (GAM) on count data, while taking simultaneously into account imperfect detection (with distance sampling data) and covariates to obtain smoothed spatial maps of density. Once a model is adjusted, if its fit to the data is good enough, it can be used to predict the response variable (density of animals) over large areas, and possibly outside of the surveyed area.
 
-geffaeR uses the [DSM](https://github.com/DistanceDevelopment/dsm) package where ore information and a clear explanation on the use of Density Surface Models can be found (e.g. <http://distancesampling.org/R/vignettes/mexico-analysis.html>).
-In this vignette it is presented how to fit a simple DSM with geffaeR and what is needed to do it applied on an applied example.
+geffaeR uses the [DSM](https://github.com/DistanceDevelopment/dsm) package where more information and a clear explanation on the use of Density Surface Models can be found (e.g. <http://distancesampling.org/R/vignettes/mexico-analysis.html>). In this vignette it is presented how to fit a simple DSM with geffaeR and what is needed to do it applied on an applied example.
 
 The vignette is organized in two main parts:
 
-1. Data presentation
-2. DSM with geffaeR
-
+1.  Data presentation
+2.  DSM with geffaeR
 
 # 1.Data presentation
 
 To illustrate how to fit DSMs in geffaeR, it is proposed to use the **DSM_pack_MOLMOL** included as data within geffaeR. It consist in a list of list bringing together all files needed for a DSM analysis.
+
 ```{r str DSM_pack_MOLMOL, echo=F, warning=FALSE}
 suppressPackageStartupMessages(library(geffaeR))
 str(DSM_pack_MOLMOL[[1]], max.level = 1)
@@ -43,10 +45,9 @@ str(DSM_pack_MOLMOL[[4]], max.level = 2)
 str(DSM_pack_MOLMOL[[5]], max.level = 1)
 ```
 
-
 ## What Is This Bizarre Fish?
 
-The sunfish, _Mola mola_, is a marine fish species that can reach up to 1 ton! It can live in temperate and tropical waters. It have a particular shape that makes it easy to recognize :
+The sunfish, *Mola mola*, is a marine fish species that can reach up to 1 ton! It can live in temperate and tropical waters. It have a particular shape that makes it easy to recognize :
 
 ```{r molamola image, echo = F, out.width='250px'}
 knitr::include_graphics("Mola_mola.jpg")
@@ -55,12 +56,12 @@ knitr::include_graphics("Mola_mola.jpg")
 There are some speculations that sunfish densities in the oceans have increased, but the evidence is scarce and indirect. Here the aim is to estimate the density of sunfish is the North-Western Mediterranean Sea.
 
 ## How ?
-The data were collected during the SAMM surveys (*Suivi Aérien de la Mégafaune Marine*, <https://www.observatoire-pelagis.cnrs.fr/observatoire/Suivi-en-mer/suivi-aerien/>) in 2011 and 2012. These surveys consist in flying over the sea in a plane (equiped with bubble windows) at a height of $180$ metres above sea level and at a speed of $180$ kilometers per hour along pre-defined transects. As the transects are flown over, two observers on either side of the plane scan the sea surface for sightings of marine megafauna. 
+
+The data were collected during the SAMM surveys (*Suivi Aérien de la Mégafaune Marine*, <https://www.observatoire-pelagis.cnrs.fr/observatoire/Suivi-en-mer/suivi-aerien/>) in 2011 and 2012. These surveys consist in flying over the sea in a plane (equiped with bubble windows) at a height of $180$ metres above sea level and at a speed of $180$ kilometers per hour along pre-defined transects. As the transects are flown over, two observers on either side of the plane scan the sea surface for sightings of marine megafauna.
 
 ```{r global view, echo=F, warning = F}
 suppressPackageStartupMessages(library(sf))
 suppressPackageStartupMessages(library(tidyverse))
-suppressPackageStartupMessages(library(ggplot2))
 
 distdata <- DSM_pack_MOLMOL$list_prepare_obs_MOLMOL$MOLMOL_obs_output$distdata
 
@@ -70,11 +71,10 @@ distdata_detected <- distdata %>%
 ggplot() +
   geom_sf(data = NEA_simplified_FR %>% st_as_sf(), mapping = aes()) +
   geom_rect(aes(xmin = 2, xmax = 12, ymin = 40, ymax = 45), fill = alpha("white",0), colour = "black", size = 2) +
-  theme_light() +
+
   ggtitle("Global view of the study area") +
   theme(plot.margin =  margin(0, 0, 0, 0, "cm"))
 ```
-
 
 ```{r map observation effort, echo=F, out.width="50%"}
 segdata <- DSM_pack_MOLMOL$effort_output$segdata
@@ -83,7 +83,6 @@ ggplot() +
   geom_sf(data = NEA_simplified_FR %>% st_as_sf(), mapping = aes()) +
   coord_sf(xlim = c(2,12), ylim = c(40,45)) +
   geom_point(data = segdata, aes(x = longitude, y = latitude), colour = alpha("black",0.5)) +
-  theme_light() +
   ggtitle("Sampling effort in SAMM campaign \nin the mediterranean sea") +
   theme(plot.margin =  margin(0, 0, 0, 0, "cm"))
 
@@ -91,128 +90,88 @@ ggplot() +
   geom_sf(data = NEA_simplified_FR %>% st_as_sf(), mapping = aes()) +
   coord_sf(xlim = c(2,12), ylim = c(40,45)) +
   geom_point(data = distdata_detected, aes(x = longitude, y = latitude), colour = alpha("black",0.5)) +
-  theme_light() +
   ggtitle("Observation of MOLMOL in SAMM \ncampaign in the mediterranean sea") +
   theme(plot.margin =  margin(0, 0, 0, 0, "cm"))
 ```
 
 ## When ?
-```{r SAMM calendar, include = F}
 
-library(extrafont)
-library(mathUtil)
-library(lubridate)
-library(dplyr)
-library(cowplot)
-library(ggpubr)
-
-
-occ_effort <-  segdata %>% 
-  group_by(date, session) %>% 
-  summarize(n=n()) %>% 
-  select(!n)
-
-
-theme_set(
-  theme_bw() +
-    theme(
-      axis.text = element_text(size = 14),
-      axis.title = element_text(size = 14),
-      strip.text.y = element_text(size = 15),
-      legend.text=element_text(size=12),
-      legend.title = element_text(size = 12)
-    )
+```{r SAMM calendar, echo = F, out.width='50%', out.height='100%', fig.height = 13, fig.width = 7.5}
+suppressPackageStartupMessages(
+  expr = {
+    library(calendR)
+    library(lubridate)  
+  }
 )
 
-empty_calendar <- tibble(
-  DateCol = c(
-    seq(dmy("01/01/2011"), dmy("31/12/2012"), "days")
-  )
-)
 
-empty_calendar <- empty_calendar %>% 
-  mutate(weekday = wday(DateCol, label = T, week_start = 1, locale = "English_United States.1252"), # can put week_start = 1 to start week on Monday
-         month = month(DateCol, label = T, locale = "English_United States.1252"),
-         date = yday(DateCol),
-         week = isoweek(DateCol),
-         year = year(DateCol)
-  )
+# 2011
+segdata_2011 <- segdata %>% 
+  select(date, session) %>% 
+  mutate(day = yday(date), year = year(date))  %>% 
+  filter(year == 2011) %>% 
+  group_by(day, session) %>% 
+  summarise(n=n(), .groups = 'drop')
 
+spday_2011 <- rep(NA, yday("2011-12-31"))
 
+# Add the events to the desired days
+spday_2011[segdata_2011$day] <- as.character(segdata_2011$session)
 
 
-
-# isoweek makes the last week of the year as week 1, so need to change that to week 53 for the plot
-empty_calendar$week[empty_calendar$month=="Dec" & empty_calendar$week==1] = 53 
-
-empty_calendar <- empty_calendar %>% 
-  group_by(month) %>% 
-  mutate(monthweek = 1 + week - min(week)) %>% 
-  as_tibble()
-
-# empty_calendar %>% 
-#   filter(monthweek == 52) %>% 
-#   unique(year, month) %>% 
-#   mutate(monthweek = ifelse(monthweek == 52, 1 + week - min(week))
-# 
-
-# join occ with empty calendar
-occ_calendar_tot <- empty_calendar %>% 
-  left_join(occ_effort, by = c("DateCol"="date")) %>% 
-  rename(dateCol = DateCol)
-
-occ_calendar_tot$valueCol <- as_factor(occ_calendar_tot$session)
-occ_calendar_tot$year <- as.factor(occ_calendar_tot$year)
+cal_2011 <- calendR(
+  year = 2011,
+  special.days = spday_2011,
+  special.col = "blue",     # Add as many colors as events
+  legend.pos = "bottom",
+  orientation = "portrait",
+  start = "M")
 
 
-# subsetting function
-subsetting <- function(df, subset, var){
-  df <- df %>% 
-    filter(!!sym(var) == !!subset)
-  return(df)
-}
 
-unique_year <- unique(occ_calendar_tot$year)[1:2]
+# 2012
+segdata_2012 <- segdata %>% 
+  select(date, session) %>% 
+  mutate(day = yday(date), year = year(date))  %>% 
+  filter(year == 2012) %>% 
+  group_by(day, session) %>% 
+  summarise(n=n(), .groups = 'drop')
 
-# g_calendar depending on year
-g_cal <- lapply(unique_year,
-               subsetting,
-               var = "year",
-               df = occ_calendar_tot
-               ) %>% 
-  map(g_calendar) %>% 
-  map2(.f = function(x, title){x <- x + ggtitle(title)}, .y = unique_year)
+spday_2012 <- rep(NA, yday("2012-12-31"))
 
-# common legend (fake plot to get legend)
-com_legend <- get_legend(
-  ggplot(occ_calendar_tot %>%
-           filter(!is.na(session))) +
-    geom_bar(stat = "identity", aes(x=weekday, y=date, fill = session)) 
-    # scale_fill_manual(values = irisColors)
-)
+# Add the events to the desired days
+spday_2012[segdata_2012$day] <- as.character(segdata_2012$session)
 
-# plot the 2 years
-ggarrange(plotlist = g_cal, common.legend = T, nrow = 2, legend.grob = com_legend, legend = "right")
-# ggarrange(plotlist = g_cal)
+
+cal_2012 <- calendR(
+  year = 2012,
+  special.days = spday_2012,
+  special.col = c("blue","red"),     # Add as many colors as events
+  legend.pos = "bottom",
+  orientation = "portrait",
+  start = "M")
+
+
+
+print(cal_2011)
+print(cal_2012)
 
 ```
 
+The SAMM surveys were carried out twice so far but in this vignette, only data from 2011 and 2012 will be used. These data correspond to two seasons: winter (blue) and summer (red).
 
-The SAMM surveys were carried out twice so far but in this vignette, only data from 2011 and 2012 will be used: `r sort(unique(lubridate::year(segdata$date)))`. These data correspond to two seasons: winter and summer.
-
-
-# 2. DSM 
+# 2. DSM
 
 To fit some simple DSM with geffaeR, $4$ objects are necessary:
 
-* segdata (output of `prepare_effort()`)
-* shape (shape of the study area)
-* observation (countdata_leg and contdata_seg outputs of `prepare_obs()`)
-* esw / distFit : output of `plot_detection()`
+-   segdata (output of `prepare_effort()`)
+-   shape (shape of the study area)
+-   observation (countdata_leg and contdata_seg outputs of `prepare_obs()`)
+-   esw / distFit : output of `plot_detection()`
 
 To also predict, a fifth object will be needed:
 
-* gridata (sf object)
+-   gridata (sf object)
 
 The object collates all the locations at which we may want to predict sunfish densities from a fitted DSM.
 
@@ -226,8 +185,7 @@ knitr::include_graphics("DSM_functions.png")
 
 ### Prepare predata and segdata for DSM
 
-The first step consist in imputing missing values of covariates of segdata and gridata. Missing data imputation is done either using the Amelia package (<https://cran.r-project.org/web/packages/Amelia/index.html>) or the missMDA package (<https://cran.r-project.org/web/packages/missMDA/>). Missing data imputation is used to ensure that a complete dataset with no missing values for any of the covariates will be used during model fitting. It is up to the user to check that the imputed values are realistic and plausible. Here we will consider two physiographic covariates, seafloor depth and distance to the nearest coastline, and one environmental covariate, chlorophyll a concentration averaged over a month. We can choose to use a logarithm transformation during missing data imputation to ensure that only positive values will be imputed. Here the missMDA package is used by specifying imputation = "PCA" below.
-
+The first step consist in imputing missing values of covariates of segdata and gridata. Missing data imputation is done either using the Amelia package (<https://cran.r-project.org/web/packages/Amelia/index.html>) or the missMDA package (<https://cran.r-project.org/web/packages/missMDA/>). Missing data imputation is used to ensure that a complete dataset with no missing values for any of the covariates will be used during model fitting. It is up to the user to check that the imputed values are realistic and plausible. Here we will consider two physiographic covariates, **seafloor depth** and **distance to the nearest coastline**, and one environmental covariate, **chlorophyll a** concentration averaged over a month. We can choose to use a logarithm transformation during missing data imputation to ensure that only positive values will be imputed. Here the missMDA package is used by specifying `imputation = "PCA"` below.
 
 ```{r}
 library(geffaeR)
@@ -252,9 +210,11 @@ predata_output <- prep_predata(segdata = segdata,
                                verbose = F
                                )
 
+# predata_output$predata %>% 
+#   ggplot() +
+#   geom_point(aes(x = longitude, y = latitude))
 
 ```
-
 
 The output of a call to this function is a wee bit complicated:
 
@@ -262,37 +222,38 @@ The output of a call to this function is a wee bit complicated:
 str(predata_output, max.level = 1)
 ```
 
-* predata : gridata with only covariates, coordinates and cells size (Area column) 
-* segdata : segdata 
-* pca_seg : output of PCA function on segdata (eig, coord on axis, ...)
-* pca_pred : output of PCA function on predata (gridata) (eig, coord on axis, ...)
-* seg_mipat : extended infos on missing values of covariates in segdata
-* pred_mipat : extended infos on missing values of covariates in predata
+-   predata : gridata with only covariates, coordinates and cells size (Area column)
+-   segdata : segdata
+-   pca_seg : output of PCA function on segdata (eig, coord on axis, ...)
+-   pca_pred : output of PCA function on predata (gridata) (eig, coord on axis, ...)
+-   seg_mipat : extended infos on missing values of covariates in segdata
+-   pred_mipat : extended infos on missing values of covariates in predata
 
 ### Add observations on segdata
+
 Once a complete dataset for covariates is available and satisfactory, sightings of the species of interest, namely the sunfish can be join to these data. Note that the effort data here has been segmented in a pre-processing step. The function to join sightings to the covariate data is named, pardon my French! *ajout_obs*:
 
 ```{r}
-effort_w_obs <- ajout_obs(countdata_leg = DSM_pack_MOLMOL$list_prepare_obs_MOLMOL$MOLMOL_obs_output$countdata_leg,
-                          legdata = DSM_pack_MOLMOL$effort_output$legdata,
-                          countdata_seg = DSM_pack_MOLMOL$list_prepare_obs_MOLMOL$MOLMOL_obs_output$countdata_seg,
-                          segdata = predata_output$segdata)
+effort_w_obs <- ajout_obs(
+  countdata_leg = DSM_pack_MOLMOL$list_prepare_obs_MOLMOL$MOLMOL_obs_output$countdata_leg,
+  legdata = DSM_pack_MOLMOL$effort_output$legdata,
+  countdata_seg = DSM_pack_MOLMOL$list_prepare_obs_MOLMOL$MOLMOL_obs_output$countdata_seg,
+  segdata = predata_output$segdata
+)
 
 str(effort_w_obs, max.level = 2)
 ```
 
-The dataframe segdata in effort_w_obs has now two additional 2 column: one called "n" corresponding to the number of sightings made on segment of effort; and "y" corresponding to the total number of individuals counted.
-
+The dataframe segdata in effort_w\_obs has now two additional 2 column: one called "n" corresponding to the number of sightings made on segment of effort; and "y" corresponding to the total number of individuals counted.
 
 ### Fit all possible model
- 
-The next step consist in fitting all possible models and choose the best model to use for DSM with `fit_all_dsm` function. 
-The minimum requirements to use this function are :
 
-* segdata completed (output of `prep_predata`) and with observation (output of `ajout_obs`).
-* distFit or esw (outputs of `plot_detection`, see the vignette ???)
-* obsdata
-* predictors : covariates of segdata which will be used to fit gam models.
+The next step consist in fitting all possible models and choose the best model to use for DSM with `fit_all_dsm` function. The minimum requirements to use this function are :
+
+-   segdata completed (output of `prep_predata`) and with observation (output of `ajout_obs`).
+-   distFit or esw (outputs of `plot_detection`, (see the vignette : I_Preparation_of_data_CDS_and_kriging.Rmd)
+-   obsdata
+-   predictors : covariates of segdata which will be used to fit gam models.
 
 ```{r}
 # get segdata_completed_w_obs
@@ -308,23 +269,38 @@ obsdata <- DSM_pack_MOLMOL$list_prepare_obs_MOLMOL$MOLMOL_obs_output$obsdata
 predictors <- c("CHL_month", "distCot", "depth")
 
 # fit models
-fit_dsm <- fit_all_dsm(distFit = distFit,
-                       segdata_obs = segdata_completed_w_obs,
-                       obsdata = obsdata,
-                       predictors = predictors
-                       )
+fit_dsm_basic <- fit_all_dsm(distFit = distFit,
+                             segdata_obs = segdata_completed_w_obs,
+                             obsdata = obsdata,
+                             predictors = predictors
+)
+
+obsdata_w_coords <- obsdata %>% 
+  left_join(segdata %>% select(longitude, latitude, Seg), by = "Seg")
+
+ggplot() +
+  geom_sf(data = shape %>% st_as_sf()) +
+  geom_point(data = obsdata_w_coords, aes(x = longitude, y = latitude)) +
+  
+  facet_wrap(vars(session))
+
+
+dsm_model <- fit_dsm_basic$best_models4plotting[[1]]
+plot(dsm_model)
+  
 
 ```
 
 A call to fit_all_dsm() yields as output a table that sums up model fitting according to different indicators and 2 list of the k best models (5 by default) sorted by their "stacking_weights". Both lists are the same but one has standardized covariates (that is mean-centered and unit-variance, labelled best_models) and the other has the raw values (best_models4plotting, which will be used for plotting purposes).
 
 ```{r, echo = F}
-library(kableExtra)
-fit_dsm$all_fits_binded %>% 
+suppressPackageStartupMessages(
+  library(kableExtra)  
+)
+fit_dsm_basic$all_fits_binded %>% 
   kable("html") %>%
   kable_styling(font_size = 12)
 ```
-
 
 ### visualize splines
 
@@ -332,11 +308,11 @@ One does want to visualize splines of each variable fitted with `fit_all_dsm`, a
 
 ```{r}
 # get first model of fit_dsm
-fit_dsm_1 <-fit_dsm$best_models4plotting[[1]]
+fit_dsm_basic_1 <-fit_dsm_basic$best_models4plotting[[1]]
 
 splines <- pred_splines(
   segdata = segdata_completed_w_obs,
-  dsm_model = fit_dsm_1
+  dsm_model = fit_dsm_basic_1
 )
 
 str(splines, max.level = 1)
@@ -344,26 +320,25 @@ str(splines, max.level = 1)
 ```
 
 <!-- Décrire ce qu'il y a dans les outputs de pred_splines -->
-* g_splines : correspond to the ggplot graph that gives splines of each variable of the model.
-* df_splines : a data.frame to be used for further plotting if needs be
 
+-   g_splines : correspond to the ggplot graph that gives splines of each variable of the model.
+-   df_splines : a data.frame to be used for further plotting if needs be
 
 ```{r}
 # Visualize variable splines
 splines$g_splines
 ```
 
-
 ### Predict all models of fit_all_dsm
 
-This step consists in getting predicted values from models fitted with the output of fit_all_dsm.  
+This step consists in getting predicted values from models fitted with the output of fit_all_dsm.
 
 ```{r}
 # get predata
 predata <- predata_output$predata
 
 predicted_models <- predict_all(
-  listdsm = fit_dsm,
+  listdsm = fit_dsm_basic,
   predata = predata
 )
 
@@ -372,20 +347,19 @@ str(predicted_models)
 
 `predict_all` gives a data.frame of predicted values and standard error of the k best models of `fit_all_dsm` with a weighted combination of the k best named 'stacking' in the model column. By default, stacking is used on the *5* models with the smallest AIC.
 
-
-### Prediction map 
+### Prediction map
 
 `predict_map` allows to visualize prediction of `predict_all`.
 
 ```{r}
 # get combination of all models  
-pred_stack <- predicted_models %>% 
-  filter(model == "stacking") 
+pred_best_1 <- predicted_models %>% 
+  filter(model == "best_1") 
 
 
 # Set predata as sf object 
 predata_custom <- predata %>% 
-  mutate(stack_pred = pred_stack$mean) %>%
+  mutate(stack_pred = pred_best_1$mean) %>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326)  
 
   
@@ -402,7 +376,6 @@ map_pred <- pred_map_dsm(
 map_pred
 
 ```
-
 
 ## 2.2 Adding a categorical variable
 
@@ -430,11 +403,10 @@ distdata %>%
 
 What has to be added to the simple DSM process ?
 
-* `prep_predata` with col2keep = "session"
-* `fit_all_dsm` with splines_by = "session"
-* `pred_splines` with splines_by = "session"
-* `pred_map_dsm` with facet_param = "session"
-
+-   `prep_predata` with col2keep = "session"
+-   `fit_all_dsm` with splines_by = "session"
+-   `pred_splines` with splines_by = "session"
+-   `pred_map_dsm` with facet_param = "session"
 
 ```{r}
 library(geffaeR)
@@ -484,35 +456,38 @@ obsdata <- DSM_pack_MOLMOL$list_prepare_obs_MOLMOL$MOLMOL_obs_output$obsdata
 predictors <- c("CHL_month","distCot","depth")
 
 # fit models
-fit_dsm <- fit_all_dsm(distFit = distFit,
-                       segdata_obs = segdata_completed_w_obs,
-                       obsdata = obsdata,
-                       predictors = predictors,
-                       splines_by = "session"
-                       )
+fit_dsm_splines_by <- fit_all_dsm(distFit = distFit,
+                                  segdata_obs = segdata_completed_w_obs,
+                                  obsdata = obsdata,
+                                  predictors = predictors,
+                                  splines_by = "session"
+)
 
 # get first model of fit_dsm
-fit_dsm_1 <- fit_dsm$best_models4plotting[[1]]
+fit_dsm__splines_by_1 <- fit_dsm_splines_by$best_models4plotting[[1]]
 
 splines <- pred_splines(
   segdata = segdata_completed_w_obs,
-  dsm_model = fit_dsm_1,
+  dsm_model = fit_dsm__splines_by_1,
   splines_by = "session"
 )
 
 splines$g_splines
 
+
+plot(fit_dsm__splines_by_1)
+
 ```
 
 Now we can visualize the differences between winter and summer in the estimated relationships with covariates. Predictions can also be made for each season.
 
-```{r}
+```{r visualize_spline_by_DSM}
 library(sf)
 # get predata
 predata <- predata_output$predata
 
 predicted_models <- predict_all(
-  listdsm = fit_dsm,
+  listdsm = fit_dsm_splines_by,
   predata = predata
 )
 
@@ -529,7 +504,7 @@ predata_custom <- predata %>%
 
   
 # Build prediction map
-map_pred <- pred_map_dsm(
+map_pred_splines_by <- pred_map_dsm(
   predata = predata_custom,
   grid = DSM_pack_MOLMOL$gridata %>%
     st_transform("+proj=aea +lat_1=43 +lat_2=62 +lat_0=30 +lon_0=10 +x_0=0 +y_0=0 +ellps=intl +units=m +no_defs"),
@@ -538,7 +513,240 @@ map_pred <- pred_map_dsm(
   facet_param = "session"
 )
 
-map_pred
+map_pred_splines_by
 
 ```
 
+### splines_by vs no splines_by
+
+```{r compare_splines_by}
+tab_basic <- fit_dsm_basic$all_fits_binded %>% 
+  slice(1) %>% 
+  mutate(type_model = "no_splines")
+
+tab_wo_weights <- fit_dsm_splines_by$all_fits_binded %>% 
+  slice(1) %>% 
+  mutate(type_model = "splined_by")
+
+tab_splines_by_vs_no_splines_by <- tab_basic %>% 
+  bind_rows(tab_wo_weights)
+
+tab_splines_by_vs_no_splines_by %>% 
+  kableExtra::kable("html") %>%
+  kableExtra::kable_styling(font_size = 12)
+```
+
+Defining splines by **session** improve model AIC and explained deviance drastically in the case of *Mola mola*.
+
+## 2.3 Give weigths to observations
+
+An option is implemented in `fit_all_dsm` to give weights to observation. We used Counterfactuals methodology to give weights to observation, to summarise the principles, it considers that points which are far from the other points will have less credibility than points that are net to each other. Doing so, it will minimize speculation on outlying points and give more confidence on grouped points. We implemented this using ![whatIf](https://github.com/IQSS/WhatIf) package which allows to estimate weigths on points.
+
+### How does it work practically ?
+
+While using `fit_all_dsm` it is just needed to add `weighted = TRUE`, and that's it !
+
+```{r }
+# fit models
+fit_dsm_splines_by_weighted <- fit_all_dsm(distFit = distFit,
+                                           segdata_obs = segdata_completed_w_obs,
+                                           obsdata = obsdata,
+                                           predictors = predictors,
+                                           splines_by = "session",
+                                           weighted = TRUE
+)
+
+# get first model of fit_dsm
+fit_dsm_splines_by_weighted_1 <- fit_dsm_splines_by_weighted$best_models4plotting[[1]]
+
+splines <- pred_splines(
+  segdata = segdata_completed_w_obs,
+  dsm_model = fit_dsm_splines_by_weighted_1,
+  splines_by = "session"
+)
+
+splines$g_splines
+```
+
+```{r visualize_spline_by_weighted_DSM}
+library(sf)
+# get predata
+predata <- predata_output$predata
+
+predicted_models <- predict_all(
+  listdsm = fit_dsm_splines_by_weighted,
+  predata = predata
+)
+
+
+# get combination of all models  
+pred_stack <- predicted_models %>% 
+  filter(model == "best_1") 
+
+
+# Set predata as sf object 
+predata_custom <- predata %>% 
+  mutate(stack_pred = pred_stack$mean) %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326)  
+
+  
+# Build prediction map
+map_pred_splines_by_weighted <- pred_map_dsm(
+  predata = predata_custom,
+  grid = DSM_pack_MOLMOL$gridata %>%
+    st_transform("+proj=aea +lat_1=43 +lat_2=62 +lat_0=30 +lon_0=10 +x_0=0 +y_0=0 +ellps=intl +units=m +no_defs"),
+  var = "stack_pred",
+  title = substitute(expr = paste("Density prediction of ", italic("Mola mola"), " for 2011 and 2012 during SAMM campaign")),
+  facet_param = "session"
+)
+
+map_pred_splines_by_weighted
+
+```
+
+### Weigthed vs non-weighted
+
+```{r compare_weights}
+tab_basic <- fit_dsm_basic$all_fits_binded %>% 
+  slice(1) %>% 
+  mutate(type_model = "no_splines_no_weights")
+
+tab_wo_weights <- fit_dsm_splines_by$all_fits_binded %>% 
+  slice(1) %>% 
+  mutate(type_model = "splined_by_without_weights")
+
+tab_w_weigths <- fit_dsm_splines_by_weighted$all_fits_binded %>% 
+  slice(1) %>% 
+  mutate(type_model = "splined_by_with_weights")
+
+tab_weights_vs_no_weights <- tab_basic %>% 
+  bind_rows(tab_wo_weights, tab_w_weigths)
+
+tab_weights_vs_no_weights %>% 
+  kable("html") %>%
+  kable_styling(font_size = 12)
+```
+
+In the case of *Mola mola*, giving weights to data seems to slightly improve the model.
+
+## 2.3 Use soap-film smoother
+
+Soap-film smoother allows to integrate the irregularity of the study area and consider it in the modelling process. When the study area is perfectly regular (rectangle or circle shape) with no island, it is not necessary to use soap-film smoother, but in the other cases it could be interesting. A good example of the utility of soap-film smoother is presented on this ![post](https://fromthebottomoftheheap.net/2016/03/27/soap-film-smoothers/).
+
+In the case of *Mola mola* :
+
+```{r why_soap_mola_mola, out.width='50%', out.width='50%'}
+library(mgcViz)
+library(ggforce)
+
+get_isocline_plot <- function(dsm_model) {
+  class(dsm_model) <- class(dsm_model)[class(dsm_model) != "dsm"]
+  plot_viz <- getViz(dsm_model) %>% 
+    sm(1) %>%  
+    plot()
+  plot_viz
+}
+
+pred_wo_soap <- get_isocline_plot(fit_dsm_splines_by_weighted$best_models4plotting[[1]]) +
+  labs(title = "Corsica and Sardinia are not considered in dsm model")
+
+
+test <- pred_map_dsm(
+  predata = predata %>% filter(session=="1winter") %>% mutate(col_null = 1),
+  grid = st_crs("+proj=aea +lat_1=43 +lat_2=62 +lat_0=30 +lon_0=10 +x_0=0 +y_0=0 +ellps=intl +units=m +no_defs"),
+  var = "col_null",
+  title = "Map built with predata") +
+  guides(fill = "none") +
+  labs(subtitle = "Corsica and Sardinia are present in predata")
+
+
+
+pred_wo_soap
+test
+
+```
+
+We can see that island and edges of the study area are not considered while adjusting the DSM model, it can be source of error. To consider those subtilities, it is necessary to proceed to a soap-film smoother.
+
+### How does it work with geffaeR
+
+It is necessary to give **knots** and **boundary** of the area to dsm model. This require to create those two object and it is possible with geffaeR.
+
+Boundary and Knots are created with `prepare_soap` function. This function will create the boundary of the study area by considering the range of the coordinates given in segdata. To do so, it will use land contour and simplify it, and crop with the area created with the range of segdata coordinates. Because on boundary simplifcation, some observation can be discarded because those observation can be outside the boundary. In the same time, it will place knots in the boundary. Knots that are too close to boundary edges will be discarded (it causes issues while adjusting dsm model). We used [`autocruncher`](https://github.com/dill/soap_checker/blob/master/autocrunch.R), a function built by Simon Wood and David Miller, all credits goes to them.
+
+If the study area is in North East Europe otherwise it is necessary to provide a contour of the study area or a polygon delimiting the study area : boundary (it is explained in the `prepare_soap` function).
+
+```{r use_prepare_soap}
+prep_soap <- prepare_soap(data = predata_output$segdata,
+                          N = 10,
+                          ratio_simplify = 1e-3)
+prep_soap$gg_cropped_data
+
+```
+
+`prep_soap$gg_cropped_data` give a synthesis map with points and knots discarded, with :
+
+-   blue squares : conserved rows of segdata stored in `prep_soap$df_cropped_data`
+-   black dots : discarded rows of segdata
+-   red dots : knots conserved in `prep_soap$knots`
+-   black dots : knots discarded of `prep_soap$knots`
+-   greyish area is the boundary of the study area stored as list files for dsm model : `prep_soap$bnd` and as sf object `prep_soap$sf_ocean`.
+
+Next, it is just necessary to perform the same process previously done, specifying in `fit_all_dsm` functions **bnd** and **knots** and use **segdata** of `prep_soap`.
+
+```{r}
+
+effort_w_obs <- ajout_obs(
+  countdata_leg = DSM_pack_MOLMOL$list_prepare_obs_MOLMOL$MOLMOL_obs_output$countdata_leg,
+  legdata = DSM_pack_MOLMOL$effort_output$legdata,
+  countdata_seg = DSM_pack_MOLMOL$list_prepare_obs_MOLMOL$MOLMOL_obs_output$countdata_seg,
+  segdata = prep_soap$df_cropped_data
+)
+
+bnd <- prep_soap$bnd # necessary to put bnd in the Global Environment
+
+fit_dsm_splines_by_weighted_soap <- fit_all_dsm(
+  distFit = distFit,
+  segdata_obs = effort_w_obs$segdata_obs,
+  obsdata = obsdata,
+  predictors = predictors,
+  splines_by = "session",
+  weighted = TRUE,
+  soap = list(knots = prep_soap$knots, bnd = bnd)
+) 
+```
+
+```{r compare_soap_wo_soap, echo = FALSE}
+tab_soap <- fit_dsm_splines_by_weighted_soap$all_fits_binded %>% 
+  slice(1) %>% 
+  mutate(type_model = "splines_weigths_soap")
+
+
+tab_soap_vs_no_soap <- tab_weights_vs_no_weights %>% 
+  bind_rows(tab_soap)
+
+
+tab_soap_vs_no_soap %>% 
+  kableExtra::kable("html") %>%
+  kableExtra::kable_styling(font_size = 12)
+```
+
+```{r out.width='50%'}
+isocline_soap <- fit_dsm_splines_by_weighted_soap$best_models4plotting[[1]] %>% 
+  get_isocline_plot() +
+  labs(title = "Soap-film smoother")
+
+isocline_no_soap <- fit_dsm_splines_by_weighted$best_models4plotting[[1]] %>% 
+  get_isocline_plot() +
+  labs(title = "NO Soap-film smoother")
+
+isocline_soap
+isocline_no_soap
+
+# obsdata %>% 
+#   left_join(segdata %>% 
+#               select(longitude, latitude, Seg),
+#             by = "Seg") %>% 
+#   ggplot() +
+#   geom_point(aes(x = longitude, y = latitude))
+```
