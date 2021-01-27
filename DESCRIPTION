@@ -68,7 +68,8 @@ Imports:
     gridExtra
 VignetteBuilder: knitr
 Suggests: 
-    rmarkdown
+    rmarkdown,
+    testthat
 Remotes: IQSS/WhatIf
 Depends: 
     R (>= 2.10)

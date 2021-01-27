@@ -1,8 +1,8 @@
 # WARNING #
-# this package must not be run completly but in case by case
+# this package must not be run completely but in case by case
 # all function for package editing are here but must be run in different optic
 # ex : document is run when we want to refresh documentation of functions
-# except for the fisrt part, it have to be run in prelude
+# except for the first part, it have to be run in prelude
 
 
 # FIRST PART : ----
@@ -79,6 +79,9 @@ build()
 usethis::use_vignette("Package_example")
 devtools::build_vignettes()
 devtools::build()
+
+# use test_that
+usethis::use_testthat()
 
 # mettre des data dans le package
 load(paste("C:/Users/mgenu.RATUFA/Documents/Projet/donnees/data_package/Europe_fond2carte.RData"))
