@@ -20,11 +20,6 @@ pred_map_dsm <- function(predata, grid, var, facet_param = NULL, title = NULL) {
     st_as_sf(coords = c("longitude","latitude"), crs = 4326) %>%
     st_transform(st_crs(grid))
 
-  predict_reprojected <- sf_predict_reprojected %>%
-    as_Spatial() %>%
-    as.data.frame() %>%
-    rename(lon = coords.x1, lat = coords.x2 )
-
   no_sf <- sf_predict_reprojected %>%
     as_Spatial() %>%
     as.data.frame() %>%
