@@ -73,7 +73,6 @@ Suggests:
     htmltools,
     kableExtra,
     knitr,
-    mathUtil,
     mgcViz,
     rmarkdown,
     stringr,
