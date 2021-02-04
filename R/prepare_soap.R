@@ -138,12 +138,15 @@ autocruncher <- function(bnd,knots,nmax=200,k=10, xname="x", yname="y") {
 #' @importFrom rmapshaper ms_simplify
 #' @importFrom mgcv inSide
 #' @importFrom raster crop
-#' @import sf dplyr ggplot2
+#' @import sf dplyr
+#' @import tmap
 prepare_soap <- function(data,
                          contour = NULL,
                          polygon_pred = NULL,
                          ratio_simplify = 0.00010,
                          N = 23) {
+
+  set.seed(1234)
 
   if(!all(c("longitude","latitude") %in% colnames(data))){
     stop("data must contain 'longitude' and 'latitude' columns")
@@ -155,7 +158,7 @@ prepare_soap <- function(data,
 
   cat("longitude and latitude must be projected in WGS84\n")
 
-  # découper NEA à l'échelle de la zone d'étude
+  # dÃ©couper NEA Ã  l'Ã©chelle de la zone d'Ã©tude
   x <- range(data$longitude) * c(0.999,1.001)
   y <- range(data$latitude) * c(0.999,1.001)
 
@@ -252,7 +255,7 @@ prepare_soap <- function(data,
   border.aut <-lapply(sort(as.character(nr)), function(n)as.list.data.frame(border.aut[[n]]))
   lapply(border.aut, function(x) {nrow(as.data.frame(x))})
 
-  # N <- 10
+  # Create knots
   gx <- seq(min(x) + 0.05*(max(x)-min(x)), max(x), len = N)
   gy <- seq(min(y) + 0.05*(max(y)-min(y)), max(y), len = N)
   gp <- expand.grid(gx, gy)
@@ -260,6 +263,32 @@ prepare_soap <- function(data,
 
   knots <- gp[with(gp, mgcv::inSide(bnd = border.aut, longitude, latitude)), ]
   names(knots) <-c("longitude", "latitude")
+
+
+
+  # if(optim_knots == TRUE) {
+  #
+  #   knots <- sf_ocean %>%
+  #     st_transform(crs = 3035) %>%
+  #     st_sample(size = N*N, type = "hexagonal") %>%
+  #     st_transform(crs = 4326) %>%
+  #     as("Spatial") %>%
+  #     as_tibble() %>%
+  #     rename(longitude = coords.x1, latitude = coords.x2) %>%
+  #     as.data.frame()
+  #
+  # } else {
+  #
+  #   knots <- sf_ocean %>%
+  #     st_transform(crs = 3035) %>%
+  #     st_sample(size = N*N, type = "regular") %>%
+  #     st_transform(crs = 4326) %>%
+  #     as("Spatial") %>%
+  #     as_tibble() %>%
+  #     # rename(longitude = coords.x1, latitude = coords.x2) %>%
+  #     as.data.frame()
+  #
+  # }
 
   # delete knots to close to border (Function of D. Miller)
   crunch_ind <- autocruncher(border.aut, knots, k=56, xname="longitude", yname="latitude")
@@ -283,7 +312,7 @@ prepare_soap <- function(data,
 
   # plot ocean, knots, df_cropped_data
   gg_cropped_data <- ggplot() +
-    geom_sf(data = sf_ocean) +
+    # geom_sf(data = sf_ocean) +
     geom_point(data = knots,
                aes(x = longitude, y = latitude), colour = alpha('red',1)) +
     geom_point(data = knots[crunch_ind, ],
@@ -299,11 +328,57 @@ prepare_soap <- function(data,
     ggtitle(paste0("There were ",nrow(data)-nrow(df_cropped_data)," lines of segdata discarded during the crop")) +
     theme_light()
 
+  # Prepare objects into sf objects
+  knots_sf <- knots %>%
+    st_as_sf(coords = c("longitude","latitude"), crs = 4326) %>%
+    mutate(kept_or_discarded = ifelse(row_number() %in% crunch_ind, "discarded", "kept"))
+
+
+  sf_data_complete <- sf_data %>%
+    mutate(line_discarded = ifelse(geometry %in% st_geometry(sf_deleted_points), "discarded", "kept"))
+
+
+  nb_discarded <- sf_data_complete %>%
+    filter(line_discarded == "discarded") %>%
+    nrow()
+
+  gg_cropped_data <-
+    tm_shape(sf_ocean) +
+    tm_polygons(col = "grey") +
+    # tm_shape(sf_cropped_NEA) +
+    #   tm_borders() +
+    tm_shape(sf_data_complete) +
+    tm_symbols(col = "line_discarded",
+               title.col = "Segdata points :",
+               size = 0.2,
+               palette = c(discarded = "black",kept = "blue"),
+               alpha = 0.5,
+               shape = 22,
+               border.alpha = 0) +
+    tm_shape(knots_sf) +
+    tm_symbols(col = "kept_or_discarded",
+               title.col = "Knots points :",
+               palette = c(discarded = "green",kept = "red"),
+               size = 0.5) +
+    tm_layout(
+      inner.margins = c(0.1, 0.2, 0.1, 0.05),
+      title = glue::glue("There were {nb_discarded} points of segdata discarded during the crop."),
+      legend.position = c("left","center")
+    ) +
+    tm_scale_bar() +
+    tm_compass(position = c("right","top"))
+
+
+  # handle crunch_ind = NULL
+  if(!is.null(crunch_ind)) {
+    knots <- knots[-crunch_ind,]
+  }
+
 
   if(!is.null(polygon_pred)){
 
     return(list(bnd = border.aut,
-                knots = knots[-crunch_ind,],
+                knots = knots,
                 df_cropped_data = df_cropped_data,
                 gg_cropped_data = gg_cropped_data,
                 sf_ocean = sf_ocean))
@@ -312,7 +387,7 @@ prepare_soap <- function(data,
 
     return(list(sf_cropped_NEA = sf_cropped_NEA,
                 bnd = border.aut,
-                knots = knots[-crunch_ind,],
+                knots = knots,
                 df_cropped_data = df_cropped_data,
                 gg_cropped_data = gg_cropped_data,
                 sf_ocean = sf_ocean))

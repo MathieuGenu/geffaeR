@@ -1,75 +1,89 @@
 Package: geffaeR
-Title: Generic function for abundance estimation with R
+Title: Generic Function for Abundance Estimation with R
 Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Mathieu",
-           family = "Genu",
-           role = "aut",
-           email = "mathieu.genu@univ-lr.fr"),
-    person(given = "Matthieu",
-           family = "Authier",
-           role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0001-7394-1993"),
-           email = "matthieu.authier@univ-lr.fr"))
+             family = "Genu",
+             role = "aut",
+             email = "mathieu.genu@univ-lr.fr"),
+      person(given = "Matthieu",
+             family = "Authier",
+             role = c("aut", "cre"),
+             email = "matthieu.authier@univ-lr.fr",
+             comment = c(ORCID = "0000-0001-7394-1993")))
 Author: Mathieu Genu [aut, cre], Matthieu Authier [aut, cre]
 Description: The package transforms SAMMOA output and
     applies different analysis and give graphical output.
 License: GPL-3
+Depends: 
+    R (>= 2.10)
+Imports: 
+    Amelia,
+    arm,
+    broom,
+    cli,
+    clisymbols,
+    coda,
+    cowplot,
+    crayon,
+    crch,
+    Distance,
+    dplyr,
+    dsm,
+    FactoMineR,
+    fields,
+    foreign,
+    geoR,
+    ggplot2,
+    ggspatial,
+    glue,
+    graphics,
+    grDevices,
+    grid,
+    gridExtra,
+    loo,
+    lubridate,
+    MASS,
+    mgcv,
+    missMDA,
+    mvtnorm,
+    parallel,
+    raster,
+    reshape,
+    rgdal,
+    rmapshaper,
+    rstan,
+    rstudioapi,
+    sf,
+    sp,
+    stats,
+    tidyr,
+    tmap,
+    tweedie,
+    usethis,
+    utils,
+    VIM,
+    viridis,
+    viridisLite,
+    WhatIf
+Suggests: 
+    calendR,
+    DT,
+    ggforce,
+    htmltools,
+    kableExtra,
+    knitr,
+    mathUtil,
+    mgcViz,
+    rmarkdown,
+    stringr,
+    testthat,
+    tidyverse
+VignetteBuilder: 
+    knitr
+Remotes: 
+    IQSS/WhatIf
 Encoding: UTF-8
 Language: fr
 LazyData: true
 RoxygenNote: 7.1.1
-Imports: 
-    rgdal,
-    maptools,
-    sp,
-    raster,
-    foreign,
-    lubridate,
-    reshape,
-    dplyr,
-    ggplot2,
-    cowplot,
-    mvtnorm,
-    Distance,
-    captioner,
-    Rdistance,
-    dsm,
-    knitr,
-    fields,
-    ggthemes,
-    broom,
-    coda,
-    purrr,
-    VIM,
-    Amelia,
-    missMDA,
-    FactoMineR,
-    rstan,
-    Rcpp,
-    geoR,
-    MASS,
-    arm,
-    viridisLite,
-    stats,
-    utils,
-    mgcv,
-    cli,
-    crayon,
-    crch,
-    sf,
-    ggspatial,
-    loo,
-    tweedie,
-    glue,
-    DT,
-    htmltools,
-    methods,
-    gridExtra
-VignetteBuilder: knitr
-Suggests: 
-    rmarkdown,
-    testthat
-Remotes: IQSS/WhatIf
-Depends: 
-    R (>= 2.10)

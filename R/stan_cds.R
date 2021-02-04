@@ -17,9 +17,9 @@
 stan_cds <- function(cds_data, segdata_obs, distdata) {
 
   options(mc.cores = parallel::detectCores())
-  rstan_options(auto_write = TRUE)
+  rstan::rstan_options(auto_write = TRUE)
 
-  stan_cds_hn <- stan_model(model_code = cds_data,
+  stan_cds_hn <- rstan::stan_model(model_code = cds_data,
                             model_name = "quasi-Conventional Distance Sampling (Negative Binomial likelihood)"
   )
 
@@ -58,7 +58,7 @@ stan_cds <- function(cds_data, segdata_obs, distdata) {
   n_iter <- 750
   n_warm <- 250
   n_thin <- 1
-  mod <- sampling(obj = stan_cds_hn,
+  mod <- rstan::sampling(obj = stan_cds_hn,
                          data = standata_cds(segdata_obs = segdata_obs, distdata = distdata),
                          pars = c('intercept', 'alpha', 'inv_omega', 'esw', 'log_lik'),
                          chains = n_chains,
