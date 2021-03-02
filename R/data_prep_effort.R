@@ -60,13 +60,9 @@ prepare_data_effort <- function(effort_base,
 
   ### Block et Surface
   # bon nom pour block et area
-  if(!is.data.frame(block_area)) {
-    stop("block_area n'est pas un objet de type data.frame.")
-  } else if(!all(names(block_area) %in% c("Block","Area"))) {
-    stop(paste('block_area doit contenir les colonnes : "Block" et "Area".',sep=''))
-  } else {
-    block_area <- block_area
-  }
+  assert_that(is.data.frame(block_area))
+  assert_that(block_area %has_name% c("Block","Area"))
+
   # correspondance entre strateSec et block area
   if(!any(block_area$Block %in% effort$strateSec)){
     stop(cat("la variable Block de block_area ne correspond pas aux valeurs de strateSec dans la table effort :",

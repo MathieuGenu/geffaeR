@@ -20,6 +20,7 @@ Depends:
 Imports: 
     Amelia,
     arm,
+    assertthat,
     broom,
     cli,
     clisymbols,

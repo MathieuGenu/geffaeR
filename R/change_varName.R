@@ -12,11 +12,14 @@
 #'       Example, for a row, if \code{strate = N1} and \code{subRegion = ATL} we will get
 #'       \code{strateSec = ATL_N1}.
 #' @export
+#' @import assertthat
 
 change_effort_varName <- function(effort_base){
 
+  assert_that(is.data.frame(effort_base))
+
   col_name_neces <- c("lon","lat","seaState","subjective","subRegion","strate", "survey",
-                      "strateSec","transect","legId","segLength","segId","left","right")
+                      "strateSec","transect","legId","segLength","segId","left","right", "CenterTime")
 
   if(all(col_name_neces %in% colnames(effort_base))){
 
@@ -89,10 +92,13 @@ change_effort_varName <- function(effort_base){
       if (length(potential_segId) == 1) {
         colnames(effort_base)[potential_segId] <- "segId"
       } else {
+
+        # TO DELETE, user should select its segId by itself #
         length_unique_col <- sapply(effort_base[potential_segId], function(x){length(unique(x))})
         if (length(length_unique_col[length_unique_col > 3]) == 1) {
           colnames(effort_base)[colnames(effort_base) %in% names(length_unique_col[length_unique_col])] <- "segId"
         } else {
+        #####################################################
           stop("Can't determine a segId column because there are several segId columns(5k, 10k or more...)\n
              choose between one of them.")
         }
@@ -128,8 +134,9 @@ change_effort_varName <- function(effort_base){
     # Error message if needed columns are missing ----
     if (!all(col_name_neces %in% colnames(effort_base))) {
       var_still_alone <- col_name_neces[!(col_name_neces %in% colnames(effort_base))]
-      stop(paste(c("Pour la base effort, la fonction ne trouve pas d'équivalent pour : ", var_still_alone), collapse="\n "))
+      stop(paste(c("For effort data, can't find equivalent name for : ", var_still_alone), collapse="\n"))
     }
+
 
     return(effort_base)
   }
@@ -145,11 +152,13 @@ change_effort_varName <- function(effort_base){
 #'
 #' @return This function return the same data.frame as in input with the standardized column name.
 #' @export
+#' @importFrom assertthat assert_that
 
 
 
 change_obs_varName <- function(obs_base) {
 
+  assert_that(is.data.frame(obs_base))
 
   col_name_neces <- c("strate","subRegion","transect","taxon","group",
                       "family","species","podSize","decAngle","lat","lon",
@@ -282,7 +291,7 @@ change_obs_varName <- function(obs_base) {
     # Error message if needed columns are missing ----
     if (!all(col_name_neces %in% colnames(obs_base))) {
       var_still_alone <- col_name_neces[!(col_name_neces %in% colnames(obs_base))]
-      stop(paste(c("Pour la base observation, la fonction ne trouve pas d'équivalent pour : ", var_still_alone), collapse="\n "))
+      stop(paste(c("For observation data, can't find equivalent name for : ", var_still_alone), collapse="\n "))
     }
     return(obs_base)
   }
